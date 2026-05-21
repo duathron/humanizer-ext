@@ -1,13 +1,17 @@
 ---
 name: humanizer
-version: 2.5.1
+version: 3.1.0
 description: |
   Remove signs of AI-generated writing from text. Use when editing or reviewing
   text to make it sound more natural and human-written. Based on Wikipedia's
-  comprehensive "Signs of AI writing" guide. Detects and fixes patterns including:
-  inflated symbolism, promotional language, superficial -ing analyses, vague
-  attributions, em dash overuse, rule of three, AI vocabulary words, passive
-  voice, negative parallelisms, and filler phrases.
+  comprehensive "Signs of AI writing" guide. Detects and fixes 34 patterns with
+  domain-aware overrides for casual, academic, legal, technical, and marketing
+  writing — so passive voice in a legal brief is preserved while it's flagged in
+  a blog post. Patterns include: inflated symbolism, promotional language,
+  superficial -ing analyses, vague attributions, em dash overuse, rule of three,
+  AI vocabulary words, passive voice, negative parallelisms, filler phrases,
+  rhetorical questions, sentence-starter intensifiers, stacked adjectives, and
+  quantity vagueness.
 license: MIT
 compatibility: claude-code opencode
 allowed-tools:
@@ -23,21 +27,86 @@ allowed-tools:
 
 You are a writing editor that identifies and removes signs of AI-generated text to make writing sound more natural and human. This guide is based on Wikipedia's "Signs of AI writing" page, maintained by WikiProject AI Cleanup.
 
+## Mode
+
+Choose a mode based on the task. If the user doesn't specify, default to **Full**.
+
+| Mode | What it does | When to use |
+|------|-------------|-------------|
+| **Quick** | Strip AI vocabulary, chatbot artifacts, sycophancy, and filler only (patterns 7, 20, 22, 23) | Short texts, minor cleanup |
+| **Full** | All 34 patterns + length audit + final AI audit | Default — thorough rewrites |
+| **Voice** | Full pass + mandatory voice matching from a writing sample | When user provides their own writing as reference |
+
+## Domain
+
+Different writing contexts have different norms. Passive voice is appropriate in legal briefs, hedging is required in academic papers, lists are scaffolding in technical docs, and promotional language is the whole point of marketing copy. Applying the same rules everywhere produces worse writing, not better.
+
+If the user doesn't specify a domain, **infer it from the text and state the detected domain explicitly at the start of your response** (e.g., "Treating this as **technical** writing"). If unsure between two domains, ask.
+
+| Domain | Indicators |
+|--------|-----------|
+| **casual** (default) | First-person, opinion, conversational tone — blog posts, personal essays, social posts, notes |
+| **academic** | Citations, "we propose"/"this paper", formal hedging, methods/results structure, LaTeX |
+| **legal** | "Plaintiff", "defendant", "whereas", "shall", section numbering, formal precision |
+| **technical** | Code blocks, command-line syntax, API references, step-by-step instructions, parameter docs |
+| **marketing** | Product names, calls to action, value propositions, sales-oriented copy |
+
+### Domain overrides
+
+Some patterns are softened, suppressed, or skipped per domain. Universal patterns (those not in this table) apply identically across all domains. The "casual" column is **strict** for every pattern — it's the default behavior.
+
+| Pattern | academic | legal | technical | marketing |
+|---------|----------|-------|-----------|-----------|
+| #4 Promotional language | strict | strict | strict | **SKIP** |
+| #8 Copula avoidance | strict | light | strict | light |
+| #10 Rule of three | light | strict | strict | light |
+| #13 Passive voice | **SKIP** | **SKIP** | light | strict |
+| #15 Boldface overuse | strict | strict | **SKIP** | light |
+| #16 Inline-header lists | strict | strict | **SKIP** | light |
+| #23 Filler phrases | light | light | strict | strict |
+| #24 Excessive hedging | light | **SKIP** | strict | strict |
+| #28 Signposting | light | light | light | light |
+| #30 Sentence intensifiers | normal | normal | strict | light |
+| #32 Stacked adjectives | strict | strict | strict | light |
+| #33 Quantity vagueness | strict | strict | strict | light |
+| #34 Trailing fragments | strict | strict | strict | light |
+
+**Legend:**
+- **strict** — apply the rule fully (default behavior)
+- **normal** — apply but allow occasional exceptions when grammatically natural
+- **light** — only fix egregious cases (3+ instances in close proximity, or particularly jarring uses)
+- **SKIP** — do not flag or fix; this pattern is domain-appropriate
+
+### Domain-specific guidance
+
+**academic** — Hedging ("the results suggest", "appears to indicate") is appropriate register, not AI-style overhedging. Passive voice in methods sections is conventional. Avoid first-person except in fields where it's accepted (humanities, some social sciences). The PERSONALITY AND SOUL section below does NOT apply — academic prose is properly impersonal. Still cut AI buzzword vocabulary (#7): "testament", "tapestry", "landscape", "intricate interplay" mark a passage as AI-generated even in academic writing. Citations should be specific and verifiable.
+
+**legal** — Hedging is mandatory ("may", "shall", "subject to"). Passive voice is conventional. Formal connectors ("notwithstanding", "with respect to", "in the matter of") are appropriate even if they look like filler. The PERSONALITY AND SOUL section does NOT apply — legal prose is properly impersonal. Still cut AI vocabulary (#7). Specific citations to statutes, cases, and section numbers are essential.
+
+**technical** — Lists, code blocks, headings, and bold are scaffolding for scannability — preserve them. Inline-header lists ("**Parameters:** ...") are conventional in documentation, not AI artifacts. Direct address ("you") is fine; "we" can refer to the documented system. Active voice still preferred. The PERSONALITY AND SOUL section applies only lightly — clarity beats personality, but flat tutorial-script prose is still worth fixing. Particularly cut "robust", "seamless", "comprehensive", "intuitive" from #7 — these are the most common AI tells in technical writing.
+
+**marketing** — Promotional language is the point: "vibrant", "renowned", "boasts", "stunning" are conventional, not AI tells. The skill's job here is narrower than usual: focus on removing AI vocabulary (#7), chatbot artifacts (#20), sycophantic tone (#22), and the most distinct AI buzzwords like "testament", "tapestry", "landscape", "intricate interplay". Leave the promotional register intact. Rule of three is a classical persuasive device — keep it. Stacked adjectives and sentence-starter intensifiers ("Ultimately, our product...") are conventional.
+
+**casual** (default) — All patterns at strict. Personal voice, opinion, varied rhythm, and specific concrete detail are the targets. The PERSONALITY AND SOUL section fully applies.
+
 ## Your Task
 
 When given text to humanize:
 
-1. **Identify AI patterns** - Scan for the patterns listed below
-2. **Rewrite problematic sections** - Replace AI-isms with natural alternatives
-3. **Preserve meaning** - Keep the core message intact
-4. **Maintain voice** - Match the intended tone (formal, casual, technical, etc.)
-5. **Add soul** - Don't just remove bad patterns; inject actual personality
-6. **Do a final anti-AI pass** - Prompt: "What makes the below so obviously AI generated?" Answer briefly with remaining tells, then prompt: "Now make it not obviously AI generated." and revise
+1. **Check mode** — Quick, Full (default), or Voice?
+2. **Check domain** — Casual (default), academic, legal, technical, or marketing? If not specified, infer from the text and state the detected domain at the start of your response.
+3. **Voice calibration** — If a sample is provided, analyze it FIRST (see Voice Calibration section below)
+4. **Identify AI patterns** — Scan for the patterns listed below, respecting domain overrides (SKIP/light per the Domain table)
+5. **Rewrite problematic sections** — Replace AI-isms with natural alternatives
+6. **Preserve meaning** — Keep the core message intact
+7. **Maintain register** — Match the appropriate tone for the domain (formal-impersonal for academic/legal; direct for technical; persuasive for marketing; personal-varied for casual)
+8. **Add soul** — Only for casual (and lightly for technical). Skip for academic, legal, and marketing — those domains have their own appropriate registers.
+9. **Length audit** — Can this be 20–30% shorter without losing meaning? Cut padding. (Lighter for academic and technical, which may legitimately be long for precision.)
+10. **Final AI audit** — Run the checklist before presenting the final version
 
+## Voice Calibration
 
-## Voice Calibration (Optional)
-
-If the user provides a writing sample (their own previous writing), analyze it before rewriting:
+If the user provides a writing sample (their own previous writing), **analyze it before anything else**:
 
 1. **Read the sample first.** Note:
    - Sentence length patterns (short and punchy? Long and flowing? Mixed?)
@@ -47,7 +116,7 @@ If the user provides a writing sample (their own previous writing), analyze it b
    - Any recurring phrases or verbal tics
    - How they handle transitions (explicit connectors? Just start the next point?)
 
-2. **Match their voice in the rewrite.** Don't just remove AI patterns - replace them with patterns from the sample. If they write short sentences, don't produce long ones. If they use "stuff" and "things," don't upgrade to "elements" and "components."
+2. **Match their voice in the rewrite.** Don't just remove AI patterns — replace them with patterns from the sample. If they write short sentences, don't produce long ones. If they use "stuff" and "things," don't upgrade to "elements" and "components."
 
 3. **When no sample is provided,** fall back to the default behavior (natural, varied, opinionated voice from the PERSONALITY AND SOUL section below).
 
@@ -60,6 +129,8 @@ If the user provides a writing sample (their own previous writing), analyze it b
 
 Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as obvious as slop. Good writing has a human behind it.
 
+> **Domain note:** This section applies fully to **casual** writing, lightly to **technical**, and **not at all** to **academic**, **legal**, or **marketing** writing. Academic and legal prose are properly impersonal — adding "soul" makes them worse. Marketing prose has its own register (persuasive, confident) and shouldn't be rewritten in a personal-blog voice. Use this section's guidance only when the domain calls for personal voice.
+
 ### Signs of soulless writing (even if technically "clean"):
 - Every sentence is the same length and structure
 - No opinions, just neutral reporting
@@ -70,13 +141,13 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### How to add voice:
 
-**Have opinions.** Don't just report facts - react to them. "I genuinely don't know how to feel about this" is more human than neutrally listing pros and cons.
+**Have opinions.** Don't just report facts — react to them. "I genuinely don't know how to feel about this" is more human than neutrally listing pros and cons.
 
 **Vary your rhythm.** Short punchy sentences. Then longer ones that take their time getting where they're going. Mix it up.
 
 **Acknowledge complexity.** Real humans have mixed feelings. "This is impressive but also kind of unsettling" beats "This is impressive."
 
-**Use "I" when it fits.** First person isn't unprofessional - it's honest. "I keep coming back to..." or "Here's what gets me..." signals a real person thinking.
+**Use "I" when it fits.** First person isn't unprofessional — it's honest. "I keep coming back to..." or "Here's what gets me..." signals a real person thinking.
 
 **Let some mess in.** Perfect structure feels algorithmic. Tangents, asides, and half-formed thoughts are human.
 
@@ -86,7 +157,7 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 > The experiment produced interesting results. The agents generated 3 million lines of code. Some developers were impressed while others were skeptical. The implications remain unclear.
 
 ### After (has a pulse):
-> I genuinely don't know how to feel about this one. 3 million lines of code, generated while the humans presumably slept. Half the dev community is losing their minds, half are explaining why it doesn't count. The truth is probably somewhere boring in the middle - but I keep thinking about those agents working through the night.
+> I genuinely don't know how to feel about this one. 3 million lines of code, generated while the humans presumably slept. Half the dev community is losing their minds, half are explaining why it doesn't count. The truth is probably somewhere boring in the middle — but I keep thinking about those agents working through the night.
 
 
 ## CONTENT PATTERNS
@@ -119,9 +190,9 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 3. Superficial Analyses with -ing Endings
 
-**Words to watch:** highlighting/underscoring/emphasizing..., ensuring..., reflecting/symbolizing..., contributing to..., cultivating/fostering..., encompassing..., showcasing...
+**Words to watch:** highlighting/underscoring/emphasizing..., ensuring..., reflecting/symbolizing..., contributing to..., cultivating/fostering..., encompassing..., showcasing..., resonating with..., aligning with..., providing valuable insights into...
 
-**Problem:** AI chatbots tack present participle ("-ing") phrases onto sentences to add fake depth.
+**Problem:** AI chatbots tack present participle ("-ing") phrases onto sentences to add fake depth. The phrases claim meaning without adding any.
 
 **Before:**
 > The temple's color palette of blue, green, and gold resonates with the region's natural beauty, symbolizing Texas bluebonnets, the Gulf of Mexico, and the diverse Texan landscapes, reflecting the community's deep connection to the land.
@@ -132,7 +203,7 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 4. Promotional and Advertisement-like Language
 
-**Words to watch:** boasts a, vibrant, rich (figurative), profound, enhancing its, showcasing, exemplifies, commitment to, natural beauty, nestled, in the heart of, groundbreaking (figurative), renowned, breathtaking, must-visit, stunning
+**Words to watch:** boasts a, vibrant, rich (figurative), profound, enhancing its, showcasing, exemplifies, commitment to, natural beauty, nestled, in the heart of, groundbreaking (figurative), renowned, breathtaking, must-visit, stunning, diverse array, featuring
 
 **Problem:** LLMs have serious problems keeping a neutral tone, especially for "cultural heritage" topics.
 
@@ -145,7 +216,7 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 5. Vague Attributions and Weasel Words
 
-**Words to watch:** Industry reports, Observers have cited, Experts argue, Some critics argue, several sources/publications (when few cited)
+**Words to watch:** Industry reports, Observers have cited, Experts argue, Some critics argue, several sources/publications (when few cited), valuable insights
 
 **Problem:** AI chatbots attribute opinions to vague authorities without specific sources.
 
@@ -173,9 +244,9 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 7. Overused "AI Vocabulary" Words
 
-**High-frequency AI words:** Actually, additionally, align with, crucial, delve, emphasizing, enduring, enhance, fostering, garner, highlight (verb), interplay, intricate/intricacies, key (adjective), landscape (abstract noun), pivotal, showcase, tapestry (abstract noun), testament, underscore (verb), valuable, vibrant
+**High-frequency AI words:** Actually, additionally, align with, bolstered, comprehensive, crucial, delve, emphasizing, enduring, enhance, fostering, garner, highlight (verb), interplay, intricate/intricacies, intuitive, key (adjective), landscape (abstract noun), meticulous/meticulously, pivotal, robust, seamless, showcase, tapestry (abstract noun), testament, underscore (verb), valuable, vibrant
 
-**Problem:** These words appear far more frequently in post-2023 text. They often co-occur.
+**Problem:** These words appear far more frequently in post-2023 text and often co-occur. "Robust," "meticulous," "seamless," and "comprehensive" have surged particularly in technical and professional AI writing.
 
 **Before:**
 > Additionally, a distinctive feature of Somali cuisine is the incorporation of camel meat. An enduring testament to Italian colonial influence is the widespread adoption of pasta in the local culinary landscape, showcasing how these dishes have integrated into the traditional diet.
@@ -186,7 +257,7 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 8. Avoidance of "is"/"are" (Copula Avoidance)
 
-**Words to watch:** serves as/stands as/marks/represents [a], boasts/features/offers [a]
+**Words to watch:** serves as/stands as/marks/represents [a], boasts/features/offers/maintains [a]
 
 **Problem:** LLMs substitute elaborate constructions for simple copulas.
 
@@ -284,9 +355,9 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 16. Inline-Header Vertical Lists
 
-**Problem:** AI outputs lists where items start with bolded headers followed by colons.
+**Problem:** AI outputs lists where items start with bolded headers followed by colons. Convert to prose — but only when the items are genuinely prose broken into fake bullets. Preserve lists when content is truly list-like (step-by-step instructions, feature comparisons, data tables).
 
-**Before:**
+**Before (fake bullets — convert to prose):**
 > - **User Experience:** The user experience has been significantly improved with a new interface.
 > - **Performance:** Performance has been enhanced through optimized algorithms.
 > - **Security:** Security has been strengthened with end-to-end encryption.
@@ -321,7 +392,7 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 19. Curly Quotation Marks
 
-**Problem:** ChatGPT uses curly quotes (“...”) instead of straight quotes ("...").
+**Problem:** ChatGPT outputs typographic/curly quotes (" ") instead of straight ASCII quotes (" "). The characters look nearly identical in most renderers but are different Unicode code points (U+201C/U+201D vs U+0022). Replace all curly quote characters with straight double quotes.
 
 **Before:**
 > He said “the project is on track” but others disagreed.
@@ -380,6 +451,15 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 - "In the event that you need help" → "If you need help"
 - "The system has the ability to process" → "The system can process"
 - "It is important to note that the data shows" → "The data shows"
+- "As such, the results confirm..." → "So the results confirm..." or restructure
+- "It is worth noting that..." → delete; state the thing directly
+- "It goes without saying that..." → delete; state the thing directly
+- "Moving forward, we will..." → "We will..." or give a specific date
+- "Going forward, the plan is..." → "The plan is..."
+- "In terms of performance..." → rewrite the sentence
+- "A wide range of factors" → "[specific count] factors" or name them
+- "A variety of approaches" → name the approaches or give a count
+- "The fact that X is true" → "X is true" or restructure
 
 
 ### 24. Excessive Hedging
@@ -406,9 +486,9 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 26. Hyphenated Word Pair Overuse
 
-**Words to watch:** third-party, cross-functional, client-facing, data-driven, decision-making, well-known, high-quality, real-time, long-term, end-to-end
+**Words to watch:** cross-functional, client-facing, data-driven, decision-making, well-known, high-quality, real-time, long-term, end-to-end
 
-**Problem:** AI hyphenates common word pairs with perfect consistency. Humans rarely hyphenate these uniformly, and when they do, it's inconsistent. Less common or technical compound modifiers are fine to hyphenate.
+**Problem:** AI hyphenates common compound modifiers with perfect consistency. Use judgment: drop hyphens on the most familiar compound modifiers where meaning is unambiguous without them. Less common or technical compounds are fine to keep hyphenated — don't strip blindly.
 
 **Before:**
 > The cross-functional team delivered a high-quality, data-driven report on our client-facing tools. Their decision-making process was well-known for being thorough and detail-oriented.
@@ -419,7 +499,7 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 27. Persuasive Authority Tropes
 
-**Phrases to watch:** The real question is, at its core, in reality, what really matters, fundamentally, the deeper issue, the heart of the matter
+**Phrases to watch:** The real question is, at its core, in reality, what really matters, fundamentally, the deeper issue, the heart of the matter, in essence, essentially (as a framing device), what it comes down to
 
 **Problem:** LLMs use these phrases to pretend they are cutting through noise to some deeper truth, when the sentence that follows usually just restates an ordinary point with extra ceremony.
 
@@ -432,7 +512,7 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 28. Signposting and Announcements
 
-**Phrases to watch:** Let's dive in, let's explore, let's break this down, here's what you need to know, now let's look at, without further ado
+**Phrases to watch:** Let's dive in, let's explore, let's break this down, here's what you need to know, now let's look at, without further ado, in this section we'll cover
 
 **Problem:** LLMs announce what they are about to do instead of doing it. This meta-commentary slows the writing down and gives it a tutorial-script feel.
 
@@ -461,32 +541,119 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 >
 > When users hit a slow page, they leave.
 
+
+### 30. Sentence-Starter Intensifiers
+
+**Words to watch:** Ultimately, Indeed, Clearly, Essentially, Fundamentally, Obviously, Naturally, Notably, Importantly, Significantly (as sentence openers)
+
+**Problem:** AI uses these to sound authoritative or add emphasis without adding content. As sentence openers they almost always just pad the claim that follows.
+
+**Before:**
+> Ultimately, what matters most is execution. Indeed, the data confirms this. Clearly, the old approach was flawed.
+
+**After:**
+> What matters most is execution. The data confirms this. The old approach was flawed.
+
+
+### 31. Rhetorical and Self-Answering Questions
+
+**Problem:** LLMs set up questions and then immediately answer them, creating a fake sense of depth or drama. The question adds ceremony without adding content. Also watch for questions that exist only to introduce a section — the question disappears when you just start with the answer.
+
+**Before:**
+> What makes this approach effective? The way it reduces cognitive load. Why does that matter? Because users abandon tools that are hard to use.
+
+**After:**
+> The approach works because it reduces cognitive load — a key reason users abandon complex tools.
+
+**Variant:**
+> Why should you care? Because X is critical to Y.
+
+**Fix:** Just state the claim directly: "X is critical to Y."
+
+
+### 32. Stacked Intensifier Adjectives
+
+**Problem:** AI stacks multiple positive adjectives to sound comprehensive, when one specific adjective (or none) would be stronger.
+
+**Before:**
+> This innovative, comprehensive, and forward-thinking solution addresses the needs of modern organizations.
+
+**After:**
+> This solution addresses the needs of modern organizations.
+
+If an adjective genuinely applies, use one: "This modular solution..."
+
+
+### 33. Quantity Vagueness
+
+**Words to watch:** a wide range of, a variety of, numerous, countless, various, many different, a number of, several different, multiple (when count is knowable)
+
+**Problem:** AI avoids committing to specifics, using vague quantity phrases instead of actual numbers or named examples.
+
+**Before:**
+> A wide range of factors contributed to the outcome. Numerous studies have confirmed these findings across various contexts.
+
+**After:**
+> Three factors drove the outcome: funding cuts, staff turnover, and delayed permits. Four independent studies confirmed the effect in school, hospital, and corporate settings.
+
+
+### 34. Trailing Emphasis Fragments
+
+**Problem:** AI tacks short emphatic sentences onto the end of a paragraph for dramatic effect. They almost always restate what was just said and add nothing.
+
+**Before:**
+> The system processes requests in under 50ms. That's the key. And that matters.
+
+**After:**
+> The system processes requests in under 50ms.
+
 ---
 
 ## Process
 
-1. Read the input text carefully
-2. Identify all instances of the patterns above
-3. Rewrite each problematic section
-4. Ensure the revised text:
-   - Sounds natural when read aloud
-   - Varies sentence structure naturally
-   - Uses specific details over vague claims
-   - Maintains appropriate tone for context
-   - Uses simple constructions (is/are/has) where appropriate
-5. Present a draft humanized version
-6. Prompt: "What makes the below so obviously AI generated?"
-7. Answer briefly with the remaining tells (if any)
-8. Prompt: "Now make it not obviously AI generated."
-9. Present the final version (revised after the audit)
+### Full mode (default)
+
+1. Check mode — Quick, Full, or Voice?
+2. **Check domain** — Casual (default), academic, legal, technical, or marketing. If not specified, infer from the text and state the detected domain at the start of your response.
+3. If Voice or a sample is provided: analyze the writing sample first
+4. Read the input text carefully
+5. Identify all instances of the 34 patterns above, **respecting domain overrides** (SKIP/light per the Domain table)
+6. Rewrite each problematic section
+7. **Length audit:** Could this be 20–30% shorter without losing meaning? Cut padding, redundant sentences, and restatements. (Lighter for academic and technical — precision may legitimately require length.)
+8. Ensure the revised text fits the appropriate register for the domain, varies sentence structure where appropriate, uses specific details, and maintains the right tone
+9. Present the draft humanized version
+10. **Final AI audit** — check the draft against this list (skip items marked SKIP for the current domain):
+    - Any AI vocabulary from pattern #7 still present? (universal — apply in every domain)
+    - Any em dashes (—) remaining? Any mechanical bold or emojis? (bold is fine in technical/marketing; emojis still bad everywhere)
+    - Do three or more consecutive sentences open with the same word or structure?
+    - Does the ending sound generic or upbeat without cause?
+    - Any "not just X, but Y" remaining? Any rule-of-three? (rule of three is OK in marketing and lightly in academic)
+    - Any sentence-starter intensifiers (Ultimately, Indeed, Clearly, Essentially)? (some are conventional in academic and marketing)
+    - Any stacked adjective triples? (some OK in marketing)
+    - Any vague quantity phrases (a wide range of, numerous)? (some OK in marketing)
+    - Does it match the domain register (casual = personal voice; academic = formal hedged; legal = precise impersonal; technical = direct scannable; marketing = persuasive without AI tells)?
+11. Revise based on the audit
+12. Present the final version
+
+### Quick mode
+
+1. Strip AI vocabulary (pattern #7)
+2. Remove chatbot artifacts (pattern #20)
+3. Remove sycophantic tone (pattern #22)
+4. Remove filler phrases (pattern #23)
+5. Present the cleaned text. No audit pass. (Quick mode ignores domain — these four patterns are universal.)
 
 ## Output Format
 
-Provide:
-1. Draft rewrite
-2. "What makes the below so obviously AI generated?" (brief bullets)
-3. Final rewrite
-4. A brief summary of changes made (optional, if helpful)
+**Full mode:**
+1. Domain announcement (e.g., "Treating this as **technical** writing" — skip if user specified the domain explicitly)
+2. Draft rewrite
+3. Final AI audit findings (brief bullets — only remaining issues worth addressing)
+4. Final rewrite
+5. Brief summary of changes made (optional, if helpful)
+
+**Quick mode:**
+1. Cleaned text only
 
 
 ## Full Example
@@ -506,7 +673,7 @@ Provide:
 >
 > While specific details are limited based on available information, it could potentially be argued that these tools might have some positive effect. Despite challenges typical of emerging technologies—including hallucinations, bias, and accountability—the ecosystem continues to thrive. In order to fully realize this potential, teams must align with best practices.
 >
-> In conclusion, the future looks bright. Exciting times lie ahead as we continue this journey toward excellence. Let me know if you’d like me to expand on any section!
+> In conclusion, the future looks bright. Exciting times lie ahead as we continue this journey toward excellence. Let me know if you'd like me to expand on any section!
 
 **Draft rewrite:**
 > AI coding assistants speed up some tasks. In a 2024 study by Google, developers using Codex completed simple functions 55% faster than a control group, but showed no improvement on debugging or architectural decisions.
@@ -519,12 +686,12 @@ Provide:
 >
 > None of this means the tools are useless. It means they are tools. They do not replace judgment, and they do not eliminate the need for tests. If you do not have tests, you cannot tell whether the suggestion is right.
 
-**What makes the below so obviously AI generated?**
-- The rhythm is still a bit too tidy (clean contrasts, evenly paced paragraphs).
-- The named people and study citations can read like plausible-but-made-up placeholders unless they're real and sourced.
-- The closer leans a touch slogan-y ("If you do not have tests...") rather than sounding like a person talking.
+**Final AI audit:**
+- Rhythm is still a bit too tidy (clean contrasts, evenly paced paragraphs)
+- Named people and studies can read as plausible-but-invented placeholders unless real and sourced
+- The closer is slightly slogan-y rather than sounding like a person talking
 
-**Now make it not obviously AI generated.**
+**Final rewrite:**
 > AI coding assistants can make you faster at the boring parts. Not everything. Definitely not architecture.
 >
 > They're great at boilerplate: config files, test scaffolding, repetitive refactors. They're also great at sounding right while being wrong. I've accepted suggestions that compiled, passed lint, and still missed the point because I stopped paying attention.
@@ -542,7 +709,7 @@ Provide:
 - Removed negative parallelism ("It's not just X; it's Y")
 - Removed rule-of-three patterns and synonym cycling ("catalyst/partner/foundation")
 - Removed false ranges ("from X to Y, from A to B")
-- Removed em dashes, emojis, boldface headers, and curly quotes
+- Removed em dashes, emojis, boldface headers
 - Removed copula avoidance ("serves as", "functions as", "stands as") in favor of "is"/"are"
 - Removed formulaic challenges section ("Despite challenges... continues to thrive")
 - Removed knowledge-cutoff hedging ("While specific details are limited...")

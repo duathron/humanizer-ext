@@ -10,7 +10,7 @@ Clone directly into Claude Code's skills directory:
 
 ```bash
 mkdir -p ~/.claude/skills
-git clone https://github.com/blader/humanizer.git ~/.claude/skills/humanizer
+git clone https://github.com/duathron/humanizer-ext.git ~/.claude/skills/humanizer
 ```
 
 Or copy the skill file manually if you already have this repo cloned:
@@ -26,7 +26,7 @@ Clone directly into OpenCode's skills directory:
 
 ```bash
 mkdir -p ~/.config/opencode/skills
-git clone https://github.com/blader/humanizer.git ~/.config/opencode/skills/humanizer
+git clone https://github.com/duathron/humanizer-ext.git ~/.config/opencode/skills/humanizer
 ```
 
 Or copy the skill file manually if you already have this repo cloned:
@@ -62,87 +62,137 @@ Or ask the model to humanize text directly in either tool:
 Please humanize this text: [your text]
 ```
 
-### Voice Calibration
+### Modes
 
-To match your personal writing style, provide a sample of your own writing:
+The skill runs in one of three modes. If you don't specify, it defaults to **Full**.
+
+| Mode | What it does |
+|------|-------------|
+| **Quick** | Strips AI vocabulary, chatbot artifacts, sycophancy, and filler only. Fast cleanup for short texts. |
+| **Full** | All 34 patterns, a length audit (cut 20–30% padding), and a final AI audit checklist. Default. |
+| **Voice** | Full pass plus mandatory voice matching from a writing sample you provide. |
+
+Specify a mode by including it in your prompt:
 
 ```
-/humanizer
+/humanizer quick
 
-Here's a sample of my writing for voice matching:
+[paste your text here]
+```
+
+```
+/humanizer voice
+
+Here's a sample of my writing:
 [paste 2-3 paragraphs of your own writing]
 
-Now humanize this text:
+Now humanize this:
 [paste AI text to humanize]
 ```
 
-The skill will analyze your sentence rhythm, word choices, and quirks, then apply them to the rewrite instead of producing generic "clean" output.
+The Voice mode analyzes your sentence rhythm, word choices, and quirks, then applies them to the rewrite instead of producing generic "clean" output.
+
+### Domains
+
+The skill detects (or accepts) a domain and adjusts which patterns are enforced. Different writing contexts have different norms — what's "AI slop" in a blog post is appropriate convention in a legal brief.
+
+| Domain | What changes |
+|--------|-------------|
+| **casual** (default) | All 34 patterns strict; personal voice encouraged |
+| **academic** | Passive voice and hedging preserved; first-person discouraged; "soul" section disabled |
+| **legal** | Passive voice, hedging, and formal connectors preserved; precise impersonal register |
+| **technical** | Lists, bold, and inline-header lists preserved for scannability; direct active voice |
+| **marketing** | Promotional register preserved; only AI buzzwords, chatbot artifacts, and sycophancy removed |
+
+If you don't specify, the skill infers the domain from the text and tells you which one it picked. To set it explicitly, name it alongside the mode:
+
+```
+/humanizer technical
+
+[paste your text here]
+```
+
+```
+/humanizer academic full
+
+[paste your text here]
+```
 
 ## Overview
 
 Based on [Wikipedia's "Signs of AI writing"](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) guide, maintained by WikiProject AI Cleanup. This comprehensive guide comes from observations of thousands of instances of AI-generated text.
 
-The skill also includes a final "obviously AI generated" audit pass and a second rewrite, to catch lingering AI-isms in the first draft.
+The skill runs a length audit to cut 20–30% of padding, then a specific 9-point final AI audit checklist to catch lingering AI-isms before presenting the final version.
 
 ### Key Insight from Wikipedia
 
 > "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."
 
-## 29 Patterns Detected (with Before/After Examples)
+## 34 Patterns Detected (with Before/After Examples)
 
 ### Content Patterns
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 1 | **Significance inflation** | "marking a pivotal moment in the evolution of..." | "was established in 1989 to collect regional statistics" |
-| 2 | **Notability name-dropping** | "cited in NYT, BBC, FT, and The Hindu" | "In a 2024 NYT interview, she argued..." |
-| 3 | **Superficial -ing analyses** | "symbolizing... reflecting... showcasing..." | Remove or expand with actual sources |
-| 4 | **Promotional language** | "nestled within the breathtaking region" | "is a town in the Gonder region" |
-| 5 | **Vague attributions** | "Experts believe it plays a crucial role" | "according to a 2019 survey by..." |
-| 6 | **Formulaic challenges** | "Despite challenges... continues to thrive" | Specific facts about actual challenges |
+| 1 | **Significance inflation** | “marking a pivotal moment in the evolution of...” | “was established in 1989 to collect regional statistics” |
+| 2 | **Notability name-dropping** | “cited in NYT, BBC, FT, and The Hindu” | “In a 2024 NYT interview, she argued...” |
+| 3 | **Superficial -ing analyses** | “symbolizing... reflecting... resonating with...” | Remove or expand with actual sources |
+| 4 | **Promotional language** | “nestled within the breathtaking region” | “is a town in the Gonder region” |
+| 5 | **Vague attributions** | “Experts believe it plays a crucial role” | “according to a 2019 survey by...” |
+| 6 | **Formulaic challenges** | “Despite challenges... continues to thrive” | Specific facts about actual challenges |
 
 ### Language Patterns
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 7 | **AI vocabulary** | "Actually... additionally... testament... landscape... showcasing" | "also... remain common" |
-| 8 | **Copula avoidance** | "serves as... features... boasts" | "is... has" |
-| 9 | **Negative parallelisms / tailing negations** | "It's not just X, it's Y", "..., no guessing" | State the point directly |
-| 10 | **Rule of three** | "innovation, inspiration, and insights" | Use natural number of items |
-| 11 | **Synonym cycling** | "protagonist... main character... central figure... hero" | "protagonist" (repeat when clearest) |
-| 12 | **False ranges** | "from the Big Bang to dark matter" | List topics directly |
-| 13 | **Passive voice / subjectless fragments** | "No configuration file needed" | Name the actor when it helps clarity |
+| 7 | **AI vocabulary** | “robust... meticulous... bolstered... seamless... testament” | plain synonyms or cut |
+| 8 | **Copula avoidance** | “serves as... features... maintains... offers” | “is... has” |
+| 9 | **Negative parallelisms / tailing negations** | “It's not just X, it's Y”, “..., no guessing” | State the point directly |
+| 10 | **Rule of three** | “innovation, inspiration, and insights” | Use natural number of items |
+| 11 | **Synonym cycling** | “protagonist... main character... central figure... hero” | “protagonist” (repeat when clearest) |
+| 12 | **False ranges** | “from the Big Bang to dark matter” | List topics directly |
+| 13 | **Passive voice / subjectless fragments** | “No configuration file needed” | Name the actor when it helps clarity |
 
 ### Style Patterns
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 14 | **Em dash overuse** | "institutions—not the people—yet this continues—" | Prefer commas or periods |
-| 15 | **Boldface overuse** | "**OKRs**, **KPIs**, **BMC**" | "OKRs, KPIs, BMC" |
-| 16 | **Inline-header lists** | "**Performance:** Performance improved" | Convert to prose |
-| 17 | **Title Case Headings** | "Strategic Negotiations And Partnerships" | "Strategic negotiations and partnerships" |
-| 18 | **Emojis** | "🚀 Launch Phase: 💡 Key Insight:" | Remove emojis |
-| 19 | **Curly quotes** | `said “the project”` | `said “the project”` |
-| 26 | **Hyphenated word pairs** | “cross-functional, data-driven, client-facing” | Drop hyphens on common word pairs |
-| 27 | **Persuasive authority tropes** | "At its core, what matters is..." | State the point directly |
-| 28 | **Signposting announcements** | "Let's dive in", "Here's what you need to know" | Start with the content |
-| 29 | **Fragmented headers** | "## Performance" + "Speed matters." | Let the heading do the work |
+| 14 | **Em dash overuse** | “institutions—not the people—yet this continues—“ | Prefer commas or periods |
+| 15 | **Boldface overuse** | “**OKRs**, **KPIs**, **BMC**” | “OKRs, KPIs, BMC” |
+| 16 | **Inline-header lists** | “**Performance:** Performance improved” | Convert to prose (preserve genuine lists) |
+| 17 | **Title Case Headings** | “Strategic Negotiations And Partnerships” | “Strategic negotiations and partnerships” |
+| 18 | **Emojis** | “🚀 Launch Phase: 💡 Key Insight:” | Remove emojis |
+| 19 | **Curly quotes** | U+201C/U+201D typographic quotes | Straight ASCII quotes |
+| 26 | **Hyphenated word pairs** | “cross-functional, data-driven, client-facing” | Drop hyphens on common pairs (use judgment) |
+| 27 | **Persuasive authority tropes** | “At its core, what matters is...”, “In essence...” | State the point directly |
+| 28 | **Signposting announcements** | “Let's dive in”, “Here's what you need to know” | Start with the content |
+| 29 | **Fragmented headers** | “## Performance” + “Speed matters.” | Let the heading do the work |
 
 ### Communication Patterns
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 20 | **Chatbot artifacts** | "I hope this helps! Let me know if..." | Remove entirely |
-| 21 | **Cutoff disclaimers** | "While details are limited in available sources..." | Find sources or remove |
-| 22 | **Sycophantic tone** | "Great question! You're absolutely right!" | Respond directly |
+| 20 | **Chatbot artifacts** | “I hope this helps! Let me know if...” | Remove entirely |
+| 21 | **Cutoff disclaimers** | “While details are limited in available sources...” | Find sources or remove |
+| 22 | **Sycophantic tone** | “Great question! You're absolutely right!” | Respond directly |
 
 ### Filler and Hedging
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 23 | **Filler phrases** | "In order to", "Due to the fact that" | "To", "Because" |
-| 24 | **Excessive hedging** | "could potentially possibly" | "may" |
-| 25 | **Generic conclusions** | "The future looks bright" | Specific plans or facts |
+| 23 | **Filler phrases** | “In order to”, “It is worth noting that”, “Going forward” | Cut or rewrite directly |
+| 24 | **Excessive hedging** | “could potentially possibly” | “may” |
+| 25 | **Generic conclusions** | “The future looks bright” | Specific plans or facts |
+
+### New in v3.0
+
+| # | Pattern | Before | After |
+|---|---------|--------|-------|
+| 30 | **Sentence-starter intensifiers** | “Ultimately... Indeed... Clearly... Essentially...” | Cut; state the claim directly |
+| 31 | **Rhetorical / self-answering questions** | “What makes this effective? The way it reduces...” | “It works because it reduces...” |
+| 32 | **Stacked intensifier adjectives** | “innovative, comprehensive, and forward-thinking” | One specific adjective or none |
+| 33 | **Quantity vagueness** | “a wide range of factors... numerous studies” | Specific count or named examples |
+| 34 | **Trailing emphasis fragments** | “That's the key. And that matters.” | Delete; the previous sentence said it |
 
 ## Full Example
 
@@ -179,6 +229,8 @@ The skill also includes a final "obviously AI generated" audit pass and a second
 
 ## Version History
 
+- **3.1.0** - Added domain awareness: skill now detects (or accepts) a domain — casual, academic, legal, technical, or marketing — and applies per-domain overrides to 13 patterns. Passive voice is preserved in academic/legal; bold and inline-header lists in technical; promotional language in marketing. The PERSONALITY AND SOUL section now applies only to casual (and lightly to technical). Process and audit checklist updated to reference domain. Output format adds a domain announcement before the draft.
+- **3.0.0** - Added 5 new patterns (sentence-starter intensifiers, rhetorical questions, stacked adjectives, quantity vagueness, trailing emphasis fragments), raising the total to 34; expanded AI vocabulary list (bolstered, meticulous, robust, seamless, intuitive, comprehensive); added copula words (maintains, offers); expanded superficial -ing list; added filler phrases (as such, it is worth noting that, going forward, a wide range of, the fact that); added mode selector (Quick/Full/Voice); restructured process with length audit and specific final AI audit checklist; fixed inline-header list rule to preserve genuine lists; clarified hyphenation rule; fixed curly quotes explanation; sourced additional patterns from re-read of Wikipedia Signs of AI Writing article
 - **2.5.1** - Added a passive-voice / subjectless-fragment rule, raising the total to 29 patterns
 - **2.5.0** - Added patterns for persuasive framing, signposting, and fragmented headers; expanded negative parallelisms to cover tailing negations; tightened wording around em dash overuse; fixed frontmatter wording to use "filler phrases"
 - **2.4.0** - Added voice calibration: match the user's personal writing style from samples
