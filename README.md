@@ -1,6 +1,24 @@
-# Humanizer
+# Humanizer (extended)
 
 A skill for Claude Code and OpenCode that removes signs of AI-generated writing from text, making it sound more natural and human.
+
+**Extended fork of [blader/humanizer](https://github.com/blader/humanizer), actively maintained.** Adds domain-aware overrides, 5 new patterns (34 total), a Quick/Full/Voice mode selector, a length audit, and a 9-point final AI audit checklist.
+
+## What's different from upstream
+
+| Area | Upstream (v2.5.1) | This fork (v3.1.0) |
+|------|-------------------|--------------------|
+| Total patterns | 29 | **34** — adds sentence-starter intensifiers, rhetorical questions, stacked adjectives, quantity vagueness, trailing fragments |
+| AI vocabulary list | base set | **expanded** with bolstered, meticulous, robust, seamless, intuitive, comprehensive (sourced from Wikipedia article re-read) |
+| Modes | single behavior | **Quick / Full / Voice** selector |
+| Domain awareness | none — same rules everywhere | **5 domains** (casual, academic, legal, technical, marketing) with 13-pattern override matrix — passive voice preserved in legal briefs, lists preserved in technical docs, promotional language preserved in marketing |
+| Length audit | none | explicit step to cut 20–30% padding |
+| Final AI audit | vague self-prompt | **specific 9-point checklist** annotated with per-domain exceptions |
+| Pattern #16 (inline-header lists) | convert all | convert only fake bullets; preserve genuine lists |
+| Pattern #19 (curly quotes) | example rendered identically | explanation references U+201C/U+201D Unicode code points |
+| Pattern #26 (hyphenation) | strip all common pairs | use judgment; preserve technical compounds |
+
+See the [version history](#version-history) for the full changelog.
 
 ## Installation
 
