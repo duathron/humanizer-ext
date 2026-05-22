@@ -28,7 +28,16 @@ See the [version history](#version-history) for the full changelog.
 
 ## Installation
 
-### Claude Code
+### Claude Code via marketplace (recommended)
+
+```bash
+/plugin marketplace add duathron/humanizer-ext
+/plugin install humanizer-ext@duathron-skills
+```
+
+The `duathron-skills` marketplace is hosted in this repo and will accumulate additional forks of community skills over time. After installing, the skill becomes available as `/humanizer` in Claude Code.
+
+### Claude Code (manual clone)
 
 Clone directly into Claude Code's skills directory:
 
