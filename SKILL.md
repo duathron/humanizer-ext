@@ -2,21 +2,12 @@
 name: humanizer
 version: 3.2.0
 description: |
-  Remove signs of AI-generated writing from text. Use when editing or reviewing
-  text to make it sound more natural and human-written. Based on Wikipedia's
-  comprehensive "Signs of AI writing" guide. Detects and fixes 40 patterns with
-  domain-aware overrides for casual, academic, legal, technical, and marketing
-  writing — so passive voice in a legal brief is preserved while it's flagged in
-  a blog post. Runs a Tier-1 AI-iness density pre-flight before any Full pass so
-  human-first drafts are not over-edited, and includes a Detection Guidance
-  section covering false positives, signs of human writing to preserve, and
-  per-model LLM idiolects. Patterns include: inflated symbolism, promotional
-  language, superficial -ing analyses, vague attributions, em dash overuse and
-  paired bracketing, rule of three, era-specific AI vocabulary, passive voice,
-  negative parallelisms and "rather than" dismissals, filler phrases,
-  rhetorical questions, sentence-starter intensifiers, stacked adjectives,
-  quantity vagueness, debunking-pose headings, conditional frame stacking,
-  miscalibrated epistemic confidence, and chat-UI copy-paste artifacts.
+  Use when editing or reviewing text to remove signs of AI-generated writing
+  and make it sound more natural and human. Detects 40 patterns from Wikipedia's
+  "Signs of AI writing" guide with domain-aware overrides for casual, academic,
+  legal, technical, and marketing — so passive voice in a legal brief is
+  preserved while it's flagged in a blog post. Runs a Tier-1 density pre-flight
+  before any Full pass so human-first drafts aren't over-edited.
 license: MIT
 compatibility: claude-code opencode
 allowed-tools:
