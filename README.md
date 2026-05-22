@@ -2,20 +2,26 @@
 
 A skill for Claude Code and OpenCode that removes signs of AI-generated writing from text, making it sound more natural and human.
 
-**Extended fork of [blader/humanizer](https://github.com/blader/humanizer), actively maintained.** Adds domain-aware overrides, 5 new patterns (34 total), a Quick/Full/Voice mode selector, a length audit, and a 9-point final AI audit checklist.
+**Extended fork of [blader/humanizer](https://github.com/blader/humanizer), actively maintained.** Adds domain-aware overrides, 11 new patterns (40 total), a Quick/Full/Voice mode selector, a Tier-1 AI-iness density pre-flight, a Detection Guidance section (false positives + signs of human writing + LLM idiolects), a length audit, and an extended 13-point final AI audit checklist.
 
 ## What's different from upstream
 
-| Area | Upstream (v2.5.1) | This fork (v3.1.0) |
+| Area | Upstream (v2.5.1) | This fork (v3.2.0) |
 |------|-------------------|--------------------|
-| Total patterns | 29 | **34** — adds sentence-starter intensifiers, rhetorical questions, stacked adjectives, quantity vagueness, trailing fragments |
-| AI vocabulary list | base set | **expanded** with bolstered, meticulous, robust, seamless, intuitive, comprehensive (sourced from Wikipedia article re-read) |
+| Total patterns | 29 | **40** — adds sentence-starter intensifiers, rhetorical questions, stacked adjectives, quantity vagueness, trailing fragments, debunking-pose headings, conditional frame stacking, miscalibrated epistemic confidence, reference-markup artifacts, placeholder text, markdown contamination |
+| AI vocabulary list | base set | **expanded** with bolstered, meticulous, robust, seamless, intuitive, comprehensive, plus **era-specific clusters** (GPT-4 / GPT-4o / GPT-5 eras) for dating suspect text |
 | Modes | single behavior | **Quick / Full / Voice** selector |
-| Domain awareness | none — same rules everywhere | **5 domains** (casual, academic, legal, technical, marketing) with 13-pattern override matrix — passive voice preserved in legal briefs, lists preserved in technical docs, promotional language preserved in marketing |
+| Domain awareness | none — same rules everywhere | **5 domains** (casual, academic, legal, technical, marketing) with 16-pattern override matrix — passive voice preserved in legal briefs, lists preserved in technical docs, promotional language preserved in marketing |
+| Detection guidance | none | **dedicated section** — what NOT to flag (false positives), signs of human writing to preserve, per-model LLM idiolects (ChatGPT / Grok / Gemini / Claude) |
+| Density pre-flight | none | **Tier-1 dead-giveaway density check** before any Full pass; auto-drops to Quick when density = 0 so human-first drafts aren't over-edited |
 | Length audit | none | explicit step to cut 20–30% padding |
-| Final AI audit | vague self-prompt | **specific 9-point checklist** annotated with per-domain exceptions |
+| Final AI audit | vague self-prompt | **specific 13-point checklist** annotated with per-domain exceptions |
+| Pattern #9 ("not just X") | base | extended to "rather than" dismissals + on-the-table test |
+| Pattern #14 (em dash) | base | extended to paired bracketing with 4 fix options by insertion type |
 | Pattern #16 (inline-header lists) | convert all | convert only fake bullets; preserve genuine lists |
 | Pattern #19 (curly quotes) | example rendered identically | explanation references U+201C/U+201D Unicode code points |
+| Pattern #21 (cutoff disclaimers) | base | extended to speculative gap-filling ("maintains a low profile" template) |
+| Pattern #25 (generic conclusions) | base | extended to structural `## Conclusion` sections (delete the whole section) |
 | Pattern #26 (hyphenation) | strip all common pairs | use judgment; preserve technical compounds |
 
 See the [version history](#version-history) for the full changelog.
@@ -87,7 +93,7 @@ The skill runs in one of three modes. If you don't specify, it defaults to **Ful
 | Mode | What it does |
 |------|-------------|
 | **Quick** | Strips AI vocabulary, chatbot artifacts, sycophancy, and filler only. Fast cleanup for short texts. |
-| **Full** | All 34 patterns, a length audit (cut 20–30% padding), and a final AI audit checklist. Default. |
+| **Full** | All 40 patterns, a Tier-1 AI-iness density pre-flight, a length audit (cut 20–30% padding), and a 13-point final AI audit checklist. Default. |
 | **Voice** | Full pass plus mandatory voice matching from a writing sample you provide. |
 
 Specify a mode by including it in your prompt:
@@ -116,7 +122,7 @@ The skill detects (or accepts) a domain and adjusts which patterns are enforced.
 
 | Domain | What changes |
 |--------|-------------|
-| **casual** (default) | All 34 patterns strict; personal voice encouraged |
+| **casual** (default) | All 40 patterns strict; personal voice encouraged |
 | **academic** | Passive voice and hedging preserved; first-person discouraged; "soul" section disabled |
 | **legal** | Passive voice, hedging, and formal connectors preserved; precise impersonal register |
 | **technical** | Lists, bold, and inline-header lists preserved for scannability; direct active voice |
@@ -146,7 +152,7 @@ The skill runs a length audit to cut 20–30% of padding, then a specific 9-poin
 
 > "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."
 
-## 34 Patterns Detected (with Before/After Examples)
+## 40 Patterns Detected (with Before/After Examples)
 
 ### Content Patterns
 
@@ -163,9 +169,9 @@ The skill runs a length audit to cut 20–30% of padding, then a specific 9-poin
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 7 | **AI vocabulary** | “robust... meticulous... bolstered... seamless... testament” | plain synonyms or cut |
+| 7 | **AI vocabulary** (with era clusters) | “robust... meticulous... bolstered... seamless... testament”; GPT-4 / GPT-4o / GPT-5 era lists | plain synonyms or cut (flag figurative use, not literal) |
 | 8 | **Copula avoidance** | “serves as... features... maintains... offers” | “is... has” |
-| 9 | **Negative parallelisms / tailing negations** | “It's not just X, it's Y”, “..., no guessing” | State the point directly |
+| 9 | **Negative parallelisms / tailing negations / “rather than” dismissals** | “It's not just X, it's Y”, “..., no guessing”, “X rather than Y (where Y is unstated)” | State the point directly; cut dismissed alternatives nobody claimed |
 | 10 | **Rule of three** | “innovation, inspiration, and insights” | Use natural number of items |
 | 11 | **Synonym cycling** | “protagonist... main character... central figure... hero” | “protagonist” (repeat when clearest) |
 | 12 | **False ranges** | “from the Big Bang to dark matter” | List topics directly |
@@ -175,7 +181,7 @@ The skill runs a length audit to cut 20–30% of padding, then a specific 9-poin
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 14 | **Em dash overuse** | “institutions—not the people—yet this continues—“ | Prefer commas or periods |
+| 14 | **Em dash overuse / paired bracketing** | “institutions—not the people—yet this continues—”, “report—covering three continents—concluded” | Prefer commas or periods; break paired brackets into appositives or separate sentences |
 | 15 | **Boldface overuse** | “**OKRs**, **KPIs**, **BMC**” | “OKRs, KPIs, BMC” |
 | 16 | **Inline-header lists** | “**Performance:** Performance improved” | Convert to prose (preserve genuine lists) |
 | 17 | **Title Case Headings** | “Strategic Negotiations And Partnerships” | “Strategic negotiations and partnerships” |
@@ -191,16 +197,16 @@ The skill runs a length audit to cut 20–30% of padding, then a specific 9-poin
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
 | 20 | **Chatbot artifacts** | “I hope this helps! Let me know if...” | Remove entirely |
-| 21 | **Cutoff disclaimers** | “While details are limited in available sources...” | Find sources or remove |
+| 21 | **Cutoff disclaimers / speculative gap-filling** | “While details are limited...”; “she maintains a low profile” | Find sources or remove |
 | 22 | **Sycophantic tone** | “Great question! You're absolutely right!” | Respond directly |
 
 ### Filler and Hedging
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 23 | **Filler phrases** | “In order to”, “It is worth noting that”, “Going forward” | Cut or rewrite directly |
+| 23 | **Filler phrases / didactic disclaimers** | “In order to”, “It is worth noting that”, “Going forward”, “It is important to note”, “Keep in mind”, “consult a professional” | Cut or rewrite directly |
 | 24 | **Excessive hedging** | “could potentially possibly” | “may” |
-| 25 | **Generic conclusions** | “The future looks bright” | Specific plans or facts |
+| 25 | **Generic conclusions / structural `## Conclusion` sections** | “The future looks bright”; a whole `## Conclusion` that restates the body | Specific plans or facts; delete the whole section |
 
 ### New in v3.0
 
@@ -211,6 +217,29 @@ The skill runs a length audit to cut 20–30% of padding, then a specific 9-poin
 | 32 | **Stacked intensifier adjectives** | “innovative, comprehensive, and forward-thinking” | One specific adjective or none |
 | 33 | **Quantity vagueness** | “a wide range of factors... numerous studies” | Specific count or named examples |
 | 34 | **Trailing emphasis fragments** | “That's the key. And that matters.” | Delete; the previous sentence said it |
+
+### Heading Patterns (new in v3.2)
+
+| # | Pattern | Before | After |
+|---|---------|--------|-------|
+| 35 | **Debunking-pose headings** | “What the research actually says”, “X: the long game”, “demystified” | Cut “actually / the real / that lands”; audit headings as a separate pass |
+
+### Epistemic Patterns (new in v3.2)
+
+| # | Pattern | Before | After |
+|---|---------|--------|-------|
+| 36 | **Conditional frame stacking** | “If the argument holds, and if the reading is right, then perhaps...” | State the conclusion; reserve “if” for real analytical branches |
+| 37 | **Miscalibrated epistemic confidence** | Over: “decisively demonstrates fundamentally”; Over-hedge: “appears to have arguably may have somewhat” | Narrow the claim to what the evidence supports; don't swap one extreme for the other |
+
+### Artifacts and Contamination (new in v3.2)
+
+These do not occur in genuinely human-written text — when present, AI involvement is essentially confirmed. **Always strip them, regardless of domain.**
+
+| # | Pattern | Before | After |
+|---|---------|--------|-------|
+| 38 | **Reference-markup artifacts** | “...modern history `turn0search0`”, `?utm_source=chatgpt.com`, `<grok_card>`, `:contentReference[oaicite:0]` | Strip the markup; add a real citation if needed |
+| 39 | **Phrasal templates / placeholder text** | “Founded in [YEAR], [COMPANY] is...”, `2025-xx-xx`, `XXXX`, `___` | Fill in or delete the sentence |
+| 40 | **Markdown / wikitext contamination** | ```` ```markdown ```` fences left in prose, “Would you like me to convert...” meta-prompts | Remove the fence and meta-prompt |
 
 ## Full Example
 
@@ -247,6 +276,7 @@ The skill runs a length audit to cut 20–30% of padding, then a specific 9-poin
 
 ## Version History
 
+- **3.2.0** - Cherry-picked five upstream PRs and integrated them with the fork's domain system. Added a new **Detection Guidance** section (false positives, signs of human writing to preserve, per-model LLM idiolects — ChatGPT / Grok / Gemini / Claude) so editors know what NOT to flag. Added a **Tier-1 AI-iness density pre-flight** in Full mode: counts dead-giveaway tells per 100 words and auto-drops to Quick when density = 0, so human-first drafts aren't over-edited. Expanded six existing patterns: #7 with era-specific vocabulary clusters (GPT-4 / GPT-4o / GPT-5 eras) and a figurative-vs-literal caveat; #9 with "rather than" dismissals + on-the-table test; #14 with paired em dash bracketing and four fix options; #21 with speculative gap-filling ("maintains a low profile" template); #23 with three more didactic disclaimers; #25 with structural `## Conclusion` section deletion. Added six new patterns (35–40) in three new themed sections: **Heading Patterns** (#35 Debunking-Pose Headings), **Epistemic Patterns** (#36 Conditional Frame Stacking, #37 Miscalibrated Epistemic Confidence), and **Artifacts and Contamination** (#38 Reference-Markup Artifacts, #39 Phrasal Templates / Placeholder Text, #40 Markdown / Wikitext Contamination). Domain overrides extended for #35–37; #38–40 are universal. Final AI audit checklist grew from 9 to 13 points. Sources: PRs #113, #112, #111, #116, #85, and #115 (adapted) from blader/humanizer.
 - **3.1.0** - Added domain awareness: skill now detects (or accepts) a domain — casual, academic, legal, technical, or marketing — and applies per-domain overrides to 13 patterns. Passive voice is preserved in academic/legal; bold and inline-header lists in technical; promotional language in marketing. The PERSONALITY AND SOUL section now applies only to casual (and lightly to technical). Process and audit checklist updated to reference domain. Output format adds a domain announcement before the draft.
 - **3.0.0** - Added 5 new patterns (sentence-starter intensifiers, rhetorical questions, stacked adjectives, quantity vagueness, trailing emphasis fragments), raising the total to 34; expanded AI vocabulary list (bolstered, meticulous, robust, seamless, intuitive, comprehensive); added copula words (maintains, offers); expanded superficial -ing list; added filler phrases (as such, it is worth noting that, going forward, a wide range of, the fact that); added mode selector (Quick/Full/Voice); restructured process with length audit and specific final AI audit checklist; fixed inline-header list rule to preserve genuine lists; clarified hyphenation rule; fixed curly quotes explanation; sourced additional patterns from re-read of Wikipedia Signs of AI Writing article
 - **2.5.1** - Added a passive-voice / subjectless-fragment rule, raising the total to 29 patterns
