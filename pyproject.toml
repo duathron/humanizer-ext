@@ -1,0 +1,13 @@
+[project]
+name = "humanizer-ext"
+version = "3.3.0-dev"
+description = "Humanizer skill — repo-side tooling for tests and evals"
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pyyaml>=6.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v"
