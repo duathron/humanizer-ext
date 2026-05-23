@@ -82,3 +82,29 @@ def test_universal_and_en_packs_are_disjoint():
     universal = _pattern_ids_in_file(REPO_ROOT / "patterns" / "_universal.md")
     en = _pattern_ids_in_file(REPO_ROOT / "patterns" / "en.md")
     assert universal & en == set(), f"overlapping pattern IDs: {universal & en}"
+
+
+def test_en_overrides_exists():
+    assert (REPO_ROOT / "domains" / "en_overrides.md").is_file()
+
+
+def test_en_overrides_contains_override_table_and_guidance():
+    text = (REPO_ROOT / "domains" / "en_overrides.md").read_text(encoding="utf-8")
+    # Sentinel strings from the existing SKILL.md sections we're extracting
+    assert "Domain overrides" in text
+    assert "Domain-specific guidance" in text
+    # Override table must mention all 5 domain columns
+    for domain in ["academic", "legal", "technical", "marketing", "casual"]:
+        assert domain in text.lower(), f"missing domain mention: {domain}"
+
+
+def test_en_overrides_pattern_ids_exist_in_packs():
+    """Every pattern ID referenced in en_overrides.md must be in en.md or _universal.md."""
+    overrides_text = (REPO_ROOT / "domains" / "en_overrides.md").read_text(encoding="utf-8")
+    referenced = {int(m.group(1)) for m in re.finditer(r"#(\d+)\b", overrides_text)}
+    defined = (
+        _pattern_ids_in_file(REPO_ROOT / "patterns" / "en.md")
+        | _pattern_ids_in_file(REPO_ROOT / "patterns" / "_universal.md")
+    )
+    orphans = referenced - defined
+    assert not orphans, f"en_overrides.md references undefined pattern IDs: {orphans}"
