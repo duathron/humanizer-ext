@@ -52,3 +52,33 @@ def test_universal_pack_contains_expected_patterns():
         f"_universal.md pattern IDs differ from spec: "
         f"missing {UNIVERSAL_PATTERN_IDS - ids}, extra {ids - UNIVERSAL_PATTERN_IDS}"
     )
+
+
+EN_PATTERN_IDS = {
+    1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 16, 20, 21, 22, 23, 24,
+    27, 28, 30, 31, 32, 33, 34, 35, 36, 37,
+}
+
+
+def test_en_pack_exists():
+    assert (REPO_ROOT / "patterns" / "en.md").is_file()
+
+
+def test_en_pack_contains_expected_patterns():
+    ids = _pattern_ids_in_file(REPO_ROOT / "patterns" / "en.md")
+    assert ids == EN_PATTERN_IDS, (
+        f"en.md pattern IDs differ from spec: "
+        f"missing {EN_PATTERN_IDS - ids}, extra {ids - EN_PATTERN_IDS}"
+    )
+
+
+def test_en_pack_includes_personality_section():
+    text = (REPO_ROOT / "patterns" / "en.md").read_text(encoding="utf-8")
+    assert "## PERSONALITY AND SOUL" in text
+
+
+def test_universal_and_en_packs_are_disjoint():
+    """No pattern ID appears in both packs."""
+    universal = _pattern_ids_in_file(REPO_ROOT / "patterns" / "_universal.md")
+    en = _pattern_ids_in_file(REPO_ROOT / "patterns" / "en.md")
+    assert universal & en == set(), f"overlapping pattern IDs: {universal & en}"
