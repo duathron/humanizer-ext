@@ -1,6 +1,6 @@
 [project]
 name = "humanizer-ext"
-version = "3.3.0-dev"
+version = "3.3.0.dev0"
 description = "Humanizer skill — repo-side tooling for tests and evals"
 requires-python = ">=3.10"
 
