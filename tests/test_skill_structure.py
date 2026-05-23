@@ -28,3 +28,27 @@ def test_skill_md_description_under_plugin_limit():
         f"description is {len(fm['description'])} chars, "
         f"exceeds Claude Code 1024-char limit"
     )
+
+
+UNIVERSAL_PATTERN_IDS = {6, 14, 15, 17, 18, 19, 25, 26, 29, 38, 39, 40}
+
+
+def _pattern_ids_in_file(path: Path) -> set[int]:
+    """Find lines like '### 14. Em Dash Overuse...' and return the IDs."""
+    text = path.read_text(encoding="utf-8")
+    return {
+        int(m.group(1))
+        for m in re.finditer(r"^### (\d+)\.\s", text, re.MULTILINE)
+    }
+
+
+def test_universal_pack_exists():
+    assert (REPO_ROOT / "patterns" / "_universal.md").is_file()
+
+
+def test_universal_pack_contains_expected_patterns():
+    ids = _pattern_ids_in_file(REPO_ROOT / "patterns" / "_universal.md")
+    assert ids == UNIVERSAL_PATTERN_IDS, (
+        f"_universal.md pattern IDs differ from spec: "
+        f"missing {UNIVERSAL_PATTERN_IDS - ids}, extra {ids - UNIVERSAL_PATTERN_IDS}"
+    )
