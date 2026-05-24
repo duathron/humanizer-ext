@@ -1,0 +1,8 @@
+{
+  "id": "e2e_en_casual_01",
+  "lang": "en",
+  "domain": "casual",
+  "source": "manual_synthesis: prototypical AI casual blog opening",
+  "input": "Great question! Here is an essay on this topic. I hope this helps!\n\nAI-assisted coding serves as an enduring testament to the transformative potential of large language models, marking a pivotal moment in the evolution of software development. In today's rapidly evolving technological landscape, these groundbreaking tools—nestled at the intersection of research and practice—are reshaping how engineers ideate, iterate, and deliver, underscoring their vital role in modern workflows.\n\nAt its core, the value proposition is clear: streamlining processes, enhancing collaboration, and fostering alignment. It's not just about autocomplete; it's about unlocking creativity at scale, ensuring that organizations can remain agile while delivering seamless, intuitive, and powerful experiences to users.",
+  "reference_rewrite": null
+}
