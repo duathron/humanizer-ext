@@ -1,2 +1,11 @@
 .claude/
 .DS_Store
+
+# Python tooling
+__pycache__/
+.pytest_cache/
+.venv/
+*.pyc
+
+# User personal samples (never committed)
+writing-samples/
