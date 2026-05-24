@@ -108,3 +108,33 @@ def test_en_overrides_pattern_ids_exist_in_packs():
     )
     orphans = referenced - defined
     assert not orphans, f"en_overrides.md references undefined pattern IDs: {orphans}"
+
+
+def test_skill_md_instructs_loading_universal_pack():
+    text = (REPO_ROOT / "SKILL.md").read_text(encoding="utf-8")
+    assert "patterns/_universal.md" in text, (
+        "SKILL.md must instruct Claude to load patterns/_universal.md"
+    )
+
+
+def test_skill_md_instructs_loading_language_pack():
+    text = (REPO_ROOT / "SKILL.md").read_text(encoding="utf-8")
+    assert "patterns/{lang}.md" in text or "patterns/en.md" in text, (
+        "SKILL.md must instruct Claude to load the language-specific pack"
+    )
+
+
+def test_skill_md_instructs_loading_domain_overrides():
+    text = (REPO_ROOT / "SKILL.md").read_text(encoding="utf-8")
+    assert "domains/{lang}_overrides.md" in text or "domains/en_overrides.md" in text, (
+        "SKILL.md must instruct Claude to load the per-language domain overrides"
+    )
+
+
+def test_skill_md_no_longer_contains_pattern_definitions():
+    """After refactor, individual ### N. <Pattern Name> sections must be gone."""
+    text = (REPO_ROOT / "SKILL.md").read_text(encoding="utf-8")
+    pattern_headings = re.findall(r"^### \d+\.\s.*$", text, re.MULTILINE)
+    assert not pattern_headings, (
+        f"SKILL.md still contains pattern definitions: {pattern_headings[:3]}..."
+    )

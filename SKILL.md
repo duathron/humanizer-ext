@@ -96,16 +96,19 @@ These are tendencies, not rules. All four families produce all the patterns in t
 When given text to humanize:
 
 1. **Check mode** — Quick, Full (default), or Voice?
-2. **Check domain** — Casual (default), academic, legal, technical, or marketing? If not specified, infer from the text and state the detected domain at the start of your response.
-3. **Voice calibration** — If a sample is provided, analyze it FIRST (see Voice Calibration section below)
-4. **Pre-flight density check** (Full mode only) — Count Tier 1 dead-giveaway tells per 100 words; if density = 0, drop to a Quick-mode pass to avoid over-editing voice. Announce the result before the draft. See the full Process section below.
-5. **Identify AI patterns** — Scan for the 40 patterns listed below, respecting domain overrides (SKIP/light per the Domain table) and the Detection Guidance "what NOT to flag" list above
-6. **Rewrite problematic sections** — Replace AI-isms with natural alternatives
-7. **Preserve meaning** — Keep the core message intact
-8. **Maintain register** — Match the appropriate tone for the domain (formal-impersonal for academic/legal; direct for technical; persuasive for marketing; personal-varied for casual)
-9. **Add soul** — Only for casual (and lightly for technical). Skip for academic, legal, and marketing — those domains have their own appropriate registers.
-10. **Length audit** — Can this be 20–30% shorter without losing meaning? Cut padding. (Lighter for academic and technical, which may legitimately be long for precision.)
-11. **Final AI audit** — Run the checklist before presenting the final version
+2. **Detect input language** from the text. Supported languages have a pack at `patterns/{lang}.md` — currently `en`. If the detected language has no pack, fall back to `en` and warn inline.
+3. **Load the relevant pattern packs.** Always Read `patterns/_universal.md`. Then Read `patterns/{lang}.md` for the detected language.
+4. **Check domain** — Casual (default), academic, legal, technical, or marketing? If not specified, infer from the text and state the detected domain at the start of your response.
+5. **Load the per-language domain overrides** by Reading `domains/{lang}_overrides.md`.
+6. **Voice calibration** — If a writing sample is provided, analyze it FIRST (see Voice Calibration section below).
+7. **Pre-flight density check** (Full mode only) — Count Tier 1 dead-giveaway tells per 100 words; if density = 0, drop to a Quick-mode pass to avoid over-editing voice. Announce the result before the draft. See the full Process section below.
+8. **Identify AI patterns** — Scan for patterns defined in the loaded packs (universal + language), respecting domain overrides (SKIP/light per the override matrix) and the Detection Guidance "what NOT to flag" list above.
+9. **Rewrite problematic sections** — Replace AI-isms with natural alternatives.
+10. **Preserve meaning** — Keep the core message intact.
+11. **Maintain register** — Match the appropriate tone for the domain.
+12. **Add soul** — Only for casual (and lightly for technical). Skip for academic, legal, and marketing. See the PERSONALITY AND SOUL section in the language pack (if present).
+13. **Length audit** — Can this be 20–30% shorter without losing meaning? Cut padding. (Lighter for academic and technical.)
+14. **Final AI audit** — Run the checklist before presenting the final version. Universal items appear here; language- and domain-specific items appear in the loaded packs.
 
 ## Voice Calibration
 
@@ -134,6 +137,7 @@ If the user provides a writing sample (their own previous writing), **analyze it
 
 1. Check mode — Quick, Full, or Voice?
 2. **Check domain** — Casual (default), academic, legal, technical, or marketing. If not specified, infer from the text and state the detected domain at the start of your response.
+2a. **Load the relevant pattern packs.** Read `patterns/_universal.md` (always). Read `patterns/{lang}.md` for the detected language (defaults to `en`). Read `domains/{lang}_overrides.md` for the domain override matrix.
 3. If Voice or a sample is provided: analyze the writing sample first
 4. Read the input text carefully
 5. **Pre-flight: AI-iness density check.** Count **Tier 1 dead-giveaway** tells per 100 words. Tier 1 = patterns #1, #4, #7, #20, #21, #22, #25 — these almost never appear in genuine human writing.
