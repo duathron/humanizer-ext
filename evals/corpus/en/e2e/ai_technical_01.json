@@ -1,0 +1,8 @@
+{
+  "id": "e2e_en_technical_01",
+  "lang": "en",
+  "domain": "technical",
+  "source": "manual_synthesis: AI-generated technical docs intro with vocabulary tells",
+  "input": "The new RetryPolicy module represents a robust, comprehensive solution that fundamentally transforms how our SDK handles transient failures, underscoring the seamless integration of resilience patterns into the core request pipeline. This intuitive, meticulously engineered API leverages a sophisticated backoff strategy that contributes to higher success rates across a wide range of failure modes. Additionally, the module's design fosters alignment with industry best practices, ensuring that clients benefit from a battle-tested implementation. - **Configuration:** Simple, intuitive setup. - **Performance:** Significantly enhanced reliability. - **Compatibility:** Seamless integration.",
+  "reference_rewrite": null
+}
