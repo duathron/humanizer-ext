@@ -230,3 +230,56 @@ def test_verify_skill_install_missing_installed(tmp_path):
 
     with pytest.raises(SkillInstallMismatch, match="not installed"):
         verify_skill_install(repo_skill_path=repo_skill, installed_skill_path=installed_skill)
+
+
+@patch("evals.scripts._shared.run_skill")
+@patch("evals.scripts._shared.verify_skill_install")
+def test_pattern_eval_scores_detection(mock_verify, mock_run_skill, tmp_path, monkeypatch):
+    from evals.scripts.run_pattern_eval import score_case
+    from evals.scripts._shared import Case
+
+    case = Case(
+        id="pattern_007_en_001",
+        input="Additionally, the report underscores the pivotal moment.",
+        expected_changes=["Additionally", "underscores", "pivotal moment"],
+        expected_unchanged=[],
+        domain="casual",
+        metadata={"pattern_id": 7, "pattern_name": "AI vocabulary", "lang": "en"},
+    )
+    # Simulate a rewrite that removed all three expected_changes
+    mock_run_skill.return_value = {
+        "domain": "casual",
+        "preflight": "",
+        "draft": "The report flags an important shift.",
+        "final": "The report flags an important shift.",
+    }
+
+    score = score_case(case, model="sonnet")
+    assert score["detected"] is True
+    assert score["removed_terms"] == ["Additionally", "underscores", "pivotal moment"]
+    assert score["retained_terms"] == []
+
+
+@patch("evals.scripts._shared.run_skill")
+def test_pattern_eval_partial_removal(mock_run_skill):
+    from evals.scripts.run_pattern_eval import score_case
+    from evals.scripts._shared import Case
+
+    case = Case(
+        id="pattern_007_en_002",
+        input="Additionally, this is a pivotal moment.",
+        expected_changes=["Additionally", "pivotal moment"],
+        expected_unchanged=[],
+        domain="casual",
+        metadata={"pattern_id": 7, "pattern_name": "AI vocabulary", "lang": "en"},
+    )
+    mock_run_skill.return_value = {
+        "domain": "casual",
+        "preflight": "",
+        "draft": "This is a pivotal moment.",
+        "final": "This is a pivotal moment.",
+    }
+    score = score_case(case, model="sonnet")
+    assert score["detected"] is False  # only 1 of 2 removed
+    assert score["removed_terms"] == ["Additionally"]
+    assert score["retained_terms"] == ["pivotal moment"]
