@@ -9,3 +9,14 @@ __pycache__/
 
 # User personal samples (never committed)
 writing-samples/
+
+# Personal-mode eval reports — never committed
+evals/reports/*_personal_*
+evals/reports/personal_*
+
+# Eval report archive (keep only the most recent summary in tree)
+evals/reports/*.json
+evals/reports/*.md
+!evals/reports/.gitkeep
+!evals/reports/summary_latest_en.md
+!evals/reports/summary_latest_en.json
