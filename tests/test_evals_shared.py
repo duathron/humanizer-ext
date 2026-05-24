@@ -147,3 +147,52 @@ def test_run_skill_returncode_nonzero_raises(mock_run):
     mock_run.return_value = MagicMock(stdout="", stderr="boom", returncode=1)
     with pytest.raises(SkillRunError, match="claude CLI exited 1"):
         run_skill("hi")
+
+
+from unittest.mock import call
+
+
+def test_retry_with_backoff_succeeds_on_third_try():
+    from evals.scripts._shared import retry_with_backoff
+
+    attempts = {"n": 0}
+    def flaky():
+        attempts["n"] += 1
+        if attempts["n"] < 3:
+            raise RuntimeError("transient")
+        return "ok"
+
+    result = retry_with_backoff(flaky, max_attempts=3, base_delay=0.01)
+    assert result == "ok"
+    assert attempts["n"] == 3
+
+
+def test_retry_with_backoff_raises_after_max():
+    from evals.scripts._shared import retry_with_backoff
+
+    def always_fails():
+        raise RuntimeError("nope")
+
+    with pytest.raises(RuntimeError, match="nope"):
+        retry_with_backoff(always_fails, max_attempts=2, base_delay=0.01)
+
+
+def test_write_report_creates_json_and_markdown(tmp_path, monkeypatch):
+    from evals.scripts._shared import write_report
+
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "evals" / "reports").mkdir(parents=True)
+
+    data = {
+        "eval_type": "pattern",
+        "lang": "en",
+        "summary": {"detection_rate": 0.92},
+        "per_pattern": [{"id": 7, "rate": 0.95}],
+    }
+    json_path, md_path = write_report("pattern_en_demo", data)
+
+    assert json_path.exists()
+    assert md_path.exists()
+    assert json.loads(json_path.read_text())["summary"]["detection_rate"] == 0.92
+    assert "pattern" in md_path.read_text().lower()
+    assert "0.92" in md_path.read_text()

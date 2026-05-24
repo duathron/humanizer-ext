@@ -149,3 +149,70 @@ def run_skill(
             f"claude CLI exited {completed.returncode}: {completed.stderr.strip()}"
         )
     return parse_skill_output(completed.stdout)
+
+
+import time
+from datetime import datetime
+from typing import Callable, TypeVar
+
+
+T = TypeVar("T")
+
+
+def retry_with_backoff(
+    fn: Callable[[], T], *, max_attempts: int = 3, base_delay: float = 1.0
+) -> T:
+    """Call fn() with exponential backoff. Reraises the last exception on failure."""
+    last_exc: Exception | None = None
+    for attempt in range(max_attempts):
+        try:
+            return fn()
+        except Exception as exc:
+            last_exc = exc
+            if attempt == max_attempts - 1:
+                break
+            time.sleep(base_delay * (2 ** attempt))
+    assert last_exc is not None
+    raise last_exc
+
+
+def write_report(name: str, data: dict[str, Any]) -> tuple[Path, Path]:
+    """Write paired JSON + Markdown reports under evals/reports/.
+
+    Filenames include a timestamp so consecutive runs do not overwrite each
+    other. The MD file is a human-readable summary; the JSON is the full
+    structured payload for diffing.
+    """
+    reports_dir = Path.cwd() / "evals" / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    json_path = reports_dir / f"{name}_{timestamp}.json"
+    md_path = reports_dir / f"{name}_{timestamp}.md"
+
+    json_path.write_text(json.dumps(data, indent=2, ensure_ascii=False))
+    md_path.write_text(_render_report_md(name, data))
+    return json_path, md_path
+
+
+def _render_report_md(name: str, data: dict[str, Any]) -> str:
+    """Render a minimal Markdown summary of a report payload."""
+    lines = [f"# Eval report: {name}", ""]
+    lines.append(f"- type: `{data.get('eval_type', '?')}`")
+    lines.append(f"- lang: `{data.get('lang', '?')}`")
+    summary = data.get("summary", {})
+    if summary:
+        lines.append("")
+        lines.append("## Summary")
+        lines.append("")
+        for k, v in summary.items():
+            lines.append(f"- **{k}**: {v}")
+    per_pattern = data.get("per_pattern", [])
+    if per_pattern:
+        lines.append("")
+        lines.append("## Per-pattern")
+        lines.append("")
+        lines.append("| pattern | metric |")
+        lines.append("|---|---|")
+        for entry in per_pattern:
+            lines.append(f"| #{entry.get('id', '?')} | {entry.get('rate', '?')} |")
+    return "\n".join(lines) + "\n"
