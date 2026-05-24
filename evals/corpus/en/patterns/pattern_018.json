@@ -1,0 +1,15 @@
+{
+  "pattern_id": 18,
+  "pattern_name": "Emojis",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_018_en_001",
+      "input": "🚀 **Launch Phase:** The product launches in Q3\n> 💡 **Key Insight:** Users prefer simplicity\n> ✅ **Next Steps:** Schedule follow-up meeting",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

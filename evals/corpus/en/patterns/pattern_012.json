@@ -1,0 +1,15 @@
+{
+  "pattern_id": 12,
+  "pattern_name": "False Ranges",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_012_en_001",
+      "input": "Our journey through the universe has taken us from the singularity of the Big Bang to the grand cosmic web, from the birth and death of stars to the enigmatic dance of dark matter.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

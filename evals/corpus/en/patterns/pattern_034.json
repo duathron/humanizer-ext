@@ -1,0 +1,15 @@
+{
+  "pattern_id": 34,
+  "pattern_name": "Trailing Emphasis Fragments",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_034_en_001",
+      "input": "The system processes requests in under 50ms. That's the key. And that matters.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

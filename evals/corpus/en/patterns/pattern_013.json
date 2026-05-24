@@ -1,0 +1,15 @@
+{
+  "pattern_id": 13,
+  "pattern_name": "Passive Voice and Subjectless Fragments",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_013_en_001",
+      "input": "No configuration file needed. The results are preserved automatically.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

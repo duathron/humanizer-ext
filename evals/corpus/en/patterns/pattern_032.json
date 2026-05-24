@@ -1,0 +1,15 @@
+{
+  "pattern_id": 32,
+  "pattern_name": "Stacked Intensifier Adjectives",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_032_en_001",
+      "input": "This innovative, comprehensive, and forward-thinking solution addresses the needs of modern organizations.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

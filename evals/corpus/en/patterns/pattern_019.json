@@ -1,0 +1,15 @@
+{
+  "pattern_id": 19,
+  "pattern_name": "Curly Quotation Marks",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_019_en_001",
+      "input": "He said \"the project is on track\" but others disagreed.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

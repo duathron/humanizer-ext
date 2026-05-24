@@ -1,0 +1,23 @@
+{
+  "pattern_id": 20,
+  "pattern_name": "Collaborative Communication Artifacts",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_020_en_001",
+      "input": "Here is an overview of the French Revolution. I hope this helps! Let me know if you'd like me to expand on any section.",
+      "expected_changes": [
+        "I hope this helps",
+        "Of course!",
+        "Certainly!",
+        "You're absolutely right!",
+        "Would you like",
+        "let me know",
+        "here is a"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

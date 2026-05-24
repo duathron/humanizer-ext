@@ -1,0 +1,15 @@
+{
+  "pattern_id": 36,
+  "pattern_name": "Conditional Frame Stacking",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_036_en_001",
+      "input": "If the argument holds, and if the evidence supports this reading, then the policy may have had some effect — if, that is, the context was as described.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

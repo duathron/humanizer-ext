@@ -1,0 +1,24 @@
+{
+  "pattern_id": 33,
+  "pattern_name": "Quantity Vagueness",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_033_en_001",
+      "input": "A wide range of factors contributed to the outcome. Numerous studies have confirmed these findings across various contexts.",
+      "expected_changes": [
+        "a wide range of",
+        "a variety of",
+        "numerous",
+        "countless",
+        "various",
+        "many different",
+        "a number of",
+        "several different"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

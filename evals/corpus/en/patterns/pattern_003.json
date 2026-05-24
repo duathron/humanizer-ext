@@ -1,0 +1,24 @@
+{
+  "pattern_id": 3,
+  "pattern_name": "Superficial Analyses with -ing Endings",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_003_en_001",
+      "input": "The temple's color palette of blue, green, and gold resonates with the region's natural beauty, symbolizing Texas bluebonnets, the Gulf of Mexico, and the diverse Texan landscapes, reflecting the community's deep connection to the land.",
+      "expected_changes": [
+        "highlighting/underscoring/emphasizing",
+        "ensuring",
+        "reflecting/symbolizing",
+        "contributing to",
+        "cultivating/fostering",
+        "encompassing",
+        "showcasing",
+        "resonating with"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

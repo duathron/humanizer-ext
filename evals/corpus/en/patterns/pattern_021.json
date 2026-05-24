@@ -1,0 +1,41 @@
+{
+  "pattern_id": 21,
+  "pattern_name": "Knowledge-Cutoff Disclaimers and Speculative Gap-Filling",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_021_en_001",
+      "input": "While specific details about the company's founding are not extensively documented in readily available sources, it appears to have been established sometime in the 1990s.",
+      "expected_changes": [
+        "as of [date]",
+        "Up to my last training update",
+        "While specific details are limited/scarce",
+        "based on available information",
+        "not extensively documented",
+        "not publicly available",
+        "maintains a low profile",
+        "keeps personal details private"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    },
+    {
+      "id": "pattern_021_en_002",
+      "input": "Information about her early life is not publicly available, suggesting she maintains a low profile and keeps personal details private. She likely grew up in a middle-class household, which would have shaped her later interest in education reform.",
+      "expected_changes": [
+        "as of [date]",
+        "Up to my last training update",
+        "While specific details are limited/scarce",
+        "based on available information",
+        "not extensively documented",
+        "not publicly available",
+        "maintains a low profile",
+        "keeps personal details private"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "pattern_id": 35,
+  "pattern_name": "Debunking-Pose Headings",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_035_en_001",
+      "input": "## What the research actually says\n> ## Why your adult child cut you off (the real map)\n> ## The architecture of a letter that lands\n> ## Grandchildren: the long game\n> ## The truth about pricing models, explained",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

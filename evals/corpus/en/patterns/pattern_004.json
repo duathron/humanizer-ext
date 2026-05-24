@@ -1,0 +1,24 @@
+{
+  "pattern_id": 4,
+  "pattern_name": "Promotional and Advertisement-like Language",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_004_en_001",
+      "input": "Nestled within the breathtaking region of Gonder in Ethiopia, Alamata Raya Kobo stands as a vibrant town with a rich cultural heritage and stunning natural beauty.",
+      "expected_changes": [
+        "boasts a",
+        "vibrant",
+        "rich (figurative)",
+        "profound",
+        "enhancing its",
+        "showcasing",
+        "exemplifies",
+        "commitment to"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

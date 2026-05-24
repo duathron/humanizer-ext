@@ -1,0 +1,15 @@
+{
+  "pattern_id": 31,
+  "pattern_name": "Rhetorical and Self-Answering Questions",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_031_en_001",
+      "input": "What makes this approach effective? The way it reduces cognitive load. Why does that matter? Because users abandon tools that are hard to use.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

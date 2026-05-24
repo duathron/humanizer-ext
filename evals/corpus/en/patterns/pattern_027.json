@@ -1,0 +1,24 @@
+{
+  "pattern_id": 27,
+  "pattern_name": "Persuasive Authority Tropes",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_027_en_001",
+      "input": "The real question is whether teams can adapt. At its core, what really matters is organizational readiness.",
+      "expected_changes": [
+        "The real question is",
+        "at its core",
+        "in reality",
+        "what really matters",
+        "fundamentally",
+        "the deeper issue",
+        "the heart of the matter",
+        "in essence"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "pattern_id": 25,
+  "pattern_name": "Generic Positive Conclusions",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_025_en_001",
+      "input": "The future looks bright for the company. Exciting times lie ahead as they continue their journey toward excellence. This represents a major step in the right direction.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

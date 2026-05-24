@@ -1,0 +1,24 @@
+{
+  "pattern_id": 1,
+  "pattern_name": "Undue Emphasis on Significance, Legacy, and Broader Trends",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_001_en_001",
+      "input": "The Statistical Institute of Catalonia was officially established in 1989, marking a pivotal moment in the evolution of regional statistics in Spain. This initiative was part of a broader movement across Spain to decentralize administrative functions and enhance regional governance.",
+      "expected_changes": [
+        "stands/serves as",
+        "is a testament/reminder",
+        "a vital/significant/crucial/pivotal/key role/moment",
+        "underscores/highlights its importance/significance",
+        "reflects broader",
+        "symbolizing its ongoing/enduring/lasting",
+        "contributing to the",
+        "setting the stage for"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

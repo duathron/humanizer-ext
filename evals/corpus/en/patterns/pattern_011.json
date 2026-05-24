@@ -1,0 +1,15 @@
+{
+  "pattern_id": 11,
+  "pattern_name": "Elegant Variation (Synonym Cycling)",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_011_en_001",
+      "input": "The protagonist faces many challenges. The main character must overcome obstacles. The central figure eventually triumphs. The hero returns home.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

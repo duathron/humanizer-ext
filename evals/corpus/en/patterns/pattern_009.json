@@ -1,0 +1,31 @@
+{
+  "pattern_id": 9,
+  "pattern_name": "Negative Parallelisms, Tailing Negations, and \"Rather Than\" Dismissals",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_009_en_001",
+      "input": "It's not just about the beat riding under the vocals; it's part of the aggression and atmosphere. It's not merely a song, it's a statement.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    },
+    {
+      "id": "pattern_009_en_002",
+      "input": "The options come from the selected item, no guessing.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    },
+    {
+      "id": "pattern_009_en_003",
+      "input": "The goal is to write clearly rather than to impress the reader with complexity.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

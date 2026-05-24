@@ -1,0 +1,24 @@
+{
+  "pattern_id": 30,
+  "pattern_name": "Sentence-Starter Intensifiers",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_030_en_001",
+      "input": "Ultimately, what matters most is execution. Indeed, the data confirms this. Clearly, the old approach was flawed.",
+      "expected_changes": [
+        "Ultimately",
+        "Indeed",
+        "Clearly",
+        "Essentially",
+        "Fundamentally",
+        "Obviously",
+        "Naturally",
+        "Notably"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

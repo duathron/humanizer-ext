@@ -1,0 +1,20 @@
+{
+  "pattern_id": 2,
+  "pattern_name": "Undue Emphasis on Notability and Media Coverage",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_002_en_001",
+      "input": "Her views have been cited in The New York Times, BBC, Financial Times, and The Hindu. She maintains an active social media presence with over 500,000 followers.",
+      "expected_changes": [
+        "independent coverage",
+        "local/regional/national media outlets",
+        "written by a leading expert",
+        "active social media presence"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "pattern_id": 22,
+  "pattern_name": "Sycophantic/Servile Tone",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_022_en_001",
+      "input": "Great question! You're absolutely right that this is a complex topic. That's an excellent point about the economic factors.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

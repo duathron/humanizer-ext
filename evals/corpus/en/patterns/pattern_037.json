@@ -1,0 +1,23 @@
+{
+  "pattern_id": 37,
+  "pattern_name": "Miscalibrated Epistemic Confidence",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_037_en_001",
+      "input": "The data decisively demonstrates that remote work fundamentally transformed productivity across all sectors.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    },
+    {
+      "id": "pattern_037_en_002",
+      "input": "It appears that the policy may have arguably had some effect on outcomes, potentially suggesting a modest shift.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

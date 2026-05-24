@@ -1,0 +1,22 @@
+{
+  "pattern_id": 5,
+  "pattern_name": "Vague Attributions and Weasel Words",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_005_en_001",
+      "input": "Due to its unique characteristics, the Haolai River is of interest to researchers and conservationists. Experts believe it plays a crucial role in the regional ecosystem.",
+      "expected_changes": [
+        "Industry reports",
+        "Observers have cited",
+        "Experts argue",
+        "Some critics argue",
+        "several sources/publications (when few cited)",
+        "valuable insights"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

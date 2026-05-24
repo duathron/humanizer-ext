@@ -1,0 +1,15 @@
+{
+  "pattern_id": 24,
+  "pattern_name": "Excessive Hedging",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_024_en_001",
+      "input": "It could potentially possibly be argued that the policy might have some effect on outcomes.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "pattern_id": 16,
+  "pattern_name": "Inline-Header Vertical Lists",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_016_en_001",
+      "input": "- **User Experience:** The user experience has been significantly improved with a new interface.\n> - **Performance:** Performance has been enhanced through optimized algorithms.\n> - **Security:** Security has been strengthened with end-to-end encryption.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

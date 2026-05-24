@@ -1,0 +1,23 @@
+{
+  "pattern_id": 28,
+  "pattern_name": "Signposting and Announcements",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_028_en_001",
+      "input": "Let's dive into how caching works in Next.js. Here's what you need to know.",
+      "expected_changes": [
+        "Let's dive in",
+        "let's explore",
+        "let's break this down",
+        "here's what you need to know",
+        "now let's look at",
+        "without further ado",
+        "in this section we'll cover"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

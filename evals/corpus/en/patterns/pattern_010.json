@@ -1,0 +1,15 @@
+{
+  "pattern_id": 10,
+  "pattern_name": "Rule of Three Overuse",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_010_en_001",
+      "input": "The event features keynote sessions, panel discussions, and networking opportunities. Attendees can expect innovation, inspiration, and industry insights.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

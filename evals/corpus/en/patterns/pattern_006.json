@@ -1,0 +1,20 @@
+{
+  "pattern_id": 6,
+  "pattern_name": "Outline-like \"Challenges and Future Prospects\" Sections",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_006_en_001",
+      "input": "Despite its industrial prosperity, Korattur faces challenges typical of urban areas, including traffic congestion and water scarcity. Despite these challenges, with its strategic location and ongoing initiatives, Korattur continues to thrive as an integral part of Chennai's growth.",
+      "expected_changes": [
+        "Despite its... faces several challenges",
+        "Despite these challenges",
+        "Challenges and Legacy",
+        "Future Outlook"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "pattern_id": 8,
+  "pattern_name": "Avoidance of \"is\"/\"are\" (Copula Avoidance)",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_008_en_001",
+      "input": "Gallery 825 serves as LAAA's exhibition space for contemporary art. The gallery features four separate spaces and boasts over 3,000 square feet.",
+      "expected_changes": [
+        "serves as/stands as/marks/represents [a]",
+        "boasts/features/offers/maintains [a]"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}
