@@ -194,6 +194,47 @@ def write_report(name: str, data: dict[str, Any]) -> tuple[Path, Path]:
     return json_path, md_path
 
 
+import hashlib
+
+
+class SkillInstallMismatch(RuntimeError):
+    """Raised when the installed humanizer skill differs from the repo version."""
+
+
+_DEFAULT_INSTALLED_SKILL = Path.home() / ".claude" / "skills" / "humanizer" / "SKILL.md"
+
+
+def verify_skill_install(
+    *,
+    repo_skill_path: Path | None = None,
+    installed_skill_path: Path | None = None,
+) -> None:
+    """Confirm the skill `claude -p` will load matches the repo SKILL.md.
+
+    Raises SkillInstallMismatch with a clear message if the installed file is
+    missing or has different bytes than the repo's SKILL.md. The eval runners
+    call this before running so a stale install does not silently invalidate
+    the report.
+    """
+    repo_skill_path = repo_skill_path or (Path.cwd() / "SKILL.md")
+    installed_skill_path = installed_skill_path or _DEFAULT_INSTALLED_SKILL
+
+    if not installed_skill_path.exists():
+        raise SkillInstallMismatch(
+            f"humanizer skill not installed at {installed_skill_path} — "
+            f"symlink or install the repo's SKILL.md before running evals"
+        )
+
+    repo_hash = hashlib.sha256(repo_skill_path.read_bytes()).hexdigest()
+    installed_hash = hashlib.sha256(installed_skill_path.read_bytes()).hexdigest()
+    if repo_hash != installed_hash:
+        raise SkillInstallMismatch(
+            f"installed SKILL.md bytes differ from repo SKILL.md "
+            f"(installed={installed_hash[:8]}, repo={repo_hash[:8]}) — "
+            f"the eval would test a stale skill version"
+        )
+
+
 def _render_report_md(name: str, data: dict[str, Any]) -> str:
     """Render a minimal Markdown summary of a report payload."""
     lines = [f"# Eval report: {name}", ""]

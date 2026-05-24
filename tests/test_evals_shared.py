@@ -196,3 +196,37 @@ def test_write_report_creates_json_and_markdown(tmp_path, monkeypatch):
     assert json.loads(json_path.read_text())["summary"]["detection_rate"] == 0.92
     assert "pattern" in md_path.read_text().lower()
     assert "0.92" in md_path.read_text()
+
+
+def test_verify_skill_install_matches(tmp_path, monkeypatch):
+    from evals.scripts._shared import verify_skill_install, SkillInstallMismatch
+
+    repo_skill = tmp_path / "SKILL.md"
+    installed_skill = tmp_path / "installed_SKILL.md"
+    repo_skill.write_text("same content\n")
+    installed_skill.write_text("same content\n")
+
+    verify_skill_install(repo_skill_path=repo_skill, installed_skill_path=installed_skill)
+
+
+def test_verify_skill_install_mismatch_raises(tmp_path):
+    from evals.scripts._shared import verify_skill_install, SkillInstallMismatch
+
+    repo_skill = tmp_path / "SKILL.md"
+    installed_skill = tmp_path / "installed_SKILL.md"
+    repo_skill.write_text("repo version\n")
+    installed_skill.write_text("old installed version\n")
+
+    with pytest.raises(SkillInstallMismatch, match="bytes differ"):
+        verify_skill_install(repo_skill_path=repo_skill, installed_skill_path=installed_skill)
+
+
+def test_verify_skill_install_missing_installed(tmp_path):
+    from evals.scripts._shared import verify_skill_install, SkillInstallMismatch
+
+    repo_skill = tmp_path / "SKILL.md"
+    repo_skill.write_text("repo version\n")
+    installed_skill = tmp_path / "nope.md"
+
+    with pytest.raises(SkillInstallMismatch, match="not installed"):
+        verify_skill_install(repo_skill_path=repo_skill, installed_skill_path=installed_skill)
