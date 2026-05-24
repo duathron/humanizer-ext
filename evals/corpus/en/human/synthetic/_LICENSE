@@ -1,0 +1,10 @@
+All files in this directory are original prose written for the humanizer-ext
+eval corpus by the maintainer. They are released under MIT (same as the
+parent project).
+
+Each file's frontmatter declares its domain. These are intentionally human-
+written examples — the false-positive eval verifies that the skill leaves
+them substantially unchanged.
+
+If you contribute additional synthetic samples via PR, include a
+contributor.txt file alongside agreeing to MIT licensing.
