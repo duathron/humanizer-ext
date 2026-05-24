@@ -1,0 +1,8 @@
+{
+  "id": "e2e_en_legal_01",
+  "lang": "en",
+  "domain": "legal",
+  "source": "manual_synthesis: AI-generated brief excerpt with vocabulary tells around appropriate legal register",
+  "input": "Plaintiff respectfully submits that the District Court's order serves as a pivotal moment in this protracted litigation, underscoring the importance of adhering to well-established precedent. It is important to note that, fundamentally, the court below failed to delve into the comprehensive record before it, instead relying on a superficial reading that ultimately undermines the robust analytical framework this Court has consistently applied. In conclusion, Plaintiff submits that reversal is not only warranted but, indeed, essential to preserving the integrity of summary judgment proceedings going forward.",
+  "reference_rewrite": null
+}

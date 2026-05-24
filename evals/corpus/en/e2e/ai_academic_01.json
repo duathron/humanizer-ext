@@ -1,0 +1,8 @@
+{
+  "id": "e2e_en_academic_01",
+  "lang": "en",
+  "domain": "academic",
+  "source": "manual_synthesis: AI-generated academic abstract with vocabulary tells",
+  "input": "Recent advances in transformer-based architectures have ushered in a transformative paradigm shift in natural language processing, underscoring the pivotal role of attention mechanisms in capturing the intricate interplay of long-range dependencies. This paper delves into a comprehensive examination of how these robust, meticulously designed models contribute to the evolving landscape of cross-lingual transfer learning, foregrounding the seamless integration of multilingual corpora that bolster downstream task performance. We propose a novel framework that, fundamentally, redefines how these models can be fine-tuned for low-resource languages.",
+  "reference_rewrite": null
+}
