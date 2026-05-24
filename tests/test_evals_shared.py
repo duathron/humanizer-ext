@@ -51,3 +51,49 @@ def test_load_pattern_corpus_empty_dir(tmp_path):
     corpus_dir = tmp_path / "patterns"
     corpus_dir.mkdir()
     assert load_pattern_corpus(corpus_dir) == []
+
+
+from evals.scripts._shared import parse_skill_output
+
+
+SAMPLE_FULL_OUTPUT = """Treating this as **casual** writing.
+
+Pre-flight: 4 Tier-1 tells per 100 words → AI-heavy. Full pass.
+
+**Draft rewrite:**
+> AI coding assistants speed up some tasks.
+> They are good at boilerplate.
+
+**Final AI audit findings:**
+- One em dash retained ("X — Y")
+- Rule of three softened
+
+**Final rewrite:**
+> AI coding assistants speed up boilerplate.
+> They struggle with architecture.
+"""
+
+
+def test_parse_skill_output_extracts_draft_and_final():
+    parsed = parse_skill_output(SAMPLE_FULL_OUTPUT)
+    assert "AI coding assistants speed up some tasks" in parsed["draft"]
+    assert "AI coding assistants speed up boilerplate" in parsed["final"]
+    assert parsed["domain"] == "casual"
+    assert "4 Tier-1 tells" in parsed["preflight"]
+
+
+def test_parse_skill_output_handles_missing_sections():
+    minimal = "**Final rewrite:**\n> Just a final.\n"
+    parsed = parse_skill_output(minimal)
+    assert parsed["final"].strip() == "> Just a final."
+    assert parsed["draft"] == ""
+    assert parsed["domain"] == ""
+    assert parsed["preflight"] == ""
+
+
+def test_parse_skill_output_quick_mode_has_only_final():
+    """Quick mode outputs cleaned text only — no Draft/Final headers."""
+    quick = "Here is the cleaned text. It removed filler.\n"
+    parsed = parse_skill_output(quick)
+    assert parsed["final"].strip() == quick.strip()
+    assert parsed["draft"] == ""
