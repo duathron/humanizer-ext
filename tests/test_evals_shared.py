@@ -282,3 +282,36 @@ def test_pattern_eval_partial_removal(mock_run_skill):
     assert score["detected"] is False  # only 1 of 2 removed
     assert score["removed_terms"] == ["Additionally"]
     assert score["retained_terms"] == ["pivotal moment"]
+
+
+@patch("evals.scripts.run_e2e_eval._call_judge")
+@patch("evals.scripts.run_e2e_eval.run_skill")
+def test_e2e_eval_aggregates_three_runs(mock_run_skill, mock_judge):
+    from evals.scripts.run_e2e_eval import score_case
+
+    mock_run_skill.return_value = {
+        "domain": "casual", "preflight": "", "draft": "Draft.", "final": "Cleaner final."
+    }
+    # Judge returns three runs of slightly varying scores
+    mock_judge.side_effect = [
+        {"human_ness": 8, "meaning": 9, "length": 8, "rationale": {"human_ness": "ok", "meaning": "ok", "length": "ok"}},
+        {"human_ness": 7, "meaning": 9, "length": 9, "rationale": {"human_ness": "ok", "meaning": "ok", "length": "ok"}},
+        {"human_ness": 9, "meaning": 10, "length": 7, "rationale": {"human_ness": "ok", "meaning": "ok", "length": "ok"}},
+    ]
+
+    case = {
+        "id": "e2e_en_casual_01",
+        "lang": "en",
+        "domain": "casual",
+        "input": "AI input.",
+        "reference_rewrite": None,
+        "source": "test",
+    }
+    score = score_case(case, runs=3, model="sonnet", judge_model="sonnet")
+
+    assert score["case_id"] == "e2e_en_casual_01"
+    assert score["mean"]["human_ness"] == pytest.approx(8.0, abs=0.01)
+    assert score["mean"]["meaning"] == pytest.approx(9.333, abs=0.01)
+    assert score["mean"]["length"] == pytest.approx(8.0, abs=0.01)
+    assert score["stddev"]["human_ness"] > 0
+    assert len(score["runs"]) == 3
