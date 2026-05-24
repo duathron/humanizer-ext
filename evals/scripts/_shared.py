@@ -95,3 +95,57 @@ def parse_skill_output(text: str) -> dict[str, str]:
         # Quick-mode or non-sentinel output — treat entire text as the final.
         result["final"] = text.strip()
     return result
+
+
+import subprocess
+
+
+class SkillRunError(RuntimeError):
+    """Raised when the claude CLI subprocess fails or returns non-zero."""
+
+
+def _build_humanizer_prompt(
+    text: str, *, lang: str | None, mode: str, domain: str | None, samples_dir: str | None
+) -> str:
+    """Compose the user prompt that invokes the humanizer skill on `text`."""
+    parts = ["/humanizer"]
+    if mode and mode != "full":
+        parts.append(mode)
+    if domain:
+        parts.append(domain)
+    if lang and lang != "en":
+        parts.append(f"language: {lang}")
+    if samples_dir:
+        parts.append(f"--samples-dir {samples_dir}")
+    header = " ".join(parts)
+    return f"{header}\n\n{text}"
+
+
+def run_skill(
+    text: str,
+    *,
+    lang: str | None = None,
+    mode: str = "full",
+    domain: str | None = None,
+    samples_dir: str | None = None,
+    model: str = "sonnet",
+    timeout: int = 180,
+) -> dict[str, str]:
+    """Invoke the humanizer skill via `claude -p` and return the parsed output.
+
+    Loads whatever humanizer skill is installed in the environment. The caller
+    is responsible for verifying that the installed skill is the version under
+    test (see `verify_skill_install` below).
+    """
+    prompt = _build_humanizer_prompt(
+        text, lang=lang, mode=mode, domain=domain, samples_dir=samples_dir
+    )
+    cmd = ["claude", "-p", prompt, "--model", model]
+    completed = subprocess.run(
+        cmd, capture_output=True, text=True, timeout=timeout
+    )
+    if completed.returncode != 0:
+        raise SkillRunError(
+            f"claude CLI exited {completed.returncode}: {completed.stderr.strip()}"
+        )
+    return parse_skill_output(completed.stdout)

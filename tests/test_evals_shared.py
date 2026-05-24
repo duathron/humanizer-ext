@@ -97,3 +97,53 @@ def test_parse_skill_output_quick_mode_has_only_final():
     parsed = parse_skill_output(quick)
     assert parsed["final"].strip() == quick.strip()
     assert parsed["draft"] == ""
+
+
+from unittest.mock import patch, MagicMock
+
+
+@patch("subprocess.run")
+def test_run_skill_calls_claude_with_prompt(mock_run):
+    from evals.scripts._shared import run_skill
+
+    mock_run.return_value = MagicMock(
+        stdout=(
+            "Treating this as **casual** writing.\n\n"
+            "**Final rewrite:**\n> Cleaned output.\n"
+        ),
+        stderr="",
+        returncode=0,
+    )
+
+    result = run_skill("Some input text.", lang="en", mode="full", model="sonnet")
+
+    assert mock_run.called
+    cmd = mock_run.call_args[0][0]
+    assert "claude" in cmd[0]
+    assert "-p" in cmd
+    full_prompt = cmd[cmd.index("-p") + 1]
+    assert "Some input text." in full_prompt
+    assert "/humanizer" in full_prompt or "humanize" in full_prompt.lower()
+
+    assert result["final"] == "> Cleaned output."
+    assert result["domain"] == "casual"
+
+
+@patch("subprocess.run")
+def test_run_skill_passes_model_flag(mock_run):
+    from evals.scripts._shared import run_skill
+
+    mock_run.return_value = MagicMock(stdout="**Final rewrite:**\n> X.\n", stderr="", returncode=0)
+    run_skill("hi", model="claude-opus-4-7")
+    cmd = mock_run.call_args[0][0]
+    assert "--model" in cmd
+    assert cmd[cmd.index("--model") + 1] == "claude-opus-4-7"
+
+
+@patch("subprocess.run")
+def test_run_skill_returncode_nonzero_raises(mock_run):
+    from evals.scripts._shared import run_skill, SkillRunError
+
+    mock_run.return_value = MagicMock(stdout="", stderr="boom", returncode=1)
+    with pytest.raises(SkillRunError, match="claude CLI exited 1"):
+        run_skill("hi")
