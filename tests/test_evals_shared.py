@@ -232,9 +232,8 @@ def test_verify_skill_install_missing_installed(tmp_path):
         verify_skill_install(repo_skill_path=repo_skill, installed_skill_path=installed_skill)
 
 
-@patch("evals.scripts._shared.run_skill")
-@patch("evals.scripts._shared.verify_skill_install")
-def test_pattern_eval_scores_detection(mock_verify, mock_run_skill, tmp_path, monkeypatch):
+@patch("evals.scripts.run_pattern_eval.run_skill")
+def test_pattern_eval_scores_detection(mock_run_skill, tmp_path, monkeypatch):
     from evals.scripts.run_pattern_eval import score_case
     from evals.scripts._shared import Case
 
@@ -260,7 +259,7 @@ def test_pattern_eval_scores_detection(mock_verify, mock_run_skill, tmp_path, mo
     assert score["retained_terms"] == []
 
 
-@patch("evals.scripts._shared.run_skill")
+@patch("evals.scripts.run_pattern_eval.run_skill")
 def test_pattern_eval_partial_removal(mock_run_skill):
     from evals.scripts.run_pattern_eval import score_case
     from evals.scripts._shared import Case
