@@ -152,7 +152,8 @@ If the user provides a writing sample (their own previous writing), **analyze it
 10. Present the draft humanized version
 11. **Final AI audit** — check the draft against this list (skip items marked SKIP for the current domain):
     - Any AI vocabulary from pattern #7 still present? (universal — apply in every domain)
-    - Any em dashes (—) remaining, including paired-bracket inserts (`X — elaboration — continues`)? Any mechanical bold or emojis? (bold is fine in technical/marketing; emojis still bad everywhere)
+    - **Em dash count audit (separate pass).** Count every literal `—` (U+2014) character in the rewrite, excluding em dashes inside quoted source material, code blocks, fenced examples, and proper names. Report the count. Each remaining em dash must satisfy ALL five conditions in pattern #14's narrow exception (hard pause that a colon would also fit; no comma/period/parenthesis can replace it; not paired with another em dash anywhere in the passage; no other em dash within the prior ~500 words; surrounding sentence does not have punchy-sales rhythm). If any condition fails, rewrite. Paired-bracket em dashes (`X — Y — Z`) are always wrong, no exceptions. Default expected count: 0.
+    - Any mechanical bold or emojis? (bold is fine in technical/marketing; emojis still bad everywhere)
     - Do three or more consecutive sentences open with the same word or structure?
     - Does the ending sound generic or upbeat without cause? Any standalone `## Conclusion` / `## Summary` section that just restates the body? (universal — delete the section)
     - Any "not just X, but Y" or "X rather than Y" where Y was never on the table?

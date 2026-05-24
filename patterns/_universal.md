@@ -69,7 +69,25 @@ A specific sub-pattern is **paired em dash bracketing**: wrapping an elaboration
 - **If a true parenthetical aside:** use parentheses — "The report (three continents, twelve case studies) concluded that demand had shifted."
 - **If subject expansion:** rewrite as two sentences.
 
-**Exception:** A single, short, earned bracket that does not repeat elsewhere in the passage is fine. The problem is the pattern, not any one instance.
+**Default position:** cut em dashes entirely from rewrites. The exception below is a narrow escape hatch, not a license — when in doubt, rewrite with comma, period, colon, or parentheses.
+
+**Exception (narrow — all five conditions must hold):** A single em dash is acceptable ONLY when:
+
+1. It functions as a hard pause where a colon would also work, AND
+2. No comma, period, or parenthesis can replace it without losing meaning, AND
+3. It does not pair with another em dash anywhere in the passage (no `X — Y — Z` brackets, no `… — … — …` rhythm), AND
+4. No other em dash appears within the previous ~500 words of the same document, AND
+5. The surrounding sentence does not have the punchy-sales-writing rhythm that em dashes typically signal (short imperative clause + em dash + dramatic pivot).
+
+If any of these conditions fails, rewrite. The exception exists for the rare case where the em dash is the only correct mark — it is not a budget of "one per paragraph."
+
+**Audit em dashes as a separate pass.** After the rewrite is otherwise complete, scan for every `—` character (literal U+2014). For each occurrence:
+
+- Justify it against all five conditions above, or rewrite it.
+- Paired-bracket em dashes (`X — elaboration — continues`) are always wrong, no exceptions.
+- Em dashes inside literal quotes, code blocks, fenced examples, or proper names quoted from a primary source are exempt — those are data, not your prose.
+
+Report the final em dash count in the audit summary (e.g., "0 em dashes remaining" or "1 em dash retained — justification: …").
 
 ### 15. Overuse of Boldface
 
