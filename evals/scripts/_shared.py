@@ -217,7 +217,17 @@ class SkillInstallMismatch(RuntimeError):
     """Raised when the installed humanizer skill differs from the repo version."""
 
 
-_DEFAULT_INSTALLED_SKILL = Path.home() / ".claude" / "skills" / "humanizer" / "SKILL.md"
+_DEFAULT_INSTALL_ROOT = Path.home() / ".claude" / "skills" / "humanizer"
+_DEFAULT_INSTALLED_SKILL = _DEFAULT_INSTALL_ROOT / "SKILL.md"
+
+# Pack files the framework loads at runtime. Every one must match the repo or
+# the eval is testing a stale version. Paths are relative to the install root /
+# repo root respectively.
+_PACK_FILES = (
+    ("patterns/_universal.md",),
+    ("patterns/en.md",),
+    ("domains/en_overrides.md",),
+)
 
 
 def verify_skill_install(
@@ -225,12 +235,17 @@ def verify_skill_install(
     repo_skill_path: Path | None = None,
     installed_skill_path: Path | None = None,
 ) -> None:
-    """Confirm the skill `claude -p` will load matches the repo SKILL.md.
+    """Confirm the skill `claude -p` will load matches the repo SKILL.md AND
+    every pack file the framework reads at runtime.
 
-    Raises SkillInstallMismatch with a clear message if the installed file is
-    missing or has different bytes than the repo's SKILL.md. The eval runners
-    call this before running so a stale install does not silently invalidate
-    the report.
+    Raises SkillInstallMismatch with a clear message if the installed SKILL.md
+    or any installed pack file is missing or has different bytes than its repo
+    counterpart. The eval runners call this before running so a stale install
+    does not silently invalidate the report.
+
+    Pack-file verification is skipped only when the caller passes an explicit
+    `installed_skill_path` that does not sit under the standard install root
+    (used by the unit tests, which work entirely in tmp_path).
     """
     repo_skill_path = repo_skill_path or (Path.cwd() / "SKILL.md")
     installed_skill_path = installed_skill_path or _DEFAULT_INSTALLED_SKILL
@@ -249,6 +264,30 @@ def verify_skill_install(
             f"(installed={installed_hash[:8]}, repo={repo_hash[:8]}) — "
             f"the eval would test a stale skill version"
         )
+
+    # Pack-file checks only run for the default install layout. Test fixtures
+    # use tmp paths and would not have packs alongside.
+    install_root = installed_skill_path.parent
+    repo_root = repo_skill_path.parent
+    if install_root != _DEFAULT_INSTALL_ROOT:
+        return
+
+    for (rel,) in _PACK_FILES:
+        installed_pack = install_root / rel
+        repo_pack = repo_root / rel
+        if not repo_pack.exists():
+            continue  # repo did not ship this pack (e.g., future language); skip
+        if not installed_pack.exists():
+            raise SkillInstallMismatch(
+                f"installed pack file missing: {installed_pack} — "
+                f"symlink the repo's {rel} into the install dir before running evals"
+            )
+        if hashlib.sha256(installed_pack.read_bytes()).hexdigest() != \
+           hashlib.sha256(repo_pack.read_bytes()).hexdigest():
+            raise SkillInstallMismatch(
+                f"installed pack bytes differ from repo: {rel} — "
+                f"the eval would test a stale pack version"
+            )
 
 
 def _render_report_md(name: str, data: dict[str, Any]) -> str:

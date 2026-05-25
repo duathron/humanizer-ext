@@ -172,7 +172,13 @@ def run(
             "below_threshold_count": sum(
                 1 for c in per_case
                 if c["mean"]["human_ness"] < DEFAULT_THRESHOLDS["human_ness"]
+                or c["mean"]["meaning"] < DEFAULT_THRESHOLDS["meaning"]
+                or c["mean"]["length"] < DEFAULT_THRESHOLDS["length"]
             ),
+            "below_threshold_by_dimension": {
+                k: sum(1 for c in per_case if c["mean"][k] < DEFAULT_THRESHOLDS[k])
+                for k in ("human_ness", "meaning", "length")
+            },
         },
         "per_case": per_case,
     }
@@ -200,6 +206,11 @@ def main() -> None:
     json_path, md_path = write_report(f"e2e_{args.lang}", report)
     print(f"Wrote {json_path.name} and {md_path.name}")
     print(f"Overall mean: {report['summary']['overall_mean']}")
+    print(
+        f"Below threshold: {report['summary']['below_threshold_count']}/{report['summary']['total_cases']} "
+        f"(by dim: {report['summary']['below_threshold_by_dimension']})"
+    )
+    sys.exit(1 if report["summary"]["below_threshold_count"] > 0 else 0)
 
 
 if __name__ == "__main__":

@@ -26,7 +26,39 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def score_case(case: Case, *, model: str = "sonnet") -> dict:
-    """Run one case through the skill and report which expected_changes survived."""
+    """Run one case through the skill and report which expected_changes survived.
+
+    A case is `detected` only when every term in `expected_changes` is absent
+    from the rewrite AND at least one term was actually present in the input
+    (so we are scoring a real change, not vacuously). Cases with an empty or
+    inapplicable `expected_changes` list are reported with `status="unscorable"`
+    and excluded from detection-rate aggregation by the runner.
+    """
+    if not case.expected_changes:
+        return {
+            "case_id": case.id,
+            "pattern_id": case.metadata.get("pattern_id"),
+            "detected": False,
+            "status": "unscorable_empty_expected_changes",
+            "removed_terms": [],
+            "retained_terms": [],
+            "rewrite_preview": "",
+        }
+
+    input_lower = case.input.lower()
+    present_in_input = [t for t in case.expected_changes if t.lower() in input_lower]
+    if not present_in_input:
+        return {
+            "case_id": case.id,
+            "pattern_id": case.metadata.get("pattern_id"),
+            "detected": False,
+            "status": "unscorable_no_trigger_in_input",
+            "expected_changes": case.expected_changes,
+            "removed_terms": [],
+            "retained_terms": [],
+            "rewrite_preview": "",
+        }
+
     result = run_skill(
         case.input,
         lang=case.metadata.get("lang", "en"),
@@ -38,17 +70,18 @@ def score_case(case: Case, *, model: str = "sonnet") -> dict:
 
     removed: list[str] = []
     retained: list[str] = []
-    for term in case.expected_changes:
+    for term in present_in_input:
         if term.lower() in rewritten:
             retained.append(term)
         else:
             removed.append(term)
 
-    detected = len(retained) == 0 and len(removed) > 0
+    detected = len(retained) == 0
     return {
         "case_id": case.id,
         "pattern_id": case.metadata.get("pattern_id"),
         "detected": detected,
+        "status": "scored",
         "removed_terms": removed,
         "retained_terms": retained,
         "rewrite_preview": rewritten[:200],
@@ -75,8 +108,10 @@ def run(
     per_pattern_summary = []
     for pid in sorted(by_pattern.keys()):
         scores = by_pattern[pid]
-        detected = sum(1 for s in scores if s["detected"])
-        total = len(scores)
+        scorable = [s for s in scores if s.get("status") == "scored"]
+        unscorable = [s for s in scores if s.get("status", "").startswith("unscorable")]
+        detected = sum(1 for s in scorable if s["detected"])
+        total = len(scorable)
         rate = detected / total if total else 0.0
         per_pattern_summary.append(
             {
@@ -84,15 +119,19 @@ def run(
                 "rate": round(rate, 3),
                 "detected": detected,
                 "total": total,
-                "below_threshold": rate < threshold,
-                "misses": [s["case_id"] for s in scores if not s["detected"]],
+                "unscorable": len(unscorable),
+                "below_threshold": total > 0 and rate < threshold,
+                "misses": [s["case_id"] for s in scorable if not s["detected"]],
             }
         )
 
+    all_scorable = [
+        s for ps in by_pattern.values() for s in ps if s.get("status") == "scored"
+    ]
     overall = (
-        sum(s["detected"] for ps in by_pattern.values() for s in ps)
-        / sum(len(ps) for ps in by_pattern.values())
-    ) if by_pattern else 0.0
+        sum(s["detected"] for s in all_scorable) / len(all_scorable)
+    ) if all_scorable else 0.0
+    total_unscorable = sum(p["unscorable"] for p in per_pattern_summary)
 
     return {
         "eval_type": "pattern",
@@ -106,6 +145,7 @@ def run(
             ),
             "total_patterns": len(per_pattern_summary),
             "total_cases": sum(p["total"] for p in per_pattern_summary),
+            "unscorable_cases": total_unscorable,
         },
         "per_pattern": per_pattern_summary,
     }

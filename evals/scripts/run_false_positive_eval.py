@@ -29,8 +29,10 @@ DEFAULT_THRESHOLD = 0.10  # edit ratio above this = over-editing
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
-def score_human_text(text: str, *, model: str = "sonnet", domain: str = "casual") -> dict:
-    result = run_skill(text, lang="en", mode="full", domain=domain, model=model)
+def score_human_text(
+    text: str, *, lang: str = "en", model: str = "sonnet", domain: str = "casual"
+) -> dict:
+    result = run_skill(text, lang=lang, mode="full", domain=domain, model=model)
     rewritten = result.get("final") or result.get("draft") or ""
     edit_distance = Levenshtein.distance(text, rewritten)
     edit_ratio = edit_distance / max(1, len(text))
@@ -62,6 +64,25 @@ def _read_sample(path: Path) -> tuple[str, str]:
     return "casual", raw.strip()
 
 
+def _resolve_personal_samples_dir() -> Path:
+    """Personal-mode lookup chain (per spec §4.4):
+    $HUMANIZER_SAMPLES_DIR → ~/.claude/humanizer-samples/ → ./writing-samples/.
+    Returns the first existing dir, or raises FileNotFoundError if none."""
+    import os
+    candidates: list[Path] = []
+    if env := os.environ.get("HUMANIZER_SAMPLES_DIR"):
+        candidates.append(Path(env).expanduser())
+    candidates.append(Path.home() / ".claude" / "humanizer-samples")
+    candidates.append(Path.cwd() / "writing-samples")
+    for c in candidates:
+        if c.is_dir():
+            return c
+    raise FileNotFoundError(
+        "Personal samples dir not found. Set $HUMANIZER_SAMPLES_DIR or create "
+        f"one of: {', '.join(str(c) for c in candidates)}"
+    )
+
+
 def run(
     lang: str = "en",
     corpus: str = "synthetic",
@@ -69,7 +90,10 @@ def run(
     threshold: float = DEFAULT_THRESHOLD,
 ) -> dict:
     verify_skill_install()
-    corpus_dir = REPO_ROOT / "evals" / "corpus" / lang / "human" / corpus
+    if corpus == "personal":
+        corpus_dir = _resolve_personal_samples_dir()
+    else:
+        corpus_dir = REPO_ROOT / "evals" / "corpus" / lang / "human" / corpus
     files = sorted(
         p for p in corpus_dir.iterdir()
         if p.is_file() and p.suffix in {".md", ".txt"} and not p.name.startswith("_")
@@ -78,7 +102,7 @@ def run(
     per_file = []
     for path in files:
         domain, body = _read_sample(path)
-        score = score_human_text(body, model=model, domain=domain)
+        score = score_human_text(body, lang=lang, model=model, domain=domain)
         score["file"] = path.name
         score["domain"] = domain
         score["above_threshold"] = score["edit_ratio"] > threshold
