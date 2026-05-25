@@ -1,0 +1,37 @@
+{
+  "date": "2026-05-25",
+  "skill_version": "v3.3.0 (shipping as v3.4.0; no skill behavior change in this release)",
+  "skill_commit": "30a9d08",
+  "skill_model": "sonnet",
+  "judge_model": "sonnet",
+  "pattern": {
+    "overall_rate": 0.244,
+    "below_threshold": 30,
+    "total_patterns": 39,
+    "total_cases": 45,
+    "report_filename": "pattern_en_20260525_091723.json",
+    "notes": "Corpus seeded broadly from 'Words to watch' lists; many expected_changes terms never appear in input, dragging detection to 0.0 for most patterns. Phase 1.5 corpus refinement needed before interpreting as skill quality signal."
+  },
+  "false_positive": {
+    "mean_edit_ratio": 0.8379,
+    "files_over_threshold": 5,
+    "total_files": 5,
+    "density_preflight_quick_drop_rate": 0.6,
+    "report_filename": "false_positive_en_synthetic_20260525_095122.json",
+    "notes": "Mean edit ratio dominated by parse_skill_output bug — Quick-mode returns whole skill response (pre-flight + audit + final) as 'final', counting commentary as edits. Density preflight signal (3/5 correctly identified human) is real. Phase 1.5 parser fix needed."
+  },
+  "e2e": {
+    "status": "not_run",
+    "blocker": "claude CLI subscription session limit hit after pattern eval; resets 9pm Europe/Berlin",
+    "overall_mean": null,
+    "cases_below_threshold": null,
+    "total_cases": 5,
+    "report_filename": null,
+    "rerun_command": "python3 -m evals.scripts.run_e2e_eval --lang en --runs 3 --model sonnet --judge-model sonnet"
+  },
+  "infra_fixes_applied_during_baseline_run": [
+    "wrap run_skill in retry_with_backoff (3 attempts, base_delay=2s)",
+    "strip ANTHROPIC_API_KEY from claude CLI subprocess env (CLI uses subscription auth; SDK uses API key)",
+    "include stdout in SkillRunError (made the session-limit message visible)"
+  ]
+}
