@@ -1,6 +1,6 @@
 ---
 name: humanizer
-version: 3.3.0
+version: 3.4.0
 description: |
   Use when editing or reviewing text to remove signs of AI-generated writing
   and make it sound more natural and human. Detects 40 patterns from Wikipedia's
