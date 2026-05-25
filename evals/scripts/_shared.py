@@ -72,13 +72,27 @@ _FINAL_RE = re.compile(
 )
 
 
+_BLOCKQUOTE_RE = re.compile(r"(?:^>\s?.*(?:\n|$))+", re.MULTILINE)
+_BANNER_RE = re.compile(
+    r"^(?:Pre-flight:|Treating this as|\*\*Pre-flight|\*\*Audit|\*\*Final AI audit|\*\*Changes made:|\*\*Domain:)",
+    re.MULTILINE,
+)
+
+
+def _strip_blockquote_markers(text: str) -> str:
+    """Remove leading `> ` from each line of a blockquote block."""
+    return "\n".join(line[2:] if line.startswith("> ") else line[1:] if line.startswith(">") else line
+                     for line in text.strip().splitlines()).strip()
+
+
 def parse_skill_output(text: str) -> dict[str, str]:
-    """Extract draft + final + domain + preflight from a Full-mode skill response.
+    """Extract draft + final + domain + preflight from a skill response.
 
     Returns a dict with keys `domain`, `preflight`, `draft`, `final`. Missing
-    sections become empty strings. For Quick-mode output (no Draft/Final
-    sentinels), the full text is returned as `final` so downstream code can
-    always use `parsed["final"]`.
+    sections become empty strings. The `final` field always contains the
+    rewrite text only (not commentary/audit/preflight); the parser uses a
+    heuristic fallback chain when explicit `**Final rewrite:**` headers are
+    absent, instead of returning the whole skill response as the rewrite.
     """
     domain_match = _DOMAIN_RE.search(text)
     preflight_match = _PREFLIGHT_RE.search(text)
@@ -88,12 +102,44 @@ def parse_skill_output(text: str) -> dict[str, str]:
     result = {
         "domain": domain_match.group(1).lower() if domain_match else "",
         "preflight": preflight_match.group(1) if preflight_match else "",
-        "draft": draft_match.group(1).strip() if draft_match else "",
-        "final": final_match.group(1).strip() if final_match else "",
+        "draft": _strip_blockquote_markers(draft_match.group(1)) if draft_match else "",
+        "final": _strip_blockquote_markers(final_match.group(1)) if final_match else "",
     }
-    if not result["final"] and not result["draft"]:
-        # Quick-mode or non-sentinel output — treat entire text as the final.
+    if result["final"] or result["draft"]:
+        return result
+
+    # No `**Final rewrite:**` header. Heuristic fallback chain:
+    #   1. Last `**Final:**` or `**Cleaned text:**` or `**Rewrite:**` block
+    #   2. Last contiguous blockquote in the response (most rewrites are quoted)
+    #   3. Text after the last `---` separator
+    #   4. If text contains no banners at all (pure Quick mode), the whole text
+    #   5. Empty (give up rather than return polluted text)
+    alt_headers = re.search(
+        r"\*\*(?:Final|Cleaned text|Rewrite|Quick-mode rewrite):\*\*\s*\n(.*?)(?=\n\*\*|\Z)",
+        text, re.DOTALL,
+    )
+    if alt_headers:
+        result["final"] = _strip_blockquote_markers(alt_headers.group(1))
+        return result
+
+    blockquotes = list(_BLOCKQUOTE_RE.finditer(text))
+    if blockquotes:
+        result["final"] = _strip_blockquote_markers(blockquotes[-1].group(0))
+        return result
+
+    if "---" in text:
+        last_segment = text.rsplit("---", 1)[-1].strip()
+        if last_segment and not _BANNER_RE.search(last_segment):
+            result["final"] = last_segment
+            return result
+
+    # Pure Quick-mode output with no banners or markdown structure.
+    if not _BANNER_RE.search(text):
         result["final"] = text.strip()
+        return result
+
+    # Text has banners but no extractable rewrite — leave final empty so
+    # downstream eval code can flag the parse failure rather than score noise.
     return result
 
 

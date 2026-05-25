@@ -85,7 +85,7 @@ def test_parse_skill_output_extracts_draft_and_final():
 def test_parse_skill_output_handles_missing_sections():
     minimal = "**Final rewrite:**\n> Just a final.\n"
     parsed = parse_skill_output(minimal)
-    assert parsed["final"].strip() == "> Just a final."
+    assert parsed["final"].strip() == "Just a final."  # parser strips `> ` blockquote markers
     assert parsed["draft"] == ""
     assert parsed["domain"] == ""
     assert parsed["preflight"] == ""
@@ -97,6 +97,45 @@ def test_parse_skill_output_quick_mode_has_only_final():
     parsed = parse_skill_output(quick)
     assert parsed["final"].strip() == quick.strip()
     assert parsed["draft"] == ""
+
+
+def test_parse_skill_output_density_drop_with_final_header():
+    """Full mode dropping to Quick still wraps the rewrite in Final rewrite header."""
+    out = (
+        "Pre-flight: 0 Tier-1 tells per 100 words → human-authored. Switching to Quick-mode.\n\n"
+        "**Final rewrite:**\n> The original text, mostly unchanged.\n"
+    )
+    parsed = parse_skill_output(out)
+    assert parsed["final"] == "The original text, mostly unchanged."
+    assert "0 Tier-1 tells" in parsed["preflight"]
+
+
+def test_parse_skill_output_extracts_last_blockquote_when_no_header():
+    """Fallback heuristic: last blockquote in messy skill output is the rewrite."""
+    messy = (
+        "**Pre-flight:** 3 Tier-1 tells per 100 words → AI-heavy.\n\n"
+        "**Audit notes:**\n- removed `pivotal`\n- removed em dash\n\n"
+        "> The rewrite goes here, just one paragraph.\n"
+    )
+    parsed = parse_skill_output(messy)
+    assert parsed["final"] == "The rewrite goes here, just one paragraph."
+
+
+def test_parse_skill_output_alt_header_cleaned_text():
+    """Fallback recognizes **Cleaned text:** as a Final-rewrite synonym."""
+    alt = "**Cleaned text:**\n> Clean version.\n"
+    parsed = parse_skill_output(alt)
+    assert parsed["final"] == "Clean version."
+
+
+def test_parse_skill_output_banners_no_rewrite_returns_empty_final():
+    """If text has banners but no extractable rewrite, return empty rather than polluted text."""
+    junk = (
+        "**Pre-flight:** scanning...\n"
+        "**Audit:** nothing found yet\n"
+    )
+    parsed = parse_skill_output(junk)
+    assert parsed["final"] == ""
 
 
 from unittest.mock import patch, MagicMock
@@ -125,7 +164,7 @@ def test_run_skill_calls_claude_with_prompt(mock_run):
     assert "Some input text." in full_prompt
     assert "/humanizer" in full_prompt or "humanize" in full_prompt.lower()
 
-    assert result["final"] == "> Cleaned output."
+    assert result["final"] == "Cleaned output."  # parser strips `> ` blockquote markers
     assert result["domain"] == "casual"
 
 

@@ -186,8 +186,19 @@ If the user provides a writing sample (their own previous writing), **analyze it
 4. Final rewrite
 5. Brief summary of changes made (optional, if helpful)
 
-**Quick mode:**
-1. Cleaned text only
+**Quick mode (invoked directly with `/humanizer quick`):**
+1. Cleaned text only. Strict format: your entire response IS the rewrite. No preflight banner. No audit notes. No prose commentary about what changed. No `**Draft:**` / `**Final:**` headers. The first character of your response is the first character of the rewrite; the last character is the last character of the rewrite. If the input was already clean, return the input verbatim with no meta-comment. This format is load-bearing for the eval harness, which extracts the rewrite by trusting that direct Quick-mode output is ONLY the rewrite.
+
+**Full mode that drops to Quick via density preflight:** the preflight announcement IS expected (`Pre-flight: 0 Tier-1 tells per 100 words → human-authored. Switching to Quick-mode pass...`), but the rewrite that follows MUST be wrapped in a `**Final rewrite:**` header block so the parser can extract it cleanly:
+
+```
+Pre-flight: 0 Tier-1 tells per 100 words → human-authored. Switching to Quick-mode pass...
+
+**Final rewrite:**
+> <the rewrite text here, blockquoted, possibly multi-paragraph>
+```
+
+Use the `**Final rewrite:**` header even when the rewrite is byte-equivalent to the input (because nothing needed to change). This consistent envelope is what lets the eval harness compute a meaningful edit distance.
 
 
 ## Reference
