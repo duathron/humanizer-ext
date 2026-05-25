@@ -1,0 +1,55 @@
+{
+  "pattern_id": 23,
+  "pattern_name": "Filler Phrases",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_023_en_001",
+      "input": "In order to achieve this goal, the team will work on the new feature.",
+      "expected_changes": ["In order to"],
+      "expected_unchanged": ["the team will work on the new feature"],
+      "domain": "casual",
+      "source": "manual_curation"
+    },
+    {
+      "id": "pattern_023_en_002",
+      "input": "Due to the fact that it was raining, we cancelled the picnic.",
+      "expected_changes": ["Due to the fact that"],
+      "expected_unchanged": ["cancelled the picnic"],
+      "domain": "casual",
+      "source": "manual_curation"
+    },
+    {
+      "id": "pattern_023_en_003",
+      "input": "It is important to note that the data shows a clear upward trend over the past five years.",
+      "expected_changes": ["It is important to note that"],
+      "expected_unchanged": ["data shows", "upward trend"],
+      "domain": "casual",
+      "source": "manual_curation"
+    },
+    {
+      "id": "pattern_023_en_004",
+      "input": "At this point in time, the system has the ability to process most requests in under a second.",
+      "expected_changes": ["At this point in time", "has the ability to"],
+      "expected_unchanged": ["under a second"],
+      "domain": "casual",
+      "source": "manual_curation"
+    },
+    {
+      "id": "pattern_023_en_005",
+      "input": "Going forward, the plan is to ship a release every two weeks. As always, please consult a professional before making changes.",
+      "expected_changes": ["Going forward", "As always, please consult a professional"],
+      "expected_unchanged": ["ship a release every two weeks"],
+      "domain": "casual",
+      "source": "manual_curation"
+    },
+    {
+      "id": "pattern_023_en_006",
+      "input": "It is worth noting that a wide range of factors contributed to the outcome.",
+      "expected_changes": ["It is worth noting that", "a wide range of"],
+      "expected_unchanged": ["contributed to the outcome"],
+      "domain": "casual",
+      "source": "manual_curation"
+    }
+  ]
+}
