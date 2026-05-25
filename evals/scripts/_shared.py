@@ -158,7 +158,9 @@ def run_skill(
         )
         if completed.returncode != 0:
             raise SkillRunError(
-                f"claude CLI exited {completed.returncode}: {completed.stderr.strip()}"
+                f"claude CLI exited {completed.returncode}\n"
+                f"  stderr: {completed.stderr.strip()[:500] or '(empty)'}\n"
+                f"  stdout: {completed.stdout.strip()[:500] or '(empty)'}"
             )
         return parse_skill_output(completed.stdout)
 
