@@ -130,25 +130,33 @@ def run_skill(
     samples_dir: str | None = None,
     model: str = "sonnet",
     timeout: int = 180,
+    max_attempts: int = 3,
 ) -> dict[str, str]:
     """Invoke the humanizer skill via `claude -p` and return the parsed output.
 
     Loads whatever humanizer skill is installed in the environment. The caller
     is responsible for verifying that the installed skill is the version under
     test (see `verify_skill_install` below).
+
+    Retries up to `max_attempts` times on SkillRunError to absorb intermittent
+    claude CLI hiccups (occasional exit 1 with empty stderr, seen in practice).
     """
     prompt = _build_humanizer_prompt(
         text, lang=lang, mode=mode, domain=domain, samples_dir=samples_dir
     )
     cmd = ["claude", "-p", prompt, "--model", model]
-    completed = subprocess.run(
-        cmd, capture_output=True, text=True, timeout=timeout
-    )
-    if completed.returncode != 0:
-        raise SkillRunError(
-            f"claude CLI exited {completed.returncode}: {completed.stderr.strip()}"
+
+    def _one_attempt() -> dict[str, str]:
+        completed = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=timeout
         )
-    return parse_skill_output(completed.stdout)
+        if completed.returncode != 0:
+            raise SkillRunError(
+                f"claude CLI exited {completed.returncode}: {completed.stderr.strip()}"
+            )
+        return parse_skill_output(completed.stdout)
+
+    return retry_with_backoff(_one_attempt, max_attempts=max_attempts, base_delay=2.0)
 
 
 import time
