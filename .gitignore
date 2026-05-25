@@ -20,3 +20,6 @@ evals/reports/*.md
 !evals/reports/.gitkeep
 !evals/reports/summary_latest_en.md
 !evals/reports/summary_latest_en.json
+
+# Per-case E2E partial caches — regenerable, user-session-specific
+evals/reports/_partial/

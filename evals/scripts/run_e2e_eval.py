@@ -134,23 +134,70 @@ def score_case(
     }
 
 
+PARTIALS_SUBDIR = "_partial"
+
+
+def _partial_path(lang: str, case_id: str) -> Path:
+    """Per-case intermediate report path. Allows resume across sessions."""
+    return REPO_ROOT / "evals" / "reports" / PARTIALS_SUBDIR / f"e2e_{lang}_{case_id}.json"
+
+
 def run(
     lang: str = "en",
     domain: str | None = None,
     runs: int = DEFAULT_RUNS,
     model: str = "sonnet",
     judge_model: str = "sonnet",
+    cases: list[str] | None = None,
+    force: bool = False,
+    aggregate_only: bool = False,
 ) -> dict:
-    verify_skill_install()
+    """Run E2E eval. Idempotent across sessions: each case's score is written to
+    evals/reports/_partial/e2e_<lang>_<case_id>.json immediately after scoring.
+    Re-running picks up cached partials and only scores missing cases. Use this
+    to split the eval across multiple Claude Pro plan sessions when the daily
+    quota would not cover a full run.
+
+    Args:
+      cases: comma-separated case IDs to score this session (e.g.
+             ["e2e_en_casual_01", "e2e_en_legal_01"]). None = all cases.
+      force: re-score cases even if a partial exists.
+      aggregate_only: skip API calls; just aggregate existing partials. Use
+                      after all sessions are done to emit the final summary.
+    """
+    if not aggregate_only:
+        verify_skill_install()
     corpus_dir = REPO_ROOT / "evals" / "corpus" / lang / "e2e"
     case_files = sorted(corpus_dir.glob("*.json"))
+    partial_dir = _partial_path(lang, "_").parent
+    partial_dir.mkdir(parents=True, exist_ok=True)
 
     per_case = []
+    skipped_no_partial = []
     for path in case_files:
         case = json.loads(path.read_text(encoding="utf-8"))
         if domain and case.get("domain") != domain:
             continue
-        per_case.append(score_case(case, runs=runs, model=model, judge_model=judge_model))
+        if cases and case["id"] not in cases:
+            # Filter applied: load partial if present, otherwise mark as skipped
+            partial = _partial_path(lang, case["id"])
+            if partial.exists():
+                per_case.append(json.loads(partial.read_text(encoding="utf-8")))
+            else:
+                skipped_no_partial.append(case["id"])
+            continue
+
+        partial = _partial_path(lang, case["id"])
+        if partial.exists() and not force:
+            per_case.append(json.loads(partial.read_text(encoding="utf-8")))
+            continue
+        if aggregate_only:
+            skipped_no_partial.append(case["id"])
+            continue
+
+        score = score_case(case, runs=runs, model=model, judge_model=judge_model)
+        partial.write_text(json.dumps(score, indent=2, ensure_ascii=False) + "\n")
+        per_case.append(score)
 
     overall = {}
     if per_case:
@@ -169,6 +216,7 @@ def run(
         "summary": {
             "overall_mean": overall,
             "total_cases": len(per_case),
+            "skipped_no_partial": skipped_no_partial,
             "below_threshold_count": sum(
                 1 for c in per_case
                 if c["mean"]["human_ness"] < DEFAULT_THRESHOLDS["human_ness"]
@@ -185,7 +233,13 @@ def run(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="E2E rewrite-quality eval runner.")
+    parser = argparse.ArgumentParser(
+        description=(
+            "E2E rewrite-quality eval runner. "
+            "Idempotent: per-case partials cached in evals/reports/_partial/ "
+            "so you can split the eval across multiple Claude Pro plan sessions."
+        )
+    )
     parser.add_argument("--lang", default="en")
     parser.add_argument("--domain", default=None)
     parser.add_argument("--runs", type=int, default=DEFAULT_RUNS)
@@ -194,7 +248,23 @@ def main() -> None:
         "--judge-model", default="sonnet",
         help="Short name (sonnet, opus) or full API ID",
     )
+    parser.add_argument(
+        "--cases", default=None,
+        help="Comma-separated case IDs to score this session (e.g. "
+             "'e2e_en_casual_01,e2e_en_legal_01'). Other cases load from "
+             "partial cache if available. Use to fit a Pro plan quota.",
+    )
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Re-score cases even if a partial exists.",
+    )
+    parser.add_argument(
+        "--aggregate-only", action="store_true",
+        help="No API calls; just aggregate existing partials into a summary.",
+    )
     args = parser.parse_args()
+
+    cases_filter = [c.strip() for c in args.cases.split(",")] if args.cases else None
 
     report = run(
         lang=args.lang,
@@ -202,6 +272,9 @@ def main() -> None:
         runs=args.runs,
         model=args.model,
         judge_model=args.judge_model,
+        cases=cases_filter,
+        force=args.force,
+        aggregate_only=args.aggregate_only,
     )
     json_path, md_path = write_report(f"e2e_{args.lang}", report)
     print(f"Wrote {json_path.name} and {md_path.name}")
@@ -210,7 +283,14 @@ def main() -> None:
         f"Below threshold: {report['summary']['below_threshold_count']}/{report['summary']['total_cases']} "
         f"(by dim: {report['summary']['below_threshold_by_dimension']})"
     )
-    sys.exit(1 if report["summary"]["below_threshold_count"] > 0 else 0)
+    if report["summary"]["skipped_no_partial"]:
+        print(
+            f"Skipped (no partial yet): {report['summary']['skipped_no_partial']} — "
+            f"re-run with --cases <id> for these or --aggregate-only after all sessions done."
+        )
+    # Only fail the build if all cases were scored AND any are below threshold.
+    is_complete = not report["summary"]["skipped_no_partial"]
+    sys.exit(1 if is_complete and report["summary"]["below_threshold_count"] > 0 else 0)
 
 
 if __name__ == "__main__":

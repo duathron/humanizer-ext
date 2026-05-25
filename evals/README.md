@@ -50,6 +50,26 @@ python evals/scripts/run_e2e_eval.py --lang en --runs 3 --judge-model sonnet
 python evals/scripts/run_e2e_eval.py --lang en --judge-model opus
 ```
 
+### Splitting E2E across multiple Pro plan sessions
+
+The E2E runner is idempotent. Each case's score is cached to `evals/reports/_partial/e2e_<lang>_<case_id>.json` as soon as it lands. Re-running skips cases that already have a partial. Use this when the Claude Pro subscription session limit cannot cover all cases at once (5 cases × 3 runs ≈ 15 skill calls per language).
+
+```bash
+# Session 1 — run two cases
+python evals/scripts/run_e2e_eval.py --lang en --cases e2e_en_casual_01,e2e_en_academic_01
+
+# Session 2 — run two more
+python evals/scripts/run_e2e_eval.py --lang en --cases e2e_en_legal_01,e2e_en_technical_01
+
+# Session 3 — run last
+python evals/scripts/run_e2e_eval.py --lang en --cases e2e_en_marketing_01
+
+# Aggregate all cached partials into the final summary (no API calls)
+python evals/scripts/run_e2e_eval.py --lang en --aggregate-only
+```
+
+`--force` re-scores a case even if a partial exists (use when corpus changes). Partials are gitignored — they are user-session artifacts, not canonical records. The aggregated `summary_latest_en.{json,md}` is the committed baseline.
+
 ## Adding a new language pack (per the v3.5.0 spec)
 
 1. **Phase A — Wiki seed (if available)** — check whether the target Wikipedia community maintains an "Anzeichen für KI-generierte Inhalte" / "Identifier l'usage d'une IA générative" equivalent.
