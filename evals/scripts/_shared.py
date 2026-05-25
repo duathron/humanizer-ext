@@ -146,9 +146,15 @@ def run_skill(
     )
     cmd = ["claude", "-p", prompt, "--model", model]
 
+    # claude CLI prefers subscription auth. If ANTHROPIC_API_KEY is set in the
+    # parent env (needed by the E2E judge via Anthropic SDK), the CLI tries
+    # API-key auth and fails on longer prompts. Strip it from the CLI's env.
+    import os as _os
+    cli_env = {k: v for k, v in _os.environ.items() if k != "ANTHROPIC_API_KEY"}
+
     def _one_attempt() -> dict[str, str]:
         completed = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=timeout
+            cmd, capture_output=True, text=True, timeout=timeout, env=cli_env
         )
         if completed.returncode != 0:
             raise SkillRunError(
