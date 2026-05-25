@@ -1,11 +1,57 @@
 # EN Baseline Eval Summary
 
-**Date:** 2026-05-25
-**Skill version:** humanizer v3.3.0 → about to ship as v3.4.0 (no skill behavior change in v3.4.0; only eval-infra additions)
-**Skill commit at run time:** `30a9d08` (worktree-v3.4.0-eval branch, pre-release)
+**Status: STALE — numbers below reflect pre-fix behavior. Re-baseline pending after session reset.**
+
+**Initial run date:** 2026-05-25
+**Skill version:** humanizer v3.3.0 → shipping as v3.4.0 (no skill behavior change in v3.4.0; only eval-infra additions)
+**Skill commit at initial run:** `30a9d08` (pre-reviewer-fixes)
+**Polish branch HEAD:** `6273832` (this commit) — eval-infra fixes that invalidate the numbers below
 **Skill model:** sonnet (via `claude -p` subscription auth)
-**Judge model:** sonnet (via Anthropic SDK) — **E2E NOT YET RUN** (see below)
-**Reports run sequence:** pattern → false-positive → e2e
+**Judge model:** sonnet (via Anthropic SDK)
+
+## ⚠️ Why the numbers below are stale
+
+Four eval-infra fixes landed on the polish branch AFTER the initial baseline run:
+
+1. **`score_case` filters expected_changes to input-present terms** (commit `723bdd9`). Previously, broad seeded trigger lists dragged pattern scores to 0.0 for most patterns because terms that never appeared in input could never be "removed" from the rewrite. Re-running pattern eval with this fix produces a defensible detection rate; **the 0.244 below is no longer the right number.**
+2. **`parse_skill_output` heuristic fallback** (commit `7b0538c`). The parser now extracts just the rewrite portion from Quick-mode and density-dropped Full-mode outputs instead of returning the whole skill response (pre-flight banner + audit + final) as "the rewrite". **The FP mean edit ratio of 0.84 below was dominated by this measurement bug; the rewrite was actually close to the input but the parser was including commentary text.**
+3. **Pattern #23 corpus added** (commit `ee77b37`). Coverage closes 39/40 → 40/40. Re-run will score one more pattern.
+4. **E2E batching** (commit `0a81dce`). The E2E runner now caches per-case partials so the eval can be split across multiple Pro plan sessions. E2E was blocked entirely in the initial run; the workflow to populate it incrementally is documented in `evals/README.md`.
+
+## Re-baseline procedure (target: after next session reset)
+
+```bash
+# Pre-flight: verify install symlinks point at the polish-branch worktree
+cd /Users/.../humanizer-ext/.claude/worktrees/v3.4.0-polish
+ln -sfn "$PWD/SKILL.md" ~/.claude/skills/humanizer/SKILL.md
+ln -sfn "$PWD/patterns/_universal.md" ~/.claude/skills/humanizer/patterns/_universal.md
+ln -sfn "$PWD/patterns/en.md" ~/.claude/skills/humanizer/patterns/en.md
+ln -sfn "$PWD/domains/en_overrides.md" ~/.claude/skills/humanizer/domains/en_overrides.md
+
+# 1. Re-run pattern eval (40 patterns, ~46 cases, ~25min, subscription only)
+python3 -m evals.scripts.run_pattern_eval --lang en --model sonnet
+
+# 2. Re-run FP eval (5 cases, ~5min, subscription only)
+python3 -m evals.scripts.run_false_positive_eval --lang en --corpus synthetic --model sonnet
+
+# 3. Run E2E in batches (each session: 2 cases ≈ 6 API calls, needs ANTHROPIC_API_KEY)
+source ~/.humanizer_evals_env
+python3 -m evals.scripts.run_e2e_eval --lang en --cases e2e_en_casual_01,e2e_en_academic_01
+# Next session:
+python3 -m evals.scripts.run_e2e_eval --lang en --cases e2e_en_legal_01,e2e_en_technical_01
+# Next session:
+python3 -m evals.scripts.run_e2e_eval --lang en --cases e2e_en_marketing_01
+# Aggregate all cached partials into a fresh summary
+python3 -m evals.scripts.run_e2e_eval --lang en --aggregate-only
+
+# 4. Replace this section header from "STALE" to "DEFENSIBLE" and update numbers.
+```
+
+---
+
+## Pre-fix baseline numbers (stale; do not rely on)
+
+**Initial run sequence:** pattern → false-positive → e2e
 
 ## Pattern detection
 
