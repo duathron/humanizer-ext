@@ -224,3 +224,96 @@ def test_compare_length_verdict_truncated():
     output_text = " ".join(["word"] * 40)
     diff = compare(input_text, output_text, lang="en")
     assert "TRUNCATED" in diff["length_verdict"]
+
+
+# ---------------------------------------------------------------------------
+# Catalogue extensions (humanizer-ext patterns #17, #19, #29, #34, #38, #39, #40, #6)
+# ---------------------------------------------------------------------------
+
+def test_curly_quotes_detected():
+    text = "He said “hello” and walked away."
+    hits = scan(text, lang="en")
+    assert hits["curly_quotes"] >= 2  # opening + closing
+
+
+def test_curly_quotes_skip_when_only_straight():
+    text = 'He said "hello" and walked away.'
+    hits = scan(text, lang="en")
+    assert hits["curly_quotes"] == 0
+
+
+def test_title_case_heading_detected():
+    text = "## Strategic Negotiations And Global Partnerships\n\nBody text."
+    hits = scan(text, lang="en")
+    assert hits["title_case_heading"] >= 1
+
+
+def test_title_case_heading_skip_sentence_case():
+    text = "## Strategic negotiations and global partnerships\n\nBody text."
+    hits = scan(text, lang="en")
+    assert hits["title_case_heading"] == 0
+
+
+def test_placeholder_text_detected_bracket():
+    text = "Founded in [YEAR], [COMPANY NAME] is a leader."
+    hits = scan(text, lang="en")
+    assert hits["placeholder_text"] >= 2
+
+
+def test_placeholder_text_detected_date_placeholder():
+    text = "Accessed 2025-xx-xx by the user."
+    hits = scan(text, lang="en")
+    assert hits["placeholder_text"] >= 1
+
+
+def test_reference_markup_artifact_chatgpt_token():
+    text = "The election turn0search0 was close. Analysts said turn0news5 it was historic."
+    hits = scan(text, lang="en")
+    assert hits["reference_markup_artifact"] >= 2
+
+
+def test_reference_markup_artifact_utm_chatgpt():
+    text = "See the [report](https://example.com/r?utm_source=chatgpt.com) for details."
+    hits = scan(text, lang="en")
+    assert hits["reference_markup_artifact"] >= 1
+
+
+def test_markdown_contamination_meta_prompt():
+    text = "Here is the rewritten version. Would you like me to expand it further?"
+    hits = scan(text, lang="en")
+    assert hits["markdown_contamination"] >= 2
+
+
+def test_trailing_emphasis_fragment_detected():
+    text = "The system processes requests in under 50ms. That matters.\n"
+    hits = scan(text, lang="en")
+    assert hits["trailing_emphasis_fragment"] >= 1
+
+
+def test_fragmented_header_detected():
+    text = "## Performance\n\nSpeed matters.\n\nWhen users hit a slow page they leave.\n"
+    hits = scan(text, lang="en")
+    assert hits["fragmented_header"] >= 1
+
+
+def test_challenges_section_heading_detected():
+    text = "## Challenges and Legacy\n\nBody text follows."
+    hits = scan(text, lang="en")
+    assert hits["challenges_section"] >= 1
+
+
+def test_challenges_section_despite_phrase_detected():
+    text = "Despite these challenges, Korattur continues to thrive as part of Chennai."
+    hits = scan(text, lang="en")
+    assert hits["challenges_section"] >= 1
+
+
+def test_new_patterns_registered_in_dimension_map_or_extensions_section():
+    """All new pattern keys should be present in PATTERNS_EN (registry consistency)."""
+    new_keys = [
+        "curly_quotes", "title_case_heading", "placeholder_text",
+        "reference_markup_artifact", "markdown_contamination",
+        "trailing_emphasis_fragment", "fragmented_header", "challenges_section",
+    ]
+    for k in new_keys:
+        assert k in PATTERNS_EN, f"new key {k} not registered in PATTERNS_EN"

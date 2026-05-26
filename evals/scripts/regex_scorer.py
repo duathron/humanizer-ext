@@ -200,6 +200,74 @@ PATTERNS_EN = {
         re.compile(r"\b\w+,\s+\w+,?\s+and\s+\w+\b"),
         "rule-of-three list (count, threshold-checked)",
     ),
+    # --- Catalogue extensions (humanizer-ext patterns #6, #17, #19, #29, #34, #38, #39, #40) ---
+    "curly_quotes": (
+        re.compile(r"[‘’“”]"),
+        "curly quotation marks",
+    ),
+    "title_case_heading": (
+        re.compile(r"(?m)^#{1,6}\s+(?:[A-Z][a-z]+\s+){2,}[A-Z][a-z]+\s*$"),
+        "Title Case heading (≥3 capitalized main words)",
+    ),
+    "placeholder_text": (
+        re.compile(
+            r"\[(?:INSERT|YOUR|BRAND|YEAR|COMPANY|NAME|TITLE|TODO|FILL|"
+            r"ADD CITATION|PLACEHOLDER)[^\]]*\]|"
+            r"\b\d{4}-xx-xx\b|<placeholder>|\bXXXX\b|___+",
+            re.I,
+        ),
+        "phrasal template / placeholder text",
+    ),
+    "reference_markup_artifact": (
+        re.compile(
+            r"turn0(?:search|news|image)\d+|"
+            r"citeturn0\w+|"
+            r"oai_?citation|"
+            r":contentReference\[oaicite|"
+            r"<grok_card[^>]*>|"
+            r"referrer=grok\.com|"
+            r"utm_source=(?:chatgpt|copilot|openai|grok)\.com|"
+            r"\?utm_source=chatgpt|"
+            r"\[web:\d+\]|"
+            r"\[attached_file:\d+\]",
+            re.I,
+        ),
+        "reference-markup artifact (chat-UI paste)",
+    ),
+    "markdown_contamination": (
+        re.compile(
+            r"```(?:markdown|wikitext)\b|"
+            r"Would you like me to (?:convert|expand|add|reformat|adjust|rewrite)|"
+            r"Here(?:'s| is) the (?:formatted|rewritten|updated|revised) version|"
+            r"I (?:have|'ve) (?:rewritten|reformatted|updated) (?:the|this|your)",
+            re.I,
+        ),
+        "markdown contamination / chatbot meta-prompt",
+    ),
+    "trailing_emphasis_fragment": (
+        re.compile(
+            r"[.!?]\s+(?:[A-Z][a-z'-]+(?:\s+[a-z][a-z'-]+){0,3})\s*[.!?]\s*(?:\n|$)",
+        ),
+        "trailing emphasis fragment (very short follow-up sentence)",
+    ),
+    "fragmented_header": (
+        re.compile(
+            r"(?m)^#{1,6}\s+\S[^\n]*\n\s*\n"
+            r"(?:[A-Z][a-z'-]+(?:\s+[\w'-]+){0,10})\s*\.?\s*\n\s*\n",
+        ),
+        "fragmented header (one-line restatement after heading)",
+    ),
+    "challenges_section": (
+        re.compile(
+            r"(?m)^#{1,6}\s+(?:Challenges?(?:\s+and\s+\w+)?|Future\s+Outlook|"
+            r"Future\s+Prospects?|Outlook|Despite\s+\w+|Limitations\s+and\s+\w+)\s*$|"
+            r"\bDespite (?:its\s+|these\s+)?(?:industrial\s+|economic\s+)?(?:challenges|"
+            r"prosperity|growth)[^.]{0,80}(?:continues\s+to\s+thrive|"
+            r"faces\s+(?:several\s+|many\s+|typical\s+)?challenges)\b",
+            re.I,
+        ),
+        "challenges / future-outlook section (structural cliche)",
+    ),
 }
 
 # Language registry. Add new packs here (e.g., "de": PATTERNS_DE).

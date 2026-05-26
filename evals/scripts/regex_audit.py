@@ -61,22 +61,22 @@ PATTERN_ID_TO_REGEX_KEYS = {
     3: ["fake_ing_analysis"],                            # superficial -ing endings
     4: ["puffery"],                                       # promotional language
     5: ["vague_attribution"],                            # vague attributions
-    6: [],                                                # challenges section — structural
+    6: ["challenges_section"],                           # challenges section
     # Language patterns
     7: ["puffery", "vocabulary_tells"],                  # AI vocabulary
-    8: [],                                                # copula avoidance — no direct regex
+    8: [],                                                # copula avoidance — needs POS
     9: ["not_just_X_its_Y"],                             # negative parallelisms
     10: ["rule_of_three"],                               # rule of three
-    11: [],                                              # synonym cycling
-    12: [],                                              # false ranges
+    11: [],                                              # synonym cycling — semantic
+    12: [],                                              # false ranges — semantic
     13: [],                                              # passive voice — would need POS tagger
     # Style patterns
     14: ["em_dash_overuse"],                             # em dash
     15: ["boldface_overuse"],                            # boldface
     16: [],                                              # inline-header lists — structural
-    17: [],                                              # title case headings
+    17: ["title_case_heading"],                          # title case headings
     18: ["emoji_bullet"],                                # emojis
-    19: [],                                              # curly quotes
+    19: ["curly_quotes"],                                # curly quotes
     # Communication patterns
     20: ["sycophantic_opener", "filler_phrases"],        # chatbot artifacts
     21: ["hedging"],                                     # cutoff disclaimers
@@ -85,22 +85,22 @@ PATTERN_ID_TO_REGEX_KEYS = {
     23: ["filler_phrases", "hedging"],                   # filler phrases
     24: ["hedging"],                                     # excessive hedging
     25: ["summary_loop"],                                # generic conclusions
-    26: [],                                              # hyphenation
+    26: [],                                              # hyphenation — context
     27: ["explainer_voice"],                             # persuasive authority tropes
     28: ["explainer_voice", "transitional_cliche"],      # signposting
-    29: [],                                              # fragmented headers
+    29: ["fragmented_header"],                           # fragmented headers
     30: ["ultimately_starter", "transitional_cliche"],   # sentence-starter intensifiers
-    31: [],                                              # rhetorical questions
+    31: [],                                              # rhetorical questions — semantic
     32: ["puffery"],                                     # stacked adjectives
-    33: [],                                              # quantity vagueness
-    34: [],                                              # trailing emphasis fragments
-    35: [],                                              # debunking headings
+    33: [],                                              # quantity vagueness — context
+    34: ["trailing_emphasis_fragment"],                  # trailing emphasis fragments
+    35: [],                                              # debunking headings — semantic
     36: ["hedging"],                                     # conditional frame stacking
     37: ["hedging"],                                     # miscalibrated confidence
     # Artifacts
-    38: [],                                              # ref markup artifacts
-    39: [],                                              # placeholder text
-    40: [],                                              # markdown contamination
+    38: ["reference_markup_artifact"],                   # ref markup artifacts
+    39: ["placeholder_text"],                            # placeholder text
+    40: ["markdown_contamination"],                      # markdown contamination
 }
 
 
