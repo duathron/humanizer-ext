@@ -10,7 +10,7 @@ This document tracks the *narrative* of the fork. The README's "Version history"
 
 `humanizer-ext` is a fork of `blader/humanizer`, a Claude Code / OpenCode skill that rewrites AI-generated text to read more like a human wrote it. The skill is built around [Wikipedia's "Signs of AI writing"](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) guide, maintained by WikiProject AI Cleanup.
 
-The fork started from upstream v2.5.1 (29 patterns, single behavior). Current release is v3.2.0 (40 patterns, three modes, five domains, density preflight, detection guidance). A v3.5.0 design — multi-lingual architecture (EN + DE shipped, further packs via documented recipe) and an evaluation infrastructure — is in active planning and documented in §5 below.
+The fork started from upstream v2.5.1 (29 patterns, single behavior). Current main is post-v3.4.0 (commits merged, tag pending fresh baseline) — the fork now has 40 patterns, three modes, five domains, density preflight, detection guidance, a layered framework + pattern packs (v3.3.0), and a three-tier eval harness with idempotent per-case partials for resume-across-sessions (v3.4.0). Phase 2 of the v3.5.0 design — the first non-English language pack (German) — is the remaining piece of the design and is documented in §5 below.
 
 ## 2. Why this fork exists
 
@@ -34,6 +34,10 @@ The fork's purpose: address these without losing upstream-sync ability.
 | 2026-05-22 | (build) | `81b0dec` | Trim SKILL.md `description` under Claude Code 1024-char frontmatter limit |
 | 2026-05-22 | (plugin) | `cd6dac0` | `.claude-plugin/plugin.json` — repo installable as Claude Code plugin |
 | 2026-05-22 | (plugin) | `074d392` | `.claude-plugin/marketplace.json` — repo doubles as `duathron-skills` marketplace |
+| 2026-05-23 | (design) | `4bb6e00`, `0540e33`, `6a4b801` | v3.5.0 design spec, PROJECT_HISTORY narrative, Phase 0 implementation plan |
+| 2026-05-24 | 3.3.0 | `f973735` (tag pushed) | SKILL.md refactor: split into framework + `patterns/_universal.md` (12 patterns) + `patterns/en.md` (28 + PERSONALITY) + `domains/en_overrides.md`. 15 pytest schema tests added. Pattern #14 (em dash) exception tightened to a 5-condition check with separate audit pass. Zero observable EN behavior change; manual regression recorded in `docs/regression-cases/RESULTS.md` |
+| 2026-05-24 | (design) | `b488192` | Phase 1 implementation plan (eval infrastructure) |
+| 2026-05-25 | 3.4.0 (tag pending) | `26174c8` (HEAD on origin/main) | Three-tier eval harness: `evals/scripts/run_pattern_eval.py` + `run_false_positive_eval.py` + `run_e2e_eval.py` with judge LLM via Anthropic SDK tool-use. `_shared.py` exports `Case`, `load_pattern_corpus`, `parse_skill_output`, `run_skill` (with retry + API-key-strip), `verify_skill_install` (checks SKILL.md + pack files), `write_report`, `retry_with_backoff`. 22 new pytest tests (37 total). EN corpus: 40/40 patterns seeded (pattern #23 added manually), 5 synthetic human samples, 5 AI E2E cases, judge rubric. E2E batching supports incremental per-case partial caching for split runs across Pro plan sessions. Initial baseline numbers were stale (pre-fix) and are clearly flagged; fresh baseline + v3.4.0 tag pending |
 
 ## 4. What we changed, how, and why
 
@@ -82,9 +86,66 @@ The fork's purpose: address these without losing upstream-sync ability.
 
 **Why:** Discovered during plugin packaging that Claude Code rejects skill descriptions over 1024 chars. Trimmed without losing the description's triggering signal.
 
-## 5. In planning — v3.5.0 (multi-lingual architecture + eval infrastructure)
+### 4.5 v3.3.0 — SKILL.md refactor into framework + language packs (Phase 0 of v3.5.0 design)
 
-Status: **design phase, not implemented**. Spec is being developed; this section will be updated as decisions are locked in or implementation begins.
+**What:**
+- Split the 60-KB monolithic `SKILL.md` into a ~15-KB language-agnostic framework plus three pack files: `patterns/_universal.md` (12 universal patterns), `patterns/en.md` (28 EN-specific patterns + the PERSONALITY AND SOUL section), and `domains/en_overrides.md` (the domain override matrix + domain-specific guidance prose).
+- Added `tests/test_skill_structure.py` — 15 pytest sanity tests that verify frontmatter validity, pack-file existence, expected pattern-ID sets per pack, disjoint EN/universal pattern IDs, and cross-reference integrity (every pattern ID in `en_overrides.md` resolves to a pack file).
+- Added `pyproject.toml` for pytest configuration and dev-dependency declaration.
+- Pattern #14 (em-dash) exception tightened during the release: replaced the loose "earned single em dash" allowance with five explicit conjunctive conditions plus a mandatory separate post-rewrite count audit, after both regression runs (pre- and post-refactor) left em dashes the audit should have caught.
+- Captured a regression baseline (`docs/regression-cases/full_example.md`) from the v3.2.0 monolithic `## Full Example` and ran a manual regression against the refactored skill; result recorded as PASS in `docs/regression-cases/RESULTS.md`.
+- Repo gained Python tooling artifacts in `.gitignore` (`__pycache__/`, `.pytest_cache/`, `.venv/`, `*.pyc`) plus a `writing-samples/` rule to keep personal voice samples out of the repo.
+
+**How:** Phase 0 of the v3.5.0 design (spec at `docs/specs/2026-05-23-humanizer-eval-de-design.md`). Executed via `superpowers:subagent-driven-development`: `cavecrew-builder` (Sonnet) handled the surgical ≤2-file edits per task; the parent (Opus) orchestrated, ran pytest between tasks, and made linguistic judgment calls for the pattern #14 tightening. Implementation done in a `worktree-v3.3.0-refactor` isolated worktree created via `EnterWorktree`, fast-forward merged to `main` after the manual regression passed.
+
+**Why:**
+- Adding a second language to the monolithic SKILL.md would double its size and make upstream sync (from `blader/humanizer`) intractable. Layering by responsibility keeps the framework upstream-sync-friendly and makes new language packs additive instead of merge-prone.
+- The pytest sanity tests cost nothing per run (no API calls), catch the kinds of structural mistakes that a future refactor or pack addition could silently introduce, and give an objective signal that the cross-reference integrity holds across all packs.
+- The pattern #14 tightening landed during the release because both regression runs surfaced the same em-dash-retention behavior; addressing it in the same release as the structural change kept the v3.3.0 changelog narrative coherent.
+
+### 4.6 v3.4.0 — Evaluation infrastructure (Phase 1 of v3.5.0 design)
+
+**What:**
+- Three eval runners under `evals/scripts/`:
+  - `run_pattern_eval.py` — per-pattern detection rate against curated before/after JSON cases. `score_case` runs the skill via `claude -p` and reports which `expected_changes` substrings survived in the rewrite. Threshold 0.85 per pattern.
+  - `run_false_positive_eval.py` — Levenshtein edit ratio between input and rewrite for known-human samples. Threshold ≤ 0.10. Includes a density-preflight signal (did the skill correctly identify the input as human-authored and downgrade to Quick mode). Personal-mode lookup chain (`--samples-dir` flag → `$HUMANIZER_SAMPLES_DIR` → `~/.claude/humanizer-samples/` → `./writing-samples/`) per spec §4.4.
+  - `run_e2e_eval.py` — whole-document rewrite quality scored by a judge LLM via the Anthropic SDK using structured tool-use (1–10 on human-ness, meaning preservation, length appropriateness). Default judge model: Sonnet 4.6. Opus 4.7 opt-in via `--judge-model opus`. Each case runs 3× to capture both skill sampling and judge noise.
+- Shared utilities in `evals/scripts/_shared.py`: `Case` dataclass, `load_pattern_corpus`, `parse_skill_output` (heuristic fallback chain: `**Final rewrite:**` → alternate headers → last blockquote → text-after-`---` → whole-text-when-no-banners → empty), `run_skill` (subprocess wrapper around `claude -p` with retry, timeout, and `ANTHROPIC_API_KEY` stripped from the CLI's subprocess env), `retry_with_backoff`, `write_report` (paired JSON + Markdown), `verify_skill_install` (SHA-256 hash check on `SKILL.md` AND pack files under the install root). 22 new pytest tests cover the shared utilities (37 tests total in the repo).
+- Judge prompt in `evals/scripts/judge_prompt.md` — strict rubric defining the three scoring dimensions and the `report_scores` tool schema.
+- EN corpus seeded automatically by `evals/scripts/seed_pattern_corpus.py`: 40/40 patterns covered (39 from auto-extraction of `**Before:**` blocks in the pattern packs; pattern #23 added manually because it uses a `Before → After:` bullet-list format the seeder regex does not match). 5 synthetic human samples (one per domain) under `evals/corpus/en/human/synthetic/`. 5 AI-generated whole-document E2E cases under `evals/corpus/en/e2e/`.
+- E2E batching: per-case partials cached under `evals/reports/_partial/e2e_<lang>_<case_id>.json` immediately after scoring. Re-runs skip cases that have a partial. `--cases <ids>` flag scopes a single session to a subset; `--aggregate-only` flag combines cached partials into the final summary without API calls. Supports splitting the E2E eval across multiple Claude Pro plan sessions when the daily quota would not cover a full run.
+- `evals/README.md` documents the prerequisites (skill install symlinks for `verify_skill_install`), runner usage, the multi-session batching workflow, and the recipe for adding a new language pack per the v3.5.0 spec.
+- Baseline numbers from the initial release run live in `evals/reports/summary_latest_en.{json,md}` but are clearly flagged as STALE — the polish-branch fixes invalidated them (see §4.7). A defensible re-baseline is the gating step for the v3.4.0 tag.
+
+**How:** Phase 1 of the v3.5.0 design. Plan at `docs/plans/2026-05-24-phase-1-eval-infrastructure.md` (20 atomic tasks, each ≤2 files). Same execution pattern as v3.3.0: `cavecrew-builder` subagents (Sonnet) for the per-task surgical edits, parent (Opus) for orchestration and the live baseline runs. `worktree-v3.4.0-eval` worktree merged to `main` after the runner code stabilized; the initial baseline run uncovered three transient/structural CLI issues that were caught and patched mid-run (see "Three patches that landed during the initial run" below).
+
+**Why:**
+- Without measurement, every pattern change to the skill is a guess. The three-tier harness gives objective signal at three levels of fidelity: pattern detection (cheap, deterministic-ish), false-positive on human texts (catches over-editing), end-to-end rewrite quality (the actual user-facing signal).
+- The judge LLM uses the Anthropic SDK directly (not `claude -p`) because the SDK's structured tool-use guarantees deterministic JSON scores that aggregate cleanly across the 3-run variance. The CLI's free-form text output would require additional parsing layers that introduce their own noise.
+- Per-case partials with idempotent resume came from the practical reality that a 5-case × 3-run × (1 skill + 1 judge) E2E eval = 30 API calls, and the Claude Pro subscription session limit can refuse to cover that in a single session. Splitting across sessions without burning quota on re-runs is what makes the eval actually runnable on a Pro plan.
+
+**Three patches that landed during the initial run:**
+1. `retry_with_backoff` wrap around `run_skill` (3 attempts, base_delay=2s) — the claude CLI occasionally returns exit 1 with empty stderr in batch use, transient but not rare.
+2. `ANTHROPIC_API_KEY` stripped from the claude-CLI subprocess environment — the CLI prefers subscription auth, and an API key in the parent env can interfere with longer-prompt requests (still working through the exact failure mode).
+3. `SkillRunError` now includes `stdout` in its message in addition to `stderr` — which is how we discovered the subscription session-limit failure (`stdout: "You've hit your session limit · resets 9pm (Europe/Berlin)"`) instead of staring at empty stderr.
+
+### 4.7 v3.4.0 polish — reviewer + first-run findings addressed
+
+**What:**
+- `score_case` (pattern eval) now filters `expected_changes` to only the terms actually present in the input before scoring, and reports an explicit `status: unscorable_*` for cases that can't be meaningfully scored (empty list, or no trigger terms in input). Previously, broad seeded trigger lists dragged scores to 0.0 for most patterns because terms that never appeared in input could never be "removed" from the rewrite. This was the proximate cause of the 24.4% initial baseline.
+- `parse_skill_output` gained a heuristic fallback chain — alternate header recognition, last-blockquote extraction, text-after-`---` segment, whole-text only when no banners are present — so Quick-mode and density-dropped Full-mode outputs no longer return the entire skill response (pre-flight + audit + final) as "the rewrite". Was driving the FP eval mean edit ratio to 0.84 (parsing artifact, not skill regression).
+- `verify_skill_install` extended to hash-check the pack files (`patterns/_universal.md`, `patterns/en.md`, `domains/en_overrides.md`) under the install root in addition to `SKILL.md` — a stale pack symlink no longer slips past the guard.
+- `run_e2e_eval` threshold check now considers all three dimensions (`human_ness`, `meaning`, `length`) instead of only `human_ness`, and `below_threshold_by_dimension` breakdown lands in the summary. `main()` exits non-zero on any threshold failure when all cases are scored.
+- `run_false_positive_eval` no longer hardcodes `lang="en"` in `score_human_text` — passes through the `--lang` flag. `--corpus personal` now resolves the personal-samples lookup chain per spec §4.4 instead of a bogus repo path.
+- SKILL.md `## Output Format` section got an explicit strict-format spec for Quick mode (entire response IS the rewrite, no banners) and for Full-mode-dropping-to-Quick (preflight banner allowed, rewrite still wrapped in `**Final rewrite:**` block for the parser to extract cleanly).
+
+**How:** Polish branch (`worktree-v3.4.0-polish`) merged to `main` as commits `7b0538c`, `ee77b37`, `0a81dce`, `6273832`, `26174c8`. Reviewer findings from the final cavecrew-reviewer pass on the eval-infra branch drove the runner fixes; the parse-skill-output fix came from observing the FP eval result directly. 22 → 22 pytest tests, with new tests covering the heuristic fallback chain (Quick-with-final-header, last-blockquote fallback, alternate-header recognition, empty-on-banners-only).
+
+**Why:** The initial baseline run was honest evidence that the eval infrastructure had measurement bugs in three places: the seeder produced too-broad expected_changes, the parser conflated commentary with rewrite, and one runner was missing dimensions from its threshold check. Fixing them as a coherent polish pass before the v3.4.0 tag means the tag points at numbers worth interpreting. The v3.4.0 tag is deferred until a fresh baseline run (post-session-reset) replaces the stale numbers; the procedure is documented step-by-step in `evals/reports/summary_latest_en.md`.
+
+## 5. In planning — v3.5.0 Phase 2 (German language pack)
+
+Phases 0 and 1 of the v3.5.0 design are shipped (§4.5, §4.6, §4.7). Phase 2 — the first non-English language pack (German) — is the remaining piece.
 
 ### 5.1 Goals
 
@@ -138,18 +199,31 @@ humanizer-ext/
     └── PROJECT_HISTORY.md            # this file
 ```
 
-### 5.4 Build order
+### 5.4 Build order — status
 
-1. **Phase 0 — Refactor (EN only, behavior-preserving).** Split SKILL.md into framework + `patterns/en.md` + `patterns/_universal.md` + `domains/en_overrides.md`. Add `tests/test_skill_structure.py`. Regression-test against existing examples: output must be unchanged.
-2. **Phase 1 — Eval infrastructure (EN).** `evals/scripts/_shared.py`, three eval runners, seed `evals/corpus/en/` from existing SKILL.md before/after pairs. Produce EN baseline report.
-3. **Phase 2 — DE language pack.** `mine_patterns.py` → DE candidates from generated AI corpus vs. Wikipedia pre-2022 + Gutenberg. Manual curation → `patterns/de.md`. `domains/de_overrides.md` from DE register knowledge. `evals/corpus/de/`. Iterate until pattern-eval ≥ 0.85, false-positive ≤ 0.10, e2e ≥ EN baseline.
-4. **Phase 3 — Polish & release.** README updates, `evals/README.md` (how to add a language pack, how to use personal samples), optional CI workflow, v3.5.0 release. Intermediate ships: Phase 0 → v3.3.0 (refactor only, EN behavior unchanged). Phase 1 → v3.4.0 (eval-infra, EN only). Phase 2 → v3.5.0 (DE pack added).
+1. **Phase 0 — Refactor (EN only, behavior-preserving). SHIPPED as v3.3.0** — see §4.5.
+2. **Phase 1 — Eval infrastructure (EN). SHIPPED as v3.4.0 (commits merged, tag pending fresh baseline)** — see §4.6, §4.7.
+3. **Phase 2 — DE language pack. PENDING.** `mine_patterns.py` → DE candidates from generated AI corpus vs. Wikipedia pre-2022 + Gutenberg. Manual curation → `patterns/de.md`. `domains/de_overrides.md` from DE register knowledge. `evals/corpus/de/`. Iterate until pattern-eval ≥ 0.85, false-positive ≤ 0.10, e2e ≥ EN baseline. Ships as v3.5.0.
+4. **Phase 3 — Polish & release. PENDING.** README updates, `evals/README.md` polish (already partly in place), optional CI workflow, v3.5.0 release.
 
-### 5.5 Open questions (not yet decided)
+### 5.5 Pre-v3.4.0-tag work (gating the tag, not a separate release)
 
-- API budget for mining corpus generation (Phase 2). Need ~500–1000 DE AI texts across five domains via Claude/GPT/Gemini APIs.
+The v3.4.0 commits are merged to `main` and pushed to `origin`. The tag is intentionally held until a fresh baseline replaces the stale numbers documented in `evals/reports/summary_latest_en.md`. Procedure:
+
+1. After the claude CLI subscription session resets (target: 21:00 Europe/Berlin), re-symlink the install to point at the current `main` checkout (the previous symlinks pointed at since-removed worktrees).
+2. Re-run pattern eval (subscription only, ~25 min wall, 40 patterns × ~46 cases).
+3. Re-run FP eval (subscription only, ~5 min wall, 5 cases).
+4. Run E2E in batches via `--cases` flag (needs `ANTHROPIC_API_KEY`); 2 cases per session × 2–3 sessions to fit the Pro plan.
+5. `--aggregate-only` to combine cached partials into the fresh summary.
+6. Replace "STALE" banner with "DEFENSIBLE" + the fresh numbers; commit; tag v3.4.0; push tag.
+
+Full command sequence is in `evals/reports/summary_latest_en.md` under "Re-baseline procedure".
+
+### 5.6 Phase 2 open questions
+
+- API budget for mining corpus generation. Need ~500–1000 DE AI texts across five domains via Claude/GPT/Gemini APIs.
 - Tagesschau archive / DE news corpus licensing for the human-side of mining (likely fallback: Wikipedia revisions pre-2022 only, which is CC-BY-SA).
-- Whether to add a `--audit-only` mode (detect + report without rewriting) as part of v4.0 or punt to v4.1.
+- Whether to add a `--audit-only` mode (detect + report without rewriting) as part of v3.5.0 or punt to a later minor release.
 - Pattern-coverage gap between EN (40 patterns) and DE (initial ~30 from DE Wiki + mining). Acceptable as long as universal patterns cover the gap and EN-IDs without DE equivalents are documented in `patterns/de.md` as "no DE equivalent".
 
 ## 6. Sources of authority
