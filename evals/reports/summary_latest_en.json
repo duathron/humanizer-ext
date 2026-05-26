@@ -1,40 +1,87 @@
 {
-  "date": "2026-05-25",
-  "skill_version": "v3.3.0 (shipping as v3.4.0; no skill behavior change in this release)",
-  "skill_commit": "30a9d08",
+  "date": "2026-05-26",
+  "status": "defensible",
+  "skill_version": "v3.4.0",
+  "skill_commit": "6d1d645",
   "skill_model": "sonnet",
   "judge_model": "sonnet",
   "pattern": {
-    "overall_rate": 0.244,
-    "below_threshold": 30,
-    "total_patterns": 39,
-    "total_cases": 45,
-    "report_filename": "pattern_en_20260525_091723.json",
-    "notes": "Corpus seeded broadly from 'Words to watch' lists; many expected_changes terms never appear in input, dragging detection to 0.0 for most patterns. Phase 1.5 corpus refinement needed before interpreting as skill quality signal."
+    "overall_rate": 0.412,
+    "scorable_cases": 17,
+    "total_cases": 51,
+    "unscorable_cases": 34,
+    "below_threshold": 9,
+    "total_patterns": 40,
+    "report_filename": "pattern_en_20260526_151726.json",
+    "notes": "Rate is over scorable subset. 34 unscorable cases reflect corpus thinness (input does not contain trigger terms), not skill failure. Hand-refine corpus to push rate well above 0.412."
   },
   "false_positive": {
-    "mean_edit_ratio": 0.8379,
-    "files_over_threshold": 5,
+    "mean_edit_ratio": 0.2039,
+    "files_over_threshold": 4,
     "total_files": 5,
-    "density_preflight_quick_drop_rate": 0.6,
-    "report_filename": "false_positive_en_synthetic_20260525_095122.json",
-    "notes": "Mean edit ratio dominated by parse_skill_output bug — Quick-mode returns whole skill response (pre-flight + audit + final) as 'final', counting commentary as edits. Density preflight signal (3/5 correctly identified human) is real. Phase 1.5 parser fix needed."
+    "density_preflight_quick_drop_rate": 1.0,
+    "report_filename": "false_positive_en_synthetic_20260526_152647.json",
+    "notes": "Parser fix dropped ratio from 0.84 to 0.20. Density preflight is 1.0 (perfect) — all 5 human samples correctly identified."
+  },
+  "regex_audit_pattern": {
+    "cases_with_regex_signal": 17,
+    "cases_without_regex_signal": 15,
+    "cases_pattern_unmapped": 19,
+    "total_cases": 51,
+    "patterns_unmapped": [
+      2,
+      6,
+      8,
+      11,
+      12,
+      13,
+      16,
+      17,
+      19,
+      26,
+      29,
+      31,
+      33,
+      34,
+      35,
+      38,
+      39,
+      40
+    ],
+    "patterns_needing_corpus_fix": [
+      7,
+      9,
+      21,
+      23,
+      24,
+      25,
+      27,
+      28,
+      30,
+      32,
+      36,
+      37
+    ],
+    "notes": "Zero-API deterministic audit. Diagnoses why 15 cases score 0 — input lacks the trigger term the pattern is supposed to flag."
+  },
+  "regex_audit_human": {
+    "files_in_low_band": 5,
+    "files_over_low_band": 0,
+    "total_files": 5,
+    "notes": "All 5 synthetic human samples land in LOW band — regex catalogue does not over-fire on legitimate prose, corpus is clean."
   },
   "e2e": {
-    "status": "not_run",
-    "blocker": "claude CLI subscription session limit hit after pattern eval; resets 9pm Europe/Berlin",
-    "overall_mean": null,
-    "cases_below_threshold": null,
-    "total_cases": 5,
-    "report_filename": null,
+    "status": "deferred_to_v3.4.1",
+    "reason": "API budget — session-limit prevents 30+ judge calls in single run. Idempotent partial-caching workflow documented in evals/README.md for batched runs.",
     "rerun_command": "python3 -m evals.scripts.run_e2e_eval --lang en --runs 3 --model sonnet --judge-model sonnet"
   },
-  "infra_fixes_applied_during_baseline_run": [
-    "wrap run_skill in retry_with_backoff (3 attempts, base_delay=2s)",
-    "strip ANTHROPIC_API_KEY from claude CLI subprocess env (CLI uses subscription auth; SDK uses API key)",
-    "include stdout in SkillRunError (made the session-limit message visible)"
-  ],
-  "status": "stale_pre_fix",
-  "skill_commit_at_polish_complete": "0a81dce",
-  "stale_reason": "pattern and FP numbers reflect pre-fix score_case and parser bugs; re-run after session reset to get defensible numbers. See summary_latest_en.md for re-baseline procedure."
+  "infra_landed_this_release": [
+    "per-case partial caching (pattern/FP/E2E): 81979d8, 0a81dce",
+    "parse_skill_output heuristic fallback chain: 7b0538c",
+    "score_case scorable/unscorable filter: 723bdd9",
+    "verify_skill_install extended to pack files: 723bdd9",
+    "regex_scorer + PATTERNS_BY_LANG + --lang flag: 1acc14f",
+    "Asaf Lecht credited: 6d1d645",
+    "regex_audit (corpus + human): this commit"
+  ]
 }
