@@ -10,7 +10,7 @@ This document tracks the *narrative* of the fork. The README's "Version history"
 
 `humanizer-ext` is a fork of `blader/humanizer`, a Claude Code / OpenCode skill that rewrites AI-generated text to read more like a human wrote it. The skill is built around [Wikipedia's "Signs of AI writing"](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) guide, maintained by WikiProject AI Cleanup.
 
-The fork started from upstream v2.5.1 (29 patterns, single behavior). Current main is post-v3.4.0 (commits merged, tag pending fresh baseline) — the fork now has 40 patterns, three modes, five domains, density preflight, detection guidance, a layered framework + pattern packs (v3.3.0), and a three-tier eval harness with idempotent per-case partials for resume-across-sessions (v3.4.0). Phase 2 of the v3.5.0 design — the first non-English language pack (German) — is the remaining piece of the design and is documented in §5 below.
+The fork started from upstream v2.5.1 (29 patterns, single behavior). v3.4.0 is the current tagged release: the fork now has 40 patterns, three modes, five domains, density preflight, detection guidance, a layered framework + pattern packs (v3.3.0), a three-tier LLM-based eval harness with idempotent per-case partials (v3.4.0), and a deterministic regex-based scorer contributed by Asaf Lecht (v3.4.0). Post-v3.4.0 work toward v3.4.1 (regex catalogue extension, partial-caching ports for pattern + FP runners, a nine-voice writers' meetup that resolved every previously-unscorable case in the EN corpus, and a `true_negative` schema for designed-not-to-fire cases) is merged to `main` and waits on a fresh baseline run for tagging. Phase 2 of the v3.5.0 design — the first non-English language pack (German) — is the remaining major piece and is documented in §5 below.
 
 ## 2. Why this fork exists
 
@@ -37,7 +37,13 @@ The fork's purpose: address these without losing upstream-sync ability.
 | 2026-05-23 | (design) | `4bb6e00`, `0540e33`, `6a4b801` | v3.5.0 design spec, PROJECT_HISTORY narrative, Phase 0 implementation plan |
 | 2026-05-24 | 3.3.0 | `f973735` (tag pushed) | SKILL.md refactor: split into framework + `patterns/_universal.md` (12 patterns) + `patterns/en.md` (28 + PERSONALITY) + `domains/en_overrides.md`. 15 pytest schema tests added. Pattern #14 (em dash) exception tightened to a 5-condition check with separate audit pass. Zero observable EN behavior change; manual regression recorded in `docs/regression-cases/RESULTS.md` |
 | 2026-05-24 | (design) | `b488192` | Phase 1 implementation plan (eval infrastructure) |
-| 2026-05-25 | 3.4.0 (tag pending) | `26174c8` (HEAD on origin/main) | Three-tier eval harness: `evals/scripts/run_pattern_eval.py` + `run_false_positive_eval.py` + `run_e2e_eval.py` with judge LLM via Anthropic SDK tool-use. `_shared.py` exports `Case`, `load_pattern_corpus`, `parse_skill_output`, `run_skill` (with retry + API-key-strip), `verify_skill_install` (checks SKILL.md + pack files), `write_report`, `retry_with_backoff`. 22 new pytest tests (37 total). EN corpus: 40/40 patterns seeded (pattern #23 added manually), 5 synthetic human samples, 5 AI E2E cases, judge rubric. E2E batching supports incremental per-case partial caching for split runs across Pro plan sessions. Initial baseline numbers were stale (pre-fix) and are clearly flagged; fresh baseline + v3.4.0 tag pending |
+| 2026-05-25 | 3.4.0 | `26174c8` | Three-tier eval harness: `evals/scripts/run_pattern_eval.py` + `run_false_positive_eval.py` + `run_e2e_eval.py` with judge LLM via Anthropic SDK tool-use. `_shared.py` exports `Case`, `load_pattern_corpus`, `parse_skill_output`, `run_skill` (with retry + API-key-strip), `verify_skill_install` (checks SKILL.md + pack files), `write_report`, `retry_with_backoff`. 22 new pytest tests (37 total). EN corpus: 40/40 patterns seeded (pattern #23 added manually), 5 synthetic human samples, 5 AI E2E cases, judge rubric. E2E batching supports incremental per-case partial caching for split runs across Pro plan sessions |
+| 2026-05-26 | 3.4.0 | `0252a01` (tag pushed `eca15650`) | Defensible v3.4.0 baseline. `regex_audit.py` (deterministic pattern + human-sample audit, zero API) lands. Pattern + FP rebaselined post-fix (0.412 / 0.2039). E2E deferred to v3.4.1 (API budget). v3.4.0 tag pushed to GitHub |
+| 2026-05-26 | (post-tag) | `1acc14f` | `regex_scorer.py` integrated (Asaf Lecht contribution, medium-integration: `PATTERNS_BY_LANG` registry, `--lang` flag, 27 new pytest cases, 64 total) |
+| 2026-05-26 | (post-tag) | `6d1d645` | Asaf Lecht credited as scorer author — `CONTRIBUTORS.md` created, README "Contributors" section added, docstring + history entries link to his GitHub |
+| 2026-05-26 | (toward 3.4.1) | `81979d8` | Per-case partial caching ported to pattern + FP runners (already shipped in E2E). Mirrors the resume-across-sessions design |
+| 2026-05-26 | (toward 3.4.1) | `3fe07ce` | `regex_scorer` catalogue extended: 8 new patterns for humanizer-ext #6, #17, #19, #29, #34, #38, #39, #40. `PATTERN_ID_TO_REGEX_KEYS` mapping updated. 14 new tests (78 total). LLM-only pattern count drops 18 → 10 |
+| 2026-05-26 | (toward 3.4.1) | `194b40d` | Nine-voice writers' meetup (journalist, academic, blogger, marketing copywriter, technical writer, legal writer, Wikipedia AI-cleanup editor, speechwriter, ghostwriter) refines every previously-unscorable EN pattern case. 21 cases get populated `expected_changes` (often narrowed per consensus); 11 cases become `true_negative`. New `Case.true_negative` field + `score_case` handles via Levenshtein edit-ratio. EN corpus: 51 cases = 42 scorable + 9 true-negative + 0 unscorable (was 19 + 0 + 32 pre-meetup) |
 
 ## 4. What we changed, how, and why
 
@@ -155,6 +161,34 @@ Author's design note (preserved in source): regexes are conservative; false nega
 
 Wiring `regex_scorer` as a fast first-pass that `run_pattern_eval.py` calls before deciding which cases need LLM-level scoring is the "big" integration path; deferred until after Phase 2 so the per-language pattern-pack abstraction is in place first.
 
+### 4.9 Post-v3.4.0 work — eval-infra robustness + corpus refinement (toward v3.4.1)
+
+**What:** Four work blocks landed on `main` after the v3.4.0 tag was pushed; they harden the eval infrastructure and bring the EN pattern corpus from "21 unscorable / 32 unfilled" to "0 unscorable / fully classified" without spending any new API budget.
+
+1. **Per-case partial caching ported to all three runners** (commit `81979d8`). Pattern and FP runners now cache per-case scores under `evals/reports/_partial/` and resume across Claude Pro subscription session limits — same pattern the E2E runner already used. New CLI flags: `--force` (re-score even if cached), `--aggregate-only` (combine partials into summary without API calls). `main()` only exits non-zero on threshold failures when ALL cases are scored — partial runs no longer falsely signal failure. Triggered by an actual session-limit interruption mid-pattern-eval rebaseline that lost all completed cases under the previous all-or-nothing logic.
+
+2. **`regex_scorer` catalogue extension** (commit `3fe07ce`, cavecrew-builder agent). Added 8 new regex patterns covering humanizer-ext patterns #6 (challenges_section), #17 (title_case_heading), #19 (curly_quotes), #29 (fragmented_header), #34 (trailing_emphasis_fragment), #38 (reference_markup_artifact), #39 (placeholder_text), #40 (markdown_contamination). 14 new pytest cases (78 total). `PATTERN_ID_TO_REGEX_KEYS` mapping in `regex_audit.py` updated so cases on these patterns now have deterministic signal; LLM-only count dropped 18 → 10. The remaining 10 LLM-only patterns (#2, #8, #11, #12, #13, #16, #26, #31, #33, #35) genuinely need semantic understanding or POS tagging — regex is the wrong tool.
+
+3. **Nine-voice corpus-refinement meetup** (commit `194b40d`). To resolve the 32 unscorable cases (23 empty `expected_changes`, 9 with triggers not in input) WITHOUT new API budget, six writing personas were dispatched as parallel subagents in addition to the three already-used (journalist, academic, blogger): marketing copywriter, technical writer, legal writer, Wikipedia AI-cleanup editor, speechwriter, ghostwriter. Each reviewed all 32 cases independently from their domain lens; verdicts (✓/⚠/❌) were synthesized into a consensus matrix in the main thread. Outcome: 21 cases got populated `expected_changes` (often narrowed per dissent), 11 became `true_negative` (strong cross-panel consensus that the proposal would over-flag legitimate prose). Six cases achieved unanimous 9/9 ✓: #18 emojis, #22 sycophancy, #29 reference-markup artifacts, #30 utm_source=chatgpt, #31 placeholder tokens, #32 markdown fence + meta-prompt — these are the strongest-signal entries in the entire corpus and should be the foundation of any future regression-tracking work.
+
+4. **`true_negative` schema added to the corpus + scorer** (commit `194b40d`). Per the meetup's cross-panel finding that some cases are designed-not-to-fire (skill should leave the input alone, not rewrite it), the `Case` dataclass gained a `true_negative: bool = False` field; `load_pattern_corpus` reads it from per-case JSON; `score_case` handles true-negative cases via Levenshtein edit-ratio (passes if ratio ≤ 0.10 — skill correctly left the input ~unchanged); `run()` aggregator tracks true-negatives separately from the detection rate. The schema gap that the meetup's journalist persona flagged ("can't distinguish empty-by-design from unfilled") is closed.
+
+**Corpus state after this work block:** 51 EN pattern cases = 42 scorable + 9 true-negative + 0 unscorable (was 19 scorable + 0 true-negative + 32 unscorable). The v3.4.0 baseline numbers in `evals/reports/summary_latest_en.{md,json}` reflect the OLD corpus state; the next pattern eval run (post-session-reset) will produce defensible numbers against the refined corpus and the v3.4.1 tag will gate on those.
+
+**How:** Mixed agent strategy:
+- Parent (Opus) for orchestration + consensus synthesis (the nine-voice synthesis was a single Opus task that read six subagent outputs and merged into a 32-row decision matrix);
+- `cavecrew-builder` (Sonnet) for the small surgical regex-catalogue extension (2 files, all new patterns + tests landed in a single agent invocation);
+- `general-purpose` (Sonnet, parallel ×6) for the persona reviews (each persona got the full 32-case list + a role-specific prompt; outputs were independent so true parallelism was safe);
+- The corpus bulk-update used a one-off Python script (`/tmp/apply_consensus.py`) running locally to write all 32 case updates in one pass — faster + lower error than 32 individual file edits via the Edit tool.
+
+**Why:** The active "better eval with no extra API cost" goal made this work block possible. None of the four pieces required API spend:
+- Partial caching is pure code change; no API needed to verify (mock tests).
+- Regex catalogue extension is offline regex authoring + pytest.
+- The nine-voice meetup spent subagent compute (six general-purpose Sonnet agents), not API-billed humanizer-skill calls; the synthesis was a single Opus reasoning task.
+- Corpus refinement is JSON editing.
+
+The next pattern-eval run will surface what the new corpus produces — but that re-run is API-bound and waits for the next session window. The infrastructure side of v3.4.1 is fully in place; only the fresh numbers are pending.
+
 ## 5. In planning — v3.5.0 Phase 2 (German language pack)
 
 Phases 0 and 1 of the v3.5.0 design are shipped (§4.5, §4.6, §4.7). Phase 2 — the first non-English language pack (German) — is the remaining piece.
@@ -214,20 +248,21 @@ humanizer-ext/
 ### 5.4 Build order — status
 
 1. **Phase 0 — Refactor (EN only, behavior-preserving). SHIPPED as v3.3.0** — see §4.5.
-2. **Phase 1 — Eval infrastructure (EN). SHIPPED as v3.4.0 (commits merged, tag pending fresh baseline)** — see §4.6, §4.7.
-3. **Phase 2 — DE language pack. PENDING.** `mine_patterns.py` → DE candidates from generated AI corpus vs. Wikipedia pre-2022 + Gutenberg. Manual curation → `patterns/de.md`. `domains/de_overrides.md` from DE register knowledge. `evals/corpus/de/`. Iterate until pattern-eval ≥ 0.85, false-positive ≤ 0.10, e2e ≥ EN baseline. Ships as v3.5.0.
-4. **Phase 3 — Polish & release. PENDING.** README updates, `evals/README.md` polish (already partly in place), optional CI workflow, v3.5.0 release.
+2. **Phase 1 — Eval infrastructure (EN). SHIPPED as v3.4.0 (tag pushed `eca15650`)** — see §4.6, §4.7, §4.8.
+3. **v3.4.1 (post-v3.4.0 robustness + corpus refinement). UNRELEASED.** — see §4.9. Code shipped to `main`; v3.4.1 tag waits on a fresh pattern + FP + E2E baseline run against the refined corpus.
+4. **Phase 2 — DE language pack. PENDING.** `mine_patterns.py` → DE candidates from generated AI corpus vs. Wikipedia pre-2022 + Gutenberg. Manual curation → `patterns/de.md`. `domains/de_overrides.md` from DE register knowledge. `evals/corpus/de/`. Iterate until pattern-eval ≥ 0.85, false-positive ≤ 0.10, e2e ≥ EN baseline. Ships as v3.5.0.
+5. **Phase 3 — Polish & release. PENDING.** README updates, `evals/README.md` polish (already partly in place), optional CI workflow, v3.5.0 release.
 
-### 5.5 Pre-v3.4.0-tag work (gating the tag, not a separate release)
+### 5.5 v3.4.1 pre-tag work (gating the next tag)
 
-The v3.4.0 commits are merged to `main` and pushed to `origin`. The tag is intentionally held until a fresh baseline replaces the stale numbers documented in `evals/reports/summary_latest_en.md`. Procedure:
+The v3.4.1 commits (regex catalogue extension, partial-caching ports, nine-voice meetup, `true_negative` schema) are merged to `main` and pushed. The v3.4.1 tag waits on a fresh pattern + FP + E2E baseline run against the refined corpus. Procedure:
 
-1. After the claude CLI subscription session resets (target: 21:00 Europe/Berlin), re-symlink the install to point at the current `main` checkout (the previous symlinks pointed at since-removed worktrees).
-2. Re-run pattern eval (subscription only, ~25 min wall, 40 patterns × ~46 cases).
-3. Re-run FP eval (subscription only, ~5 min wall, 5 cases).
+1. After the claude CLI subscription session resets, re-symlink the install to point at the current `main` checkout if it does not already.
+2. Re-run pattern eval (subscription only, ~25 min wall, 51 cases — 42 scorable + 9 true-negative now, was 19 + 0 pre-meetup). Partials were cleared in commit `194b40d`, so this is a full re-score.
+3. Re-run FP eval (subscription only, ~5 min wall, 5 cases). Per-case partials may still apply — use `--force` if measurement methodology changed.
 4. Run E2E in batches via `--cases` flag (needs `ANTHROPIC_API_KEY`); 2 cases per session × 2–3 sessions to fit the Pro plan.
 5. `--aggregate-only` to combine cached partials into the fresh summary.
-6. Replace "STALE" banner with "DEFENSIBLE" + the fresh numbers; commit; tag v3.4.0; push tag.
+6. Replace the current `summary_latest_en.{md,json}` numbers with the fresh ones; document the corpus-state delta (pre-meetup 19 scorable / 32 unscorable → post-meetup 42 scorable / 9 true-negative); commit; tag v3.4.1; push tag.
 
 Full command sequence is in `evals/reports/summary_latest_en.md` under "Re-baseline procedure".
 

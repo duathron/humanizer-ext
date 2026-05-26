@@ -1,6 +1,6 @@
 {
   "date": "2026-05-26",
-  "status": "defensible",
+  "status": "stale_corpus_changed_in_194b40d",
   "skill_version": "v3.4.0",
   "skill_commit": "6d1d645",
   "skill_model": "sonnet",
@@ -13,7 +13,7 @@
     "below_threshold": 9,
     "total_patterns": 40,
     "report_filename": "pattern_en_20260526_151726.json",
-    "notes": "Rate is over scorable subset. 34 unscorable cases reflect corpus thinness (input does not contain trigger terms), not skill failure. Hand-refine corpus to push rate well above 0.412."
+    "notes": "Rate computed over 17 scorable / 51 total. Post-meetup commit 194b40d: corpus is now 42 scorable / 9 true-negative / 0 unscorable. Next pattern eval run will produce defensible numbers against the refined corpus."
   },
   "false_positive": {
     "mean_edit_ratio": 0.2039,
@@ -62,7 +62,7 @@
       36,
       37
     ],
-    "notes": "Zero-API deterministic audit. Diagnoses why 15 cases score 0 — input lacks the trigger term the pattern is supposed to flag."
+    "notes": "Pre-meetup snapshot. After commit 194b40d the meetup consensus resolved every unscorable case — 21 cases got populated expected_changes, 11 became true_negative. cases_without_regex_signal will drop sharply on next audit."
   },
   "regex_audit_human": {
     "files_in_low_band": 5,
@@ -83,5 +83,14 @@
     "regex_scorer + PATTERNS_BY_LANG + --lang flag: 1acc14f",
     "Asaf Lecht credited: 6d1d645",
     "regex_audit (corpus + human): this commit"
-  ]
+  ],
+  "v3_4_1_pending": {
+    "corpus_state": "42 scorable + 9 true_negative + 0 unscorable",
+    "infra_landed": [
+      "per-case partial caching ports (81979d8)",
+      "regex catalogue extension (3fe07ce)",
+      "meetup consensus + true_negative schema (194b40d)"
+    ],
+    "baseline_rerun_blocker": "API budget / claude CLI subscription session quota"
+  }
 }

@@ -1,12 +1,27 @@
 # EN Baseline Eval Summary
 
-**Status: DEFENSIBLE (pattern + FP + regex audit). E2E deferred to v3.4.1 due to API budget.**
+**Status (v3.4.0 numbers — STALE since corpus refinement in `194b40d`).**
 
-**Run date:** 2026-05-26 (rebaseline after all polish fixes)
-**Skill version:** humanizer v3.4.0 (commits merged to `main`)
-**Skill commit:** `6d1d645`
+**v3.4.0 run date:** 2026-05-26 (against the pre-meetup corpus state)
+**Skill version at run:** humanizer v3.4.0 (tag `eca15650`)
+**Skill commit at run:** `6d1d645`
 **Skill model:** sonnet (via `claude -p` subscription auth)
-**Run sequence:** pattern → false-positive → regex audit (E2E deferred)
+**Run sequence:** pattern → false-positive → regex audit (E2E deferred to v3.4.1)
+
+## ⚠ Why these numbers no longer match the corpus
+
+The 9-voice writers' meetup (commit `194b40d`, 2026-05-26 evening) resolved every previously-unscorable EN pattern case:
+
+| Corpus state | Pre-meetup (this baseline) | Post-meetup (next baseline) |
+|---|---|---|
+| Total cases | 51 | 51 |
+| Scorable | 19 | **42** |
+| True-negative | 0 | **9** |
+| Unscorable | 32 | **0** |
+
+The 0.412 pattern rate below was computed over 17 scorable cases — a thin sample. The next pattern eval run will score 42 cases against refined `expected_changes` lists and will surface a different (likely higher, but harder to game) number. Pending v3.4.1.
+
+The 0.2039 FP edit ratio is unaffected by the meetup (the synthetic human samples were not part of the refinement scope). The 1.00 density preflight quick-drop rate likewise holds.
 
 ## Headline numbers
 
