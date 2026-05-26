@@ -13,6 +13,7 @@ whether that design works.
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -83,13 +84,29 @@ def _resolve_personal_samples_dir() -> Path:
     )
 
 
+PARTIALS_SUBDIR = "_partial"
+
+
+def _partial_path(lang: str, corpus: str, file_stem: str) -> Path:
+    """Per-file intermediate report path. Allows resume across sessions."""
+    return REPO_ROOT / "evals" / "reports" / PARTIALS_SUBDIR / f"fp_{lang}_{corpus}_{file_stem}.json"
+
+
 def run(
     lang: str = "en",
     corpus: str = "synthetic",
     model: str = "sonnet",
     threshold: float = DEFAULT_THRESHOLD,
+    force: bool = False,
+    aggregate_only: bool = False,
 ) -> dict:
-    verify_skill_install()
+    """Run FP eval. Idempotent across sessions: each file's score is cached to
+    evals/reports/_partial/fp_<lang>_<corpus>_<file_stem>.json. Re-runs skip
+    files with existing partials — handles claude CLI subscription session-limit
+    interruptions without re-burning quota.
+    """
+    if not aggregate_only:
+        verify_skill_install()
     if corpus == "personal":
         corpus_dir = _resolve_personal_samples_dir()
     else:
@@ -99,13 +116,26 @@ def run(
         if p.is_file() and p.suffix in {".md", ".txt"} and not p.name.startswith("_")
     )
 
+    partial_dir = _partial_path(lang, corpus, "_").parent
+    partial_dir.mkdir(parents=True, exist_ok=True)
+
     per_file = []
+    skipped_no_partial = []
     for path in files:
+        partial = _partial_path(lang, corpus, path.stem)
+        if partial.exists() and not force:
+            per_file.append(json.loads(partial.read_text(encoding="utf-8")))
+            continue
+        if aggregate_only:
+            skipped_no_partial.append(path.name)
+            continue
+
         domain, body = _read_sample(path)
         score = score_human_text(body, lang=lang, model=model, domain=domain)
         score["file"] = path.name
         score["domain"] = domain
         score["above_threshold"] = score["edit_ratio"] > threshold
+        partial.write_text(json.dumps(score, indent=2, ensure_ascii=False) + "\n")
         per_file.append(score)
 
     total = len(per_file)
@@ -126,13 +156,19 @@ def run(
             "density_preflight_quick_drop_rate": (
                 round(quick_drops / total, 2) if total else 0.0
             ),
+            "skipped_no_partial": skipped_no_partial,
         },
         "per_file": per_file,
     }
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="False-positive rate eval runner.")
+    parser = argparse.ArgumentParser(
+        description=(
+            "False-positive rate eval runner. Idempotent: per-file partials cached "
+            "in evals/reports/_partial/ so you can resume across Pro plan sessions."
+        )
+    )
     parser.add_argument("--lang", default="en")
     parser.add_argument(
         "--corpus", default="synthetic",
@@ -140,10 +176,23 @@ def main() -> None:
     )
     parser.add_argument("--model", default="sonnet")
     parser.add_argument("--threshold", type=float, default=DEFAULT_THRESHOLD)
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Re-score files even if a partial exists.",
+    )
+    parser.add_argument(
+        "--aggregate-only", action="store_true",
+        help="No API calls; just aggregate existing partials into a summary.",
+    )
     args = parser.parse_args()
 
     report = run(
-        lang=args.lang, corpus=args.corpus, model=args.model, threshold=args.threshold
+        lang=args.lang,
+        corpus=args.corpus,
+        model=args.model,
+        threshold=args.threshold,
+        force=args.force,
+        aggregate_only=args.aggregate_only,
     )
     name = f"false_positive_{args.lang}_{args.corpus}"
     json_path, md_path = write_report(name, report)
@@ -152,7 +201,13 @@ def main() -> None:
         f"Mean edit ratio: {report['summary']['mean_edit_ratio']} "
         f"({report['summary']['files_over_threshold']}/{report['summary']['total_files']} over {args.threshold})"
     )
-    sys.exit(1 if report["summary"]["files_over_threshold"] > 0 else 0)
+    if report["summary"].get("skipped_no_partial"):
+        print(
+            f"Skipped (no partial yet): {report['summary']['skipped_no_partial']} — "
+            f"re-run without --aggregate-only after next session reset."
+        )
+    is_complete = not report["summary"].get("skipped_no_partial")
+    sys.exit(1 if is_complete and report["summary"]["files_over_threshold"] > 0 else 0)
 
 
 if __name__ == "__main__":

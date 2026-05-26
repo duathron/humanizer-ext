@@ -8,6 +8,7 @@ build (exit 1) if any pattern's rate falls below the threshold.
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -88,21 +89,52 @@ def score_case(case: Case, *, model: str = "sonnet") -> dict:
     }
 
 
+PARTIALS_SUBDIR = "_partial"
+
+
+def _partial_path(lang: str, case_id: str) -> Path:
+    """Per-case intermediate report path. Allows resume across sessions."""
+    return REPO_ROOT / "evals" / "reports" / PARTIALS_SUBDIR / f"pattern_{lang}_{case_id}.json"
+
+
 def run(
     lang: str = "en",
     pattern: int | None = None,
     model: str = "sonnet",
     threshold: float = DEFAULT_THRESHOLD,
+    force: bool = False,
+    aggregate_only: bool = False,
 ) -> dict:
-    verify_skill_install()
+    """Run pattern eval. Idempotent across sessions: each case's score is
+    written to evals/reports/_partial/pattern_<lang>_<case_id>.json immediately
+    after scoring. Re-running picks up cached partials and only scores missing
+    cases — handles claude CLI subscription session-limit interruptions
+    without re-burning quota on already-completed cases.
+    """
+    if not aggregate_only:
+        verify_skill_install()
     corpus_dir = REPO_ROOT / "evals" / "corpus" / lang / "patterns"
     cases = load_pattern_corpus(corpus_dir)
     if pattern is not None:
         cases = [c for c in cases if c.metadata.get("pattern_id") == pattern]
 
+    partial_dir = _partial_path(lang, "_").parent
+    partial_dir.mkdir(parents=True, exist_ok=True)
+
     by_pattern: dict[int, list[dict]] = defaultdict(list)
+    skipped_no_partial = []
     for case in cases:
+        partial = _partial_path(lang, case.id)
+        if partial.exists() and not force:
+            score = json.loads(partial.read_text(encoding="utf-8"))
+            by_pattern[score["pattern_id"]].append(score)
+            continue
+        if aggregate_only:
+            skipped_no_partial.append(case.id)
+            continue
+
         score = score_case(case, model=model)
+        partial.write_text(json.dumps(score, indent=2, ensure_ascii=False) + "\n")
         by_pattern[score["pattern_id"]].append(score)
 
     per_pattern_summary = []
@@ -146,21 +178,40 @@ def run(
             "total_patterns": len(per_pattern_summary),
             "total_cases": sum(p["total"] for p in per_pattern_summary),
             "unscorable_cases": total_unscorable,
+            "skipped_no_partial": skipped_no_partial,
         },
         "per_pattern": per_pattern_summary,
     }
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Pattern-detection eval runner.")
+    parser = argparse.ArgumentParser(
+        description=(
+            "Pattern-detection eval runner. Idempotent: per-case partials cached "
+            "in evals/reports/_partial/ so you can resume across Pro plan sessions."
+        )
+    )
     parser.add_argument("--lang", default="en")
     parser.add_argument("--pattern", type=int, default=None, help="Filter to one pattern ID")
     parser.add_argument("--model", default="sonnet")
     parser.add_argument("--threshold", type=float, default=DEFAULT_THRESHOLD)
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Re-score cases even if a partial exists.",
+    )
+    parser.add_argument(
+        "--aggregate-only", action="store_true",
+        help="No API calls; just aggregate existing partials into a summary.",
+    )
     args = parser.parse_args()
 
     report = run(
-        lang=args.lang, pattern=args.pattern, model=args.model, threshold=args.threshold
+        lang=args.lang,
+        pattern=args.pattern,
+        model=args.model,
+        threshold=args.threshold,
+        force=args.force,
+        aggregate_only=args.aggregate_only,
     )
     json_path, md_path = write_report(f"pattern_{args.lang}", report)
     print(f"Wrote {json_path.name} and {md_path.name}")
@@ -168,7 +219,13 @@ def main() -> None:
         f"Overall detection rate: {report['summary']['overall_detection_rate']} "
         f"({report['summary']['patterns_below_threshold']}/{report['summary']['total_patterns']} below {args.threshold})"
     )
-    sys.exit(1 if report["summary"]["patterns_below_threshold"] > 0 else 0)
+    if report["summary"].get("skipped_no_partial"):
+        print(
+            f"Skipped (no partial yet): {len(report['summary']['skipped_no_partial'])} cases — "
+            f"re-run without --aggregate-only after next session reset."
+        )
+    is_complete = not report["summary"].get("skipped_no_partial")
+    sys.exit(1 if is_complete and report["summary"]["patterns_below_threshold"] > 0 else 0)
 
 
 if __name__ == "__main__":
