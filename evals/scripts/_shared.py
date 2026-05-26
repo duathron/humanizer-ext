@@ -69,7 +69,11 @@ _DRAFT_RE = re.compile(
     re.DOTALL,
 )
 _FINAL_RE = re.compile(
-    r"\*\*Final rewrite:\*\*\s*\n(.*?)(?=\n\*\*(?:Changes made):|\Z)",
+    r"\*\*Final rewrite:\*\*\s*\n(.*?)"
+    r"(?=\n\*\*(?:Changes made|What changed|Summary|Notes|Audit|Rationale|"
+    r"Why this works|Comparison|Diff|Removed|Edits)[: ]|"
+    r"\n---\s*\n|"
+    r"\Z)",
     re.DOTALL,
 )
 

@@ -1,19 +1,24 @@
 {
-  "date": "2026-05-26",
-  "status": "stale_corpus_changed_in_194b40d",
+  "date": "2026-05-26 22:04",
+  "status": "rebaselined_with_parser_bug_caveat",
   "skill_version": "v3.4.0",
-  "skill_commit": "6d1d645",
+  "skill_commit": "d0986d4",
   "skill_model": "sonnet",
   "judge_model": "sonnet",
   "pattern": {
-    "overall_rate": 0.412,
-    "scorable_cases": 17,
+    "overall_rate": 0.5,
+    "scorable_cases": 42,
     "total_cases": 51,
-    "unscorable_cases": 34,
-    "below_threshold": 9,
-    "total_patterns": 40,
-    "report_filename": "pattern_en_20260526_151726.json",
-    "notes": "Rate computed over 17 scorable / 51 total. Post-meetup commit 194b40d: corpus is now 42 scorable / 9 true-negative / 0 unscorable. Next pattern eval run will produce defensible numbers against the refined corpus."
+    "unscorable_cases": 0,
+    "true_negative_cases": 9,
+    "patterns_perfect": 15,
+    "patterns_partial": 1,
+    "patterns_miss": 17,
+    "patterns_true_neg_only": 7,
+    "true_neg_passes": 2,
+    "true_neg_total": 9,
+    "report_filename": "pattern_en_20260526_220439.json",
+    "notes": "Rate 0.5 includes parser-bug-driven false misses. parse_skill_output _FINAL_RE was including **What changed:** trailing commentary in the rewrite text, so substring checks for artifacts found them in the commentary even when the actual rewrite was clean. Parser patched in same commit as this summary update. Estimated true rate is higher than 0.5. Re-run gated on next session."
   },
   "false_positive": {
     "mean_edit_ratio": 0.2039,
@@ -92,5 +97,6 @@
       "meetup consensus + true_negative schema (194b40d)"
     ],
     "baseline_rerun_blocker": "API budget / claude CLI subscription session quota"
-  }
+  },
+  "parser_fix_pending_rerun": true
 }

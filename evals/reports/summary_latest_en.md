@@ -1,27 +1,55 @@
 # EN Baseline Eval Summary
 
-**Status (v3.4.0 numbers — STALE since corpus refinement in `194b40d`).**
+**Status: pattern eval re-baselined against refined corpus (commit `bzop6ygn2` run, 2026-05-26). Rate 0.5 — likely inflated misses due to parser bug now patched (see below). FP + regex audit numbers from earlier run still valid.**
 
-**v3.4.0 run date:** 2026-05-26 (against the pre-meetup corpus state)
-**Skill version at run:** humanizer v3.4.0 (tag `eca15650`)
-**Skill commit at run:** `6d1d645`
+**Pattern run date:** 2026-05-26 22:04 (against refined 42-scorable + 9-true-neg corpus)
+**Skill version:** humanizer v3.4.0 (tag `eca15650`) + post-tag work toward v3.4.1
+**Skill commit:** `d0986d4` (HEAD at run time)
 **Skill model:** sonnet (via `claude -p` subscription auth)
-**Run sequence:** pattern → false-positive → regex audit (E2E deferred to v3.4.1)
 
-## ⚠ Why these numbers no longer match the corpus
+## Headline numbers (current)
 
-The 9-voice writers' meetup (commit `194b40d`, 2026-05-26 evening) resolved every previously-unscorable EN pattern case:
+| Metric | Value | Notes |
+|---|---|---|
+| Pattern detection rate (overall, 42 scorable cases) | **0.5** | 21 / 42 detected. Inflated misses — see parser-bug caveat below. |
+| Pattern cases scorable / total | 42 / 51 | 0 unscorable. 9 true-neg reported separately. |
+| Patterns perfect (rate=1.0) | **15** of 33 scorable patterns | #1, #3, #4, #6, #10, #11, #16, #18, #20, #23, #24, #25, #28, #31, #32 |
+| Patterns partial (0 < rate < 1) | 1 | #21 (0.5) |
+| Patterns miss (rate=0.0) | 17 | many likely false misses from parser bug — see below |
+| True-negative-only patterns | 7 | #8, #13, #14, #15, #17, #19, #29 (skill should leave input alone) |
+| True-neg passes / total | 2 / 9 | #14 case_002 + #15 case_001 passed; others failed because skill DID rewrite the input (separate signal — skill over-edits some clean inputs) |
+| FP mean edit ratio (synthetic) | **0.2039** | from earlier run, unchanged |
+| FP density preflight quick-drop | **1.00** | from earlier run, unchanged (✓) |
+| Regex audit: human samples LOW band | **5 / 5** | ✓ |
+| E2E rewrite quality | not run | deferred (API budget) |
 
-| Corpus state | Pre-meetup (this baseline) | Post-meetup (next baseline) |
+## ⚠ Parser bug inflated MISS count — patched in this commit
+
+Investigation of the artifact-cases `#38`, `#39`, `#40` (which had unanimous 9/9 ✓ meetup endorsement) revealed the skill produced clean rewrites but the parser's `_FINAL_RE` regex captured the rewrite PLUS a trailing `**What changed:**` commentary block that quoted the original artifacts. The substring check then found "removed" terms in the commentary and flagged them as retained.
+
+Example — `pattern_038_en_001` actual partial:
+```
+rewrite_preview: "the 2024 election turned on three states, with margins under 1% in each. analysts have called it the closest race in modern history. [add a real citation here, or remove the claim.] --- **what changed: ..."
+retained_terms: ["turn0search0", ":contentReference[oaicite"]   ← from the "what changed" commentary, not the rewrite
+detected: False                                                    ← false negative
+```
+
+Skill is doing its job; parser is including too much context. Fix: extended `_FINAL_RE` lookahead to terminate on `**What changed:**`, `**Summary:**`, `**Notes:**`, `**Audit:**`, `**Rationale:**`, `**Why this works:**`, `**Comparison:**`, `**Diff:**`, `**Removed:**`, `**Edits:**`, or a `---` thematic break.
+
+**Estimated impact on rate:** unknown without re-run, but the artifact cases alone (3 misses → likely 3 detects) would push rate from 0.5 to ~0.57. The 17 MISS patterns likely contain several more parser-driven false negatives. **The skill's true rate against this corpus is almost certainly higher than 0.5.**
+
+A fresh pattern eval run with the patched parser is the gating step for the v3.4.1 tag. Quota will reset before that's possible.
+
+## Pre-meetup snapshot (for diff context)
+
+| Corpus state | Pre-meetup | Post-meetup (current) |
 |---|---|---|
 | Total cases | 51 | 51 |
 | Scorable | 19 | **42** |
 | True-negative | 0 | **9** |
 | Unscorable | 32 | **0** |
 
-The 0.412 pattern rate below was computed over 17 scorable cases — a thin sample. The next pattern eval run will score 42 cases against refined `expected_changes` lists and will surface a different (likely higher, but harder to game) number. Pending v3.4.1.
-
-The 0.2039 FP edit ratio is unaffected by the meetup (the synthetic human samples were not part of the refinement scope). The 1.00 density preflight quick-drop rate likewise holds.
+Pre-meetup detection rate over 17 scorable: **0.412**. Post-meetup rate over 42 scorable with parser bug: **0.5**. Real comparison waits on the post-parser-fix re-run.
 
 ## Headline numbers
 
