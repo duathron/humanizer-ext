@@ -10,11 +10,11 @@ Voice) need LLM judgment and live in SKILL.md prose, not here. A score
 the model can't self-flatter forces it to do real work on the things
 that can't be counted.
 
-Origin: contributed; based on a regex-based AI-detection scorer used in
-parallel humanizer-style projects. Integrated as a fast deterministic
-first-pass alongside the LLM-based `run_pattern_eval.py` (which scores
-behavioral pattern removal, not raw substring presence). See
-`evals/README.md` for how the two relate.
+Author: Asaf Lecht (https://github.com/Seithx)
+Integrated into humanizer-ext as a fast deterministic first-pass alongside
+the LLM-based `run_pattern_eval.py` (which scores behavioral pattern
+removal, not raw substring presence). See `evals/README.md` for how the
+two relate. See `CONTRIBUTORS.md` for full attribution.
 
 Usage:
     python -m evals.scripts.regex_scorer text.txt                      # score one file

@@ -143,6 +143,18 @@ The fork's purpose: address these without losing upstream-sync ability.
 
 **Why:** The initial baseline run was honest evidence that the eval infrastructure had measurement bugs in three places: the seeder produced too-broad expected_changes, the parser conflated commentary with rewrite, and one runner was missing dimensions from its threshold check. Fixing them as a coherent polish pass before the v3.4.0 tag means the tag points at numbers worth interpreting. The v3.4.0 tag is deferred until a fresh baseline run (post-session-reset) replaces the stale numbers; the procedure is documented step-by-step in `evals/reports/summary_latest_en.md`.
 
+### 4.8 v3.4.0 — `regex_scorer.py` (contributed by Asaf Lecht)
+
+**What:** Added `evals/scripts/regex_scorer.py` — a deterministic regex-based AI-tell scorer that counts high-confidence Tier-1 patterns and reports density per 100 words, per-paragraph breakdown, sentence-rhythm coefficient of variation, and (in `--compare` mode) length delta + pattern regressions between input and rewrite. No API calls; stdlib only; runs as `python -m evals.scripts.regex_scorer`. Twenty-seven new pytest cases cover the catalogue, helpers, scoring, and compare-mode logic (64 tests total).
+
+**How:** Contributed by [Asaf Lecht](https://github.com/Seithx); integrated at "medium" level per the integration plan — original `PATTERNS` dict refactored into `PATTERNS_EN` + a `PATTERNS_BY_LANG` registry; `scan` / `score_text` / `compare` / formatters / CLI all take a `lang` kwarg with `--lang en` as default and `choices=sorted(PATTERNS_BY_LANG)` so unknown languages fail fast at argparse. The Hebrew-skip path generalized into "skip language-specific patterns when the paragraph's script does not match the active language pack" (universal mechanics — em-dash, boldface, emoji — still counted). Windows-specific docstring (`py score.py`) replaced with the `python -m` form used by the rest of the eval scripts.
+
+**Why:** The LLM-based `run_pattern_eval.py` answers "did the skill behaviorally remove this pattern from this case?" — a noisier, more expensive question that needs the model. The regex scorer answers "how many high-confidence AI tells survive in this text?" — a deterministic, fast, offline question. They complement each other: regex scorer gives a sub-second density read on any text; LLM pattern eval gives a per-case detection rate against curated before/after pairs. The language registry is the Phase-2-friendly bit: when DE patterns get curated, they plug in as `PATTERNS_DE` + one line in the registry — no refactor of the surrounding scoring + comparison + CLI code.
+
+Author's design note (preserved in source): regexes are conservative; false negatives are preferred over false positives. For the humanizer eval use case that is the right tradeoff — the skill does not get full credit for a clean rewrite (false negative) rather than getting penalized for legitimate prose (false positive). Threshold values (`boldface_overuse > 0.5/100w`, `rule_of_three > 1.5/100w`) are heuristic and should be re-validated against the human-sample corpus over time.
+
+Wiring `regex_scorer` as a fast first-pass that `run_pattern_eval.py` calls before deciding which cases need LLM-level scoring is the "big" integration path; deferred until after Phase 2 so the per-language pattern-pack abstraction is in place first.
+
 ## 5. In planning — v3.5.0 Phase 2 (German language pack)
 
 Phases 0 and 1 of the v3.5.0 design are shipped (§4.5, §4.6, §4.7). Phase 2 — the first non-English language pack (German) — is the remaining piece.
