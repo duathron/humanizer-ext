@@ -1,12 +1,16 @@
 # humanizer-ext eval infrastructure
 
-Three eval types target the humanizer skill from different angles:
+Three LLM-based eval types target the humanizer skill from different angles:
 
-- **`run_pattern_eval.py`** — detection rate per pattern (cheap, deterministic-ish, runs against curated before/after pairs)
+- **`run_pattern_eval.py`** — detection rate per pattern (LLM-based, runs against curated before/after pairs)
 - **`run_false_positive_eval.py`** — edit distance ratio on human-written texts (catches over-editing)
 - **`run_e2e_eval.py`** — judge-LLM scored rewrite quality on whole AI documents (expensive, holistic)
 
-Reports land in `evals/reports/` as paired JSON + Markdown. Personal-mode reports (`evals/reports/*_personal_*`) are gitignored.
+Plus one deterministic regex-based scorer:
+
+- **`regex_scorer.py`** — counts high-confidence Tier-1 AI-writing patterns by regex; reports per-100w density, per-paragraph breakdown, sentence-rhythm CV, and (`--compare` mode) length delta + pattern regressions between input and rewrite. No API calls. Useful standalone for quick offline scoring, and as a deterministic complement to the LLM-based pattern eval. Pack registry: `PATTERNS_BY_LANG` in the source — `--lang en` available now; DE pack will land with Phase 2 of the v3.5.0 design.
+
+Reports land in `evals/reports/` as paired JSON + Markdown. Personal-mode reports (`evals/reports/*_personal_*`) and per-case partials (`evals/reports/_partial/`) are gitignored.
 
 ## Prerequisites
 
@@ -48,6 +52,11 @@ python evals/scripts/run_e2e_eval.py --lang en --runs 3 --judge-model sonnet
 
 # E2E with Opus judge (more expensive, more discriminating)
 python evals/scripts/run_e2e_eval.py --lang en --judge-model opus
+
+# Regex scorer (deterministic, no API)
+python -m evals.scripts.regex_scorer text.txt
+python -m evals.scripts.regex_scorer --compare input.txt rewrite.txt
+python -m evals.scripts.regex_scorer text.txt --json --lang en
 ```
 
 ### Splitting E2E across multiple Pro plan sessions
