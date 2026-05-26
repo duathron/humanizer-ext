@@ -6,12 +6,12 @@
     {
       "id": "pattern_029_en_001",
       "input": "## Performance\n>\n> Speed matters.\n>\n> When users hit a slow page, they leave.",
-      "expected_changes": [
-        "A heading followed by a one-line paragraph that simply restates the heading before the real content begins"
-      ],
+      "expected_changes": [],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus_true_negative",
+      "true_negative": true,
+      "notes": "Meetup 2026-05-26 (2/2/5 strong dissent). 'Speed matters.' defended as legitimate one-sentence-paragraph craft by 5/9 voices (Nielsen Norman, Paul Graham style)."
     }
   ]
 }

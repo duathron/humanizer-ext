@@ -9,7 +9,9 @@
       "expected_changes": [],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus_true_negative",
+      "true_negative": true,
+      "notes": "Meetup 2026-05-26 (7/1/0 endorse true-neg). Skill doc explicit: 'Curly quotes alone' not reliable (auto-curl by macOS/Word/Google Docs)."
     }
   ]
 }

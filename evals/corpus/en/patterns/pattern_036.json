@@ -6,10 +6,15 @@
     {
       "id": "pattern_036_en_001",
       "input": "If the argument holds, and if the evidence supports this reading, then the policy may have had some effect — if, that is, the context was as described.",
-      "expected_changes": [],
+      "expected_changes": [
+        "If the argument holds",
+        "if the evidence supports",
+        "if, that is"
+      ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (3/3/3 split). Apply because case domain=casual; academic register would TRUE NEG per A/W/L."
     }
   ]
 }

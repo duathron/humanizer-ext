@@ -6,10 +6,15 @@
     {
       "id": "pattern_016_en_001",
       "input": "- **User Experience:** The user experience has been significantly improved with a new interface.\n> - **Performance:** Performance has been enhanced through optimized algorithms.\n> - **Security:** Security has been strengthened with end-to-end encryption.",
-      "expected_changes": [],
+      "expected_changes": [
+        "**User Experience:**",
+        "**Performance:**",
+        "**Security:**"
+      ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (7/1/1). Casual-domain only — technical domain SKIPs #16 per skill doc."
     }
   ]
 }

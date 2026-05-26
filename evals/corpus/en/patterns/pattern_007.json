@@ -6,10 +6,11 @@
     {
       "id": "pattern_007_en_001",
       "input": "Additionally, a distinctive feature of Somali cuisine is the incorporation of camel meat. An enduring testament to Italian colonial influence is the widespread adoption of pasta in the local culinary landscape, showcasing how these dishes have integrated into the traditional diet.",
-      "expected_changes": [],
+      "expected_changes": ["Additionally", "enduring", "testament", "landscape", "showcasing"],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_cluster_density",
+      "notes": "Cluster of 5 #7 trigger words in ~45 input words (>11% density). Cluster rule: strict removal expected. Single isolated triggers in academic register would be scored differently — see feedback-cluster-vs-single-trigger memory."
     }
   ]
 }

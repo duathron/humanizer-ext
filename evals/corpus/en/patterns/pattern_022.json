@@ -6,10 +6,15 @@
     {
       "id": "pattern_022_en_001",
       "input": "Great question! You're absolutely right that this is a complex topic. That's an excellent point about the economic factors.",
-      "expected_changes": [],
+      "expected_changes": [
+        "Great question!",
+        "You're absolutely right",
+        "That's an excellent point"
+      ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (9/0/0 UNANIMOUS). Chatbot sycophancy — fails every register."
     }
   ]
 }

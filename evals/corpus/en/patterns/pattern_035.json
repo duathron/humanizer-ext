@@ -6,10 +6,17 @@
     {
       "id": "pattern_035_en_001",
       "input": "## What the research actually says\n> ## Why your adult child cut you off (the real map)\n> ## The architecture of a letter that lands\n> ## Grandchildren: the long game\n> ## The truth about pricing models, explained",
-      "expected_changes": [],
+      "expected_changes": [
+        "actually says",
+        "the real map",
+        "that lands",
+        "the truth about",
+        "demystified"
+      ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (4/3/2). Dropped 'the long game' + 'explained' — G/M say they fire on legit nonfiction voice."
     }
   ]
 }

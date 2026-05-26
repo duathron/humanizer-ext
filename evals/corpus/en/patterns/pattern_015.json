@@ -9,7 +9,9 @@
       "expected_changes": [],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus_true_negative",
+      "true_negative": true,
+      "notes": "Meetup 2026-05-26 (6/2/1 endorse true-neg). Bold on acronyms at first definition = standard tech writing + MOS:BOLD convention."
     }
   ]
 }

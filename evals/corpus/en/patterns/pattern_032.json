@@ -6,10 +6,13 @@
     {
       "id": "pattern_032_en_001",
       "input": "This innovative, comprehensive, and forward-thinking solution addresses the needs of modern organizations.",
-      "expected_changes": [],
+      "expected_changes": [
+        "innovative, comprehensive, and forward-thinking"
+      ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (8/1/0). Stacked-adjective triple."
     }
   ]
 }

@@ -7,11 +7,15 @@
       "id": "pattern_039_en_001",
       "input": "Founded in [YEAR], [COMPANY NAME] is a leading provider of [INDUSTRY] solutions. Accessed 2025-xx-xx.",
       "expected_changes": [
-        "\"fill in the blank\""
+        "[YEAR]",
+        "[COMPANY NAME]",
+        "[INDUSTRY]",
+        "2025-xx-xx"
       ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (9/0/0 UNANIMOUS). Placeholder artifacts — pre-publication scaffolding leaked."
     }
   ]
 }

@@ -9,7 +9,9 @@
       "expected_changes": [],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus_true_negative",
+      "true_negative": true,
+      "notes": "Meetup 2026-05-26 (1/6/2). Em-dash density needs count-based regex not substring match; substring-flagging would punish legitimate punctuation."
     },
     {
       "id": "pattern_014_en_002",
@@ -17,7 +19,9 @@
       "expected_changes": [],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus_true_negative",
+      "true_negative": true,
+      "notes": "Meetup 2026-05-26 (8/1/0 endorse true-neg). Single paired em-dash = skill doc's explicit 'earned bracket' exception."
     }
   ]
 }

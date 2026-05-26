@@ -7,18 +7,14 @@
       "id": "pattern_003_en_001",
       "input": "The temple's color palette of blue, green, and gold resonates with the region's natural beauty, symbolizing Texas bluebonnets, the Gulf of Mexico, and the diverse Texan landscapes, reflecting the community's deep connection to the land.",
       "expected_changes": [
-        "highlighting/underscoring/emphasizing",
-        "ensuring",
-        "reflecting/symbolizing",
-        "contributing to",
-        "cultivating/fostering",
-        "encompassing",
-        "showcasing",
-        "resonating with"
+        "resonates with the region's natural beauty",
+        "symbolizing Texas bluebonnets",
+        "reflecting the community's deep connection"
       ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (4/5/0). Compound phrases (participial-chain structure) not bare verbs."
     }
   ]
 }

@@ -6,10 +6,14 @@
     {
       "id": "pattern_034_en_001",
       "input": "The system processes requests in under 50ms. That's the key. And that matters.",
-      "expected_changes": [],
+      "expected_changes": [
+        "That's the key.",
+        "And that matters."
+      ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (5/3/1). Casual-domain; B/S/G defend short fragments as voice — keep but note domain."
     }
   ]
 }

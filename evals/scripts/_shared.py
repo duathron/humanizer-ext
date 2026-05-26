@@ -26,6 +26,7 @@ class Case:
     expected_unchanged: list[str]
     domain: str
     metadata: dict[str, Any] = field(default_factory=dict)
+    true_negative: bool = False  # If True, skill should leave input ~unchanged
 
 
 def load_pattern_corpus(corpus_dir: Path) -> list[Case]:
@@ -52,6 +53,7 @@ def load_pattern_corpus(corpus_dir: Path) -> list[Case]:
                     expected_unchanged=entry.get("expected_unchanged", []),
                     domain=entry["domain"],
                     metadata={**common_meta, "source": entry.get("source", "")},
+                    true_negative=entry.get("true_negative", False),
                 )
             )
     return cases

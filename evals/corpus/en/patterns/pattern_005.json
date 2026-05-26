@@ -7,16 +7,13 @@
       "id": "pattern_005_en_001",
       "input": "Due to its unique characteristics, the Haolai River is of interest to researchers and conservationists. Experts believe it plays a crucial role in the regional ecosystem.",
       "expected_changes": [
-        "Industry reports",
-        "Observers have cited",
-        "Experts argue",
-        "Some critics argue",
-        "several sources/publications (when few cited)",
-        "valuable insights"
+        "plays a crucial role",
+        "unique characteristics"
       ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (4/4/1). Dropped 'Experts believe' — multiple voices (M/T/L/W/S) defend attribution-hedging as journalism convention, not AI tell."
     }
   ]
 }

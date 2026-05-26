@@ -6,10 +6,13 @@
     {
       "id": "pattern_010_en_001",
       "input": "The event features keynote sessions, panel discussions, and networking opportunities. Attendees can expect innovation, inspiration, and industry insights.",
-      "expected_changes": [],
+      "expected_changes": [
+        "innovation, inspiration, and industry insights"
+      ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (5/4/0). Narrow to alliterative triple only — first triple is event programme (legit content per J/M)."
     }
   ]
 }

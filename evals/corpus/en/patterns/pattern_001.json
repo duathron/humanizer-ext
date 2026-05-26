@@ -7,18 +7,13 @@
       "id": "pattern_001_en_001",
       "input": "The Statistical Institute of Catalonia was officially established in 1989, marking a pivotal moment in the evolution of regional statistics in Spain. This initiative was part of a broader movement across Spain to decentralize administrative functions and enhance regional governance.",
       "expected_changes": [
-        "stands/serves as",
-        "is a testament/reminder",
-        "a vital/significant/crucial/pivotal/key role/moment",
-        "underscores/highlights its importance/significance",
-        "reflects broader",
-        "symbolizing its ongoing/enduring/lasting",
-        "contributing to the",
-        "setting the stage for"
+        "marking a pivotal moment",
+        "broader movement"
       ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (5/4/0). Narrow — dropped 'evolution of regional statistics' + 'decentralize administrative functions' (factual content, not tells, per J/A/B)."
     }
   ]
 }

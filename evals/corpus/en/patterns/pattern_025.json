@@ -6,10 +6,16 @@
     {
       "id": "pattern_025_en_001",
       "input": "The future looks bright for the company. Exciting times lie ahead as they continue their journey toward excellence. This represents a major step in the right direction.",
-      "expected_changes": [],
+      "expected_changes": [
+        "looks bright",
+        "Exciting times lie ahead",
+        "journey toward excellence",
+        "step in the right direction"
+      ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (8/1/0). All 4 generic-positive PR clichés."
     }
   ]
 }

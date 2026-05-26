@@ -6,13 +6,12 @@
     {
       "id": "pattern_008_en_001",
       "input": "Gallery 825 serves as LAAA's exhibition space for contemporary art. The gallery features four separate spaces and boasts over 3,000 square feet.",
-      "expected_changes": [
-        "serves as/stands as/marks/represents [a]",
-        "boasts/features/offers/maintains [a]"
-      ],
+      "expected_changes": [],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus_true_negative",
+      "true_negative": true,
+      "notes": "Meetup 2026-05-26 (3/3/3 SPLIT). Single-word triggers ('boasts', 'features', 'serves as') fail across all registers — pattern needs structural context, not vocabulary."
     }
   ]
 }

@@ -9,7 +9,9 @@
       "expected_changes": [],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus_true_negative",
+      "true_negative": true,
+      "notes": "Meetup 2026-05-26 (3/5/1). Title-case 'And' is capitalization style (MOS:HEAD), not AI-writing pattern per W. Multiple voices reject."
     }
   ]
 }

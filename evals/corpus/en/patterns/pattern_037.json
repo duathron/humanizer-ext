@@ -6,18 +6,28 @@
     {
       "id": "pattern_037_en_001",
       "input": "The data decisively demonstrates that remote work fundamentally transformed productivity across all sectors.",
-      "expected_changes": [],
+      "expected_changes": [
+        "decisively demonstrates",
+        "fundamentally transformed",
+        "across all sectors"
+      ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (7/2/0). Over-assertion cluster."
     },
     {
       "id": "pattern_037_en_002",
       "input": "It appears that the policy may have arguably had some effect on outcomes, potentially suggesting a modest shift.",
-      "expected_changes": [],
+      "expected_changes": [
+        "It appears that",
+        "may have arguably",
+        "potentially suggesting"
+      ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (6/2/1). Over-hedging cluster. Legal domain would SKIP (#24 SKIP in legal)."
     }
   ]
 }

@@ -7,11 +7,13 @@
       "id": "pattern_040_en_001",
       "input": "```markdown\n> ## Background\n> ---\n> The company was founded in 1994.\n> ```\n> Would you like me to expand the Background section, add citations, or convert this into wikitext?",
       "expected_changes": [
-        "- Triple-backtick fences left in prose: ` ```markdown `"
+        "```markdown",
+        "Would you like me to expand"
       ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (9/0/0 UNANIMOUS). Markdown fence + chatbot meta-prompt."
     }
   ]
 }

@@ -29,12 +29,41 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 def score_case(case: Case, *, model: str = "sonnet") -> dict:
     """Run one case through the skill and report which expected_changes survived.
 
-    A case is `detected` only when every term in `expected_changes` is absent
-    from the rewrite AND at least one term was actually present in the input
-    (so we are scoring a real change, not vacuously). Cases with an empty or
-    inapplicable `expected_changes` list are reported with `status="unscorable"`
-    and excluded from detection-rate aggregation by the runner.
+    Three case categories:
+      - `true_negative=True`: skill should leave the input ~unchanged. Scored
+        by edit-distance ratio against input; passes if ratio ≤ 0.10. Reported
+        separately from detection rate.
+      - `expected_changes` empty AND not true_negative: unscorable; surfaces a
+        corpus gap (case author forgot to populate).
+      - `expected_changes` populated: scorable. `detected=True` iff every
+        present-in-input term is absent from rewrite.
     """
+    if case.true_negative:
+        # Pre-flight: skill should leave human-like input mostly intact.
+        from rapidfuzz.distance import Levenshtein
+        result = run_skill(
+            case.input,
+            lang=case.metadata.get("lang", "en"),
+            mode="full",
+            domain=case.domain,
+            model=model,
+        )
+        rewritten = result.get("final") or result.get("draft") or ""
+        edit_distance = Levenshtein.distance(case.input, rewritten)
+        edit_ratio = edit_distance / max(1, len(case.input))
+        passes = edit_ratio <= 0.10
+        return {
+            "case_id": case.id,
+            "pattern_id": case.metadata.get("pattern_id"),
+            "detected": passes,  # for true-neg, "detected" = "skill correctly left it alone"
+            "status": "true_negative",
+            "edit_ratio": round(edit_ratio, 4),
+            "passes_true_negative": passes,
+            "removed_terms": [],
+            "retained_terms": [],
+            "rewrite_preview": rewritten[:200],
+        }
+
     if not case.expected_changes:
         return {
             "case_id": case.id,
@@ -142,9 +171,11 @@ def run(
         scores = by_pattern[pid]
         scorable = [s for s in scores if s.get("status") == "scored"]
         unscorable = [s for s in scores if s.get("status", "").startswith("unscorable")]
+        true_negatives = [s for s in scores if s.get("status") == "true_negative"]
         detected = sum(1 for s in scorable if s["detected"])
         total = len(scorable)
         rate = detected / total if total else 0.0
+        tn_passes = sum(1 for s in true_negatives if s.get("passes_true_negative"))
         per_pattern_summary.append(
             {
                 "id": pid,
@@ -152,8 +183,11 @@ def run(
                 "detected": detected,
                 "total": total,
                 "unscorable": len(unscorable),
+                "true_negatives": len(true_negatives),
+                "true_neg_passes": tn_passes,
                 "below_threshold": total > 0 and rate < threshold,
                 "misses": [s["case_id"] for s in scorable if not s["detected"]],
+                "true_neg_failures": [s["case_id"] for s in true_negatives if not s.get("passes_true_negative")],
             }
         )
 

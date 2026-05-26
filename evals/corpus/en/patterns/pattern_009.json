@@ -6,18 +6,25 @@
     {
       "id": "pattern_009_en_001",
       "input": "It's not just about the beat riding under the vocals; it's part of the aggression and atmosphere. It's not merely a song, it's a statement.",
-      "expected_changes": [],
+      "expected_changes": [
+        "not merely a song",
+        "it's a statement"
+      ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (6/2/1). Two rhetorical-escalation tells; first 'not just' too common to flag (B's dissent)."
     },
     {
       "id": "pattern_009_en_002",
       "input": "The options come from the selected item, no guessing.",
-      "expected_changes": [],
+      "expected_changes": [
+        "no guessing"
+      ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement",
+      "notes": "Tailing-negation form of #9 — the clipped `, no guessing` fragment is the AI tell. Single trigger but form-based, not density-based."
     },
     {
       "id": "pattern_009_en_003",
@@ -25,7 +32,9 @@
       "expected_changes": [],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus_true_negative",
+      "true_negative": true,
+      "notes": "Meetup 2026-05-26 (6/1/2 endorse true-neg). 'rather than' is basic English contrast; on-the-table test fails (complexity is real alternative)."
     }
   ]
 }

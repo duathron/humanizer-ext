@@ -7,21 +7,25 @@
       "id": "pattern_038_en_001",
       "input": "The 2024 election turned on three states turn0search0, with margins under 1% in each0. Analysts have called it the closest race in modern history :contentReference[oaicite:2]{index=2}.",
       "expected_changes": [
-        "- ChatGPT: `turn0search0`"
+        "turn0search0",
+        ":contentReference[oaicite",
+        "each0"
       ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (9/0/0 UNANIMOUS). Reference-markup artifacts — universal strip."
     },
     {
       "id": "pattern_038_en_002",
       "input": "See the [official report](https://example.com/report?utm_source=chatgpt.com) for details.",
       "expected_changes": [
-        "- ChatGPT: `turn0search0`"
+        "?utm_source=chatgpt.com"
       ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (9/0/0 UNANIMOUS). UTM tracking parameter — ChatGPT browsing fingerprint."
     }
   ]
 }

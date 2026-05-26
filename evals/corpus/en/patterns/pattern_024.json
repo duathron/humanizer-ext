@@ -6,10 +6,13 @@
     {
       "id": "pattern_024_en_001",
       "input": "It could potentially possibly be argued that the policy might have some effect on outcomes.",
-      "expected_changes": [],
+      "expected_changes": [
+        "could potentially possibly"
+      ],
       "expected_unchanged": [],
       "domain": "casual",
-      "source": "seeded_from_pattern_pack"
+      "source": "manual_refinement_meetup_consensus",
+      "notes": "Meetup 2026-05-26 (9/0/0 narrow). Triple-stacked hedge is the tell; 'might have some' is legit hedging."
     }
   ]
 }
