@@ -1,4 +1,5 @@
 source_name: wikipedia_career
+license_class: redistributable
 license: CC-BY-SA-3.0
 fetch_date: 2026-05-27
 doc_count: 8

@@ -2,6 +2,7 @@
 id: wiki_academic_arbeitsprozess_arbeitssoziologie
 source_url: "https://de.wikipedia.org/wiki/Arbeitsprozess_%28Arbeitssoziologie%29"
 license: "CC-BY-SA-3.0"
+license_class: redistributable
 fetch_date: "2026-05-27"
 metadata:
   title: Arbeitsprozess (Arbeitssoziologie)

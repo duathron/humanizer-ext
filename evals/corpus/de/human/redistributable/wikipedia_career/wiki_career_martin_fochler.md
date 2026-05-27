@@ -2,6 +2,7 @@
 id: wiki_career_martin_fochler
 source_url: "https://de.wikipedia.org/wiki/Martin_Fochler"
 license: "CC-BY-SA-3.0"
+license_class: redistributable
 fetch_date: "2026-05-27"
 metadata:
   title: Martin Fochler

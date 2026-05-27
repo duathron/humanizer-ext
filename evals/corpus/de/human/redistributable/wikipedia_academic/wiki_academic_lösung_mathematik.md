@@ -2,6 +2,7 @@
 id: wiki_academic_lösung_mathematik
 source_url: "https://de.wikipedia.org/wiki/L%C3%B6sung_%28Mathematik%29"
 license: "CC-BY-SA-3.0"
+license_class: redistributable
 fetch_date: "2026-05-27"
 metadata:
   title: Lösung (Mathematik)

@@ -2,6 +2,7 @@
 id: wiki_academic_biokompatibilität_von_nanomaterial
 source_url: "https://de.wikipedia.org/wiki/Biokompatibilit%C3%A4t_von_Nanomaterial"
 license: "CC-BY-SA-3.0"
+license_class: redistributable
 fetch_date: "2026-05-27"
 metadata:
   title: Biokompatibilität von Nanomaterial

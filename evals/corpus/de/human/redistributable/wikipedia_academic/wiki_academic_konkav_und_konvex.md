@@ -2,6 +2,7 @@
 id: wiki_academic_konkav_und_konvex
 source_url: "https://de.wikipedia.org/wiki/Konkav_und_konvex"
 license: "CC-BY-SA-3.0"
+license_class: redistributable
 fetch_date: "2026-05-27"
 metadata:
   title: Konkav und konvex

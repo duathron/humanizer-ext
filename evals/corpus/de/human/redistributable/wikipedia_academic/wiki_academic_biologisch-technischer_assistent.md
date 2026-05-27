@@ -2,6 +2,7 @@
 id: "wiki_academic_biologisch-technischer_assistent"
 source_url: "https://de.wikipedia.org/wiki/Biologisch-technischer_Assistent"
 license: "CC-BY-SA-3.0"
+license_class: redistributable
 fetch_date: "2026-05-27"
 metadata:
   title: "Biologisch-technischer Assistent"

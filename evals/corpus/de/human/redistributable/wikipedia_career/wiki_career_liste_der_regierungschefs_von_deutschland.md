@@ -2,6 +2,7 @@
 id: wiki_career_liste_der_regierungschefs_von_deutschland
 source_url: "https://de.wikipedia.org/wiki/Liste_der_Regierungschefs_von_Deutschland"
 license: "CC-BY-SA-3.0"
+license_class: redistributable
 fetch_date: "2026-05-27"
 metadata:
   title: Liste der Regierungschefs von Deutschland

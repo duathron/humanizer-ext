@@ -2,6 +2,7 @@
 id: wiki_academic_frauen_in_der_physik
 source_url: "https://de.wikipedia.org/wiki/Frauen_in_der_Physik"
 license: "CC-BY-SA-3.0"
+license_class: redistributable
 fetch_date: "2026-05-27"
 metadata:
   title: Frauen in der Physik

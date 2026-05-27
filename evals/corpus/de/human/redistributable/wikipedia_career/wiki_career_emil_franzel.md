@@ -2,6 +2,7 @@
 id: wiki_career_emil_franzel
 source_url: "https://de.wikipedia.org/wiki/Emil_Franzel"
 license: "CC-BY-SA-3.0"
+license_class: redistributable
 fetch_date: "2026-05-27"
 metadata:
   title: Emil Franzel

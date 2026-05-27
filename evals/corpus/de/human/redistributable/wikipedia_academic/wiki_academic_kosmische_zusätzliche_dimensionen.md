@@ -2,6 +2,7 @@
 id: wiki_academic_kosmische_zusätzliche_dimensionen
 source_url: "https://de.wikipedia.org/wiki/Kosmische_zus%C3%A4tzliche_Dimensionen"
 license: "CC-BY-SA-3.0"
+license_class: redistributable
 fetch_date: "2026-05-27"
 metadata:
   title: Kosmische zusätzliche Dimensionen

@@ -2,6 +2,7 @@
 id: wiki_academic_bibliothek_der_philosophen
 source_url: "https://de.wikipedia.org/wiki/Bibliothek_der_Philosophen"
 license: "CC-BY-SA-3.0"
+license_class: redistributable
 fetch_date: "2026-05-27"
 metadata:
   title: Bibliothek der Philosophen

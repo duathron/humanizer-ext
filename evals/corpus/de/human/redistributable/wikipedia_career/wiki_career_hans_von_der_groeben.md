@@ -2,6 +2,7 @@
 id: wiki_career_hans_von_der_groeben
 source_url: "https://de.wikipedia.org/wiki/Hans_von_der_Groeben"
 license: "CC-BY-SA-3.0"
+license_class: redistributable
 fetch_date: "2026-05-27"
 metadata:
   title: Hans von der Groeben
