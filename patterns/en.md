@@ -6,7 +6,7 @@ English-specific patterns. Loaded by the framework (`SKILL.md`) when the detecte
 
 Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as obvious as slop. Good writing has a human behind it.
 
-> **Domain note:** This section applies fully to **casual** writing, lightly to **technical**, and **not at all** to **academic**, **legal**, or **marketing** writing. Academic and legal prose are properly impersonal — adding "soul" makes them worse. Marketing prose has its own register (persuasive, confident) and shouldn't be rewritten in a personal-blog voice. Use this section's guidance only when the domain calls for personal voice.
+> **Domain note:** This section applies fully to **casual** writing, lightly to **technical**, and **not at all** to **academic**, **legal**, or **marketing** writing. Academic and legal prose are properly impersonal — adding "soul" makes them worse. Marketing prose has its own register (persuasive, confident) and shouldn't be rewritten in a personal-blog voice. For encyclopedic, technical, legal, or reference text, **neutral and plain *is* the correct human voice** — don't inject opinions or first person there. Use this section's guidance only when the domain calls for personal voice. (Wording aligned with upstream `blader/humanizer` v2.6.0.)
 
 ### Signs of soulless writing (even if technically "clean"):
 - Every sentence is the same length and structure
@@ -19,6 +19,8 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 ### How to add voice:
 
 **Have opinions.** Don't just report facts — react to them. "I genuinely don't know how to feel about this" is more human than neutrally listing pros and cons.
+
+**Do not invent the author's opinions.** Voice means *expressing* the stance already in the text with more personality — not *adding* a stance that wasn't there. If the source is enthusiastic about a technology, the rewrite stays enthusiastic; it does not quietly introduce uncertainty to seem less breathless. Injecting skepticism, caveats, or endorsements absent from the source is a fidelity failure, not a humanization success.
 
 **Vary your rhythm.** Short punchy sentences. Then longer ones that take their time getting where they're going. Mix it up.
 

@@ -46,6 +46,7 @@ If the user doesn't specify a domain, **infer it from the text and state the det
 | **legal** | "Plaintiff", "defendant", "whereas", "shall", section numbering, formal precision |
 | **technical** | Code blocks, command-line syntax, API references, step-by-step instructions, parameter docs |
 | **marketing** | Product names, calls to action, value propositions, sales-oriented copy |
+| **career** | Cover letter / Anschreiben, CV / résumé, LinkedIn About / headline, career-narrative drafts. First-person, professional-warm register, achievement metrics, concrete tech stack / domain vocabulary. |
 
 ## Detection Guidance
 
@@ -103,8 +104,8 @@ When given text to humanize:
 6. **Voice calibration** — If a writing sample is provided, analyze it FIRST (see Voice Calibration section below).
 7. **Pre-flight density check** (Full mode only) — Count Tier 1 dead-giveaway tells per 100 words; if density = 0, drop to a Quick-mode pass to avoid over-editing voice. Announce the result before the draft. See the full Process section below.
 8. **Identify AI patterns** — Scan for patterns defined in the loaded packs (universal + language), respecting domain overrides (SKIP/light per the override matrix) and the Detection Guidance "what NOT to flag" list above.
-9. **Rewrite problematic sections** — Replace AI-isms with natural alternatives.
-10. **Preserve meaning** — Keep the core message intact.
+9. **Rewrite, don't delete** — Replace AI-isms with natural alternatives. Cover everything the original covers. If the original has five paragraphs, the rewrite has five paragraphs; if a section discusses three points, the rewrite discusses three points. Compression within paragraphs is fine; dropping whole paragraphs or sections is not. (Ported from upstream `blader/humanizer` v2.6.0 / PR #84.)
+10. **Preserve meaning (hard constraint)** — Every *claim* in the source must survive in the output, even when the sentence carrying it is cut or rewritten. **Concept-noun rule:** Extract every noun-phrase concept tag from the source — these are the named ideas, not the AI-vocabulary wrappers around them (e.g., "creativity at scale", "team agility", "collaboration", "alignment", "beyond autocomplete", "software evolution"). Count them. The rewrite must carry at least **80% of those concepts** — rephrased, moved, or condensed, but present. A concept does not need its original words; it needs its meaning to survive. Before presenting the draft, run this check explicitly: list the source concepts, list the output concepts, confirm ≥80% coverage. If any are missing, restore them before showing the draft. **Dropping an AI-flavored wrapper is correct. Dropping the concept the wrapper carried is a content error.** The concept "creativity at scale" can lose "creativity at scale" but must keep the idea that AI enables a different creative throughput. The concept "team alignment" can lose "alignment" but must keep the idea that the team is working in sync or toward a shared goal.
 11. **Maintain register** — Match the appropriate tone for the domain.
 12. **Add soul** — Only for casual (and lightly for technical). Skip for academic, legal, and marketing. See the PERSONALITY AND SOUL section in the language pack (if present).
 13. **Length audit** — Can this be 20–30% shorter without losing meaning? Cut padding. (Lighter for academic and technical.)
@@ -166,6 +167,9 @@ If the user provides a writing sample (their own previous writing), **analyze it
     - Any **conditional frame stacking** ("if X, and if Y, then perhaps...") in conclusions? (light in academic/legal)
     - Any **over-assertion or over-hedging miscalibration** (cluster of "decisively/fundamentally" or "arguably/possibly")? (over-assertion OK in marketing; over-hedging not)
     - Does it match the domain register (casual = personal voice; academic = formal hedged; legal = precise impersonal; technical = direct scannable; marketing = persuasive without AI tells)?
+    - **Concept-noun coverage check (universal):** List every noun-phrase concept from the source (named ideas, stripped of their AI-vocabulary wrappers). List which ones appear in the draft. Report the ratio (e.g., "7/8 concepts present"). If coverage is below 80%, identify the missing concepts and restore them before presenting the final version. This check is load-bearing — it runs even when the density preflight dropped to Quick mode.
+    - **Fabrication check (universal):** Does the rewrite introduce any claim, detail, or specification not present in the source? Common failure modes: adding algorithm names ("exponential backoff"), narrowing scope ("transient failures" → "network timeouts"), or inserting version numbers, guarantees, or feature names. If any introduced claim is spotted, remove or revert to the source's level of specificity. This check is load-bearing — content accuracy outweighs fluency.
+    - **New authorial positions introduced?** (universal) The rewrite must not add hedges, skepticism, endorsements, or qualifications absent from the source. Forbidden injections: "Whether that actually works is still being worked out", "though results vary", "to be fair", "arguably", "in practice this may not...". If any such phrase appears in the draft but not the input, delete it. Subtle stance drift is worse than visible padding because it misrepresents the author.
 12. Revise based on the audit
 13. Present the final version
 

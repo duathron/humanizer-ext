@@ -1,8 +1,9 @@
 # EN Baseline Eval Summary
 
-**Status: pattern eval re-baselined against refined corpus with patched parser (commit `61b03c1` + resume run, 2026-05-27 07:20). Rate 0.619. FP + regex audit numbers from earlier run unchanged.**
+**Status: v3.4.1 sign-off baseline. Pattern 0.619 (post-parser-fix). FP 0.2039 + density preflight 1.00 unchanged. E2E 6/6 cases pass per-case ≥8.0 on all 3 dims after meaning-preservation rule iteration + upstream v2.6.0 port. New `career` domain shipped with first-shot E2E pass.**
 
 **Pattern run date:** 2026-05-27 07:20 (resume of 2026-05-26 22:04 run after Pro session reset)
+**E2E run dates:** 2026-05-27 09:32 (baseline 5 cases) → 2026-05-27 10:46 (post-fix marketing round 3) → 2026-05-27 11:04 (aggregate of 6 cases including new career domain)
 **Skill version:** humanizer v3.4.0 (tag `eca15650`) + post-tag work toward v3.4.1
 **Skill commit:** `61b03c1` (HEAD at run time)
 **Skill model:** sonnet (via `claude -p` subscription auth)
@@ -20,9 +21,12 @@
 | FP mean edit ratio (synthetic) | **0.2039** | from earlier run, unchanged |
 | FP density preflight quick-drop | **1.00** | from earlier run, unchanged (✓) |
 | Regex audit: human samples LOW band | **5 / 5** | ✓ |
-| E2E rewrite quality | not run | deferred (API budget) |
+| E2E rewrite quality (6 cases × 3 runs, sonnet skill + sonnet judge) | **hn 8.667 / mean 8.389 / len 8.667** | All 3 dims ≥8.0 ✓. All 6 cases pass per-case threshold. Report: `e2e_en_20260527_110456.{json,md}` |
+| E2E per-case mean (all 3 dims ≥ 8.0 required) | **6 / 6 pass** | academic 8.00/8.33/9.00 ✓ · career 9.00/8.00/8.00 ✓ · casual 9.00/8.00/8.67 ✓ · legal 8.67/9.00/8.33 ✓ · marketing 9.00/8.00/9.00 ✓ · technical 8.33/9.00/9.00 ✓ |
+| E2E meaning baseline → final | 7.733 → **8.389** (+0.656) | Round-1 (SKILL.md step 10 hard-constraint claim inventory + audit checklist fabrication / new-authorial-positions checks + technical preserve-functional-claims + marketing positioning angles) + Round-2 (concept-noun rule + casual anti-examples + brand-tier audit) + Upstream port v2.6.0 PR #84 "Rewrite, don't delete" paragraph-count rule + PERSONALITY gating wording from upstream v2.6.0 |
+| New domain: `career` | shipped | Cover letter / CV / LinkedIn / Anschreiben. Override matrix column added; preserve rules (metrics sacred / proper nouns / tech stack / JD keywords / concrete achievements). DE register noted as Phase 2 work. Career Writer persona at `AI/AGENT PERSONAS/Agents/writer-career-writer-agent.md`. |
 
-**Delta vs prior bug-inflated run:** +0.119 absolute (+5 detected). Parser-fix gain came from artifact + adjacent cases that had been false-negative due to trailing-commentary capture.
+**Delta vs prior bug-inflated run:** +0.119 absolute on pattern rate (+5 detected). Parser-fix gain came from artifact + adjacent cases that had been false-negative due to trailing-commentary capture.
 
 ## ⚠ Parser bug inflated MISS count — patched in this commit
 
