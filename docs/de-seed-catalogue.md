@@ -6,6 +6,27 @@
 
 ---
 
+## Maintainer decisions log (2026-05-27)
+
+Christian Huhn answered the open questions surfaced by Task 1 extraction. Binding for Task 5 (mining review) + Task 6 (pattern curation).
+
+**OQ1 — DE #7 (AI vocabulary) seeding:** **Manual curation by Opus + Wikipedia-AI-Cleanup-Editor persona.** Skip auto-translation of EN #7 trigger list. Skip pure mining as the only source. Build DE #7 by hand in a focused Opus + Wikipedia-AI-Cleanup-Editor meetup during Task 6. Mining (Task 5) is supplementary signal, not the spine.
+
+**OQ2 — Three DE-only patterns the Wiki misses:** **Include ALL three** in v3.5.0:
+- **#102 Konjunktiv II stacking** (würde / wäre / hätte over-hedging)
+- **#103 Anglizismen-Leakage** (denglisch: "insight", "deliver", "leveragen" in German prose)
+- **#104 Nominalstil-Inflation** (noun-heavy verbing: "die Durchführung der Analyse" over "analysieren")
+
+**OQ3 — Six Wikipedia-context-only DE-ONLY entries (catalogue #100, #102–#106 below):** **Exclude from `patterns/de.md` entirely.** These flag Wikipedia editor behavior (productivity spikes, citation format, non-existent categories) — not general prose. Out of scope for cover letter / blog / docs / academic / legal / technical / marketing / career use cases. Document the exclusion in `patterns/de.md` header so future contributors don't re-add them.
+
+**Numbering reshuffle:** the decisions above assign Konjunktiv / Anglizismen / Nominalstil firmly to **#102 / #103 / #104** in the final DE pack. **#100** reserved for the first DE-Wikipedia-prose-applicable pattern surfaced during Task 5 mining (leading candidate: the catalogue's original #101 transition-word stacking). **#101** reserved for any other prose-applicable DE-only pattern surfaced during mining.
+
+**OQ4 — Copula avoidance (#8) DE forms:** **Include in `patterns/de.md` under EN-PARALLEL #8** + verify in Task 5 mining output. Translate EN pattern using DE surface forms: `gilt als`, `dient als`, `fungiert als`, `stellt … dar`, `repräsentiert`. Mining decides whether to keep / trim the list.
+
+**OQ5 — universal pattern token-list extensions** (`_universal.md` #38 needs `(Gehe zu Suche Nr.)topic+N`, #25/#6 need German trigger strings, #40 DE Wikitext notes): **deferred to a v3.5.0 follow-up commit** during Task 6. Not blocking; universal patterns already function on EN content. DE-specific trigger extensions land alongside `patterns/de.md` curation.
+
+---
+
 ## Categorization decisions
 
 For each DE tell, decide:
