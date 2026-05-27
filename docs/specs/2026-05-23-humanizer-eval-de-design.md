@@ -38,7 +38,7 @@ The two pieces are coupled by design. The eval infrastructure is needed regardle
 The current `SKILL.md` (~60 KB, 40 patterns inline) splits into:
 
 - **`SKILL.md`** — framework only (~15–20 KB). Mode selector, language detection, domain detection, density preflight, voice-calibration lookup, final audit checklist (universal items only), output format template, instructions to load the relevant pattern + override files.
-- **`patterns/_universal.md`** — language-agnostic patterns: #14 em dash, #15 boldface, #17 title case, #18 emojis, #19 curly quotes, #26 hyphenation, #38 reference-markup artifacts, #39 phrasal templates, #40 markdown contamination, structural patterns #6 (challenges section), #25 (conclusion section), #29 (fragmented headers).
+- **`patterns/_universal.md`** — language-agnostic patterns: #14 em dash, #15 boldface, #17 title case, #18 emojis, #19 curly quotes, #26 hyphenation, #38 reference-markup artifacts, #39 phrasal templates, #40 markdown contamination, structural patterns #6 (challenges section), #25 (conclusion section), #29 (fragmented headers), **#41 diff-anchored writing** *(Drift correction 2026-05-27: count is now 13, was 12; #41 added in v3.4.2 as a port from upstream `blader/humanizer` v2.7.0 §30)*.
 - **`patterns/{lang}.md`** — language-specific patterns. Pattern IDs stay continuous across languages; DE-only patterns start at #100. Schema per pattern: `### N. <Name>` → `**Trigger:**` → `**Before:**` → `**After:**` → `**Domain notes:**`.
 - **`domains/{lang}_overrides.md`** — per-language domain override matrix. Replaces the inline matrix in current SKILL.md.
 
@@ -55,7 +55,7 @@ SKILL.md (framework)
   ├─ 1. detect mode (Quick / Full / Voice)
   ├─ 2. detect input language → instruct: Read patterns/{lang}.md + domains/{lang}_overrides.md
   ├─ 3. always Read patterns/_universal.md
-  ├─ 4. detect domain (casual / academic / legal / technical / marketing)
+  ├─ 4. detect domain (casual / academic / legal / technical / marketing / career)  ←  Drift 2026-05-27: career added in v3.4.1
   ├─ 5. voice-calibration lookup (4-step convention, §4.4)
   ├─ 6. Tier-1 density preflight (sprach-agnostisch)
   ├─ 7. apply patterns respecting domain overrides
@@ -128,7 +128,7 @@ Per AI-generated whole-document input, run the skill, then ask a judge LLM to sc
 Four-phase recipe, reused for every new language pack:
 
 - **Phase A — Wiki seed (if available).** EN: [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). DE: [Anzeichen für KI-generierte Inhalte](https://de.wikipedia.org/wiki/Wikipedia:Anzeichen_f%C3%BCr_KI-generierte_Inhalte). FR: [Aide:Identifier l'usage d'une IA générative](https://fr.wikipedia.org/wiki/Aide:Identifier_l'usage_d'une_IA_g%C3%A9n%C3%A9rative). ES + IT: no equivalent dedicated guide found, skip to Phase B.
-- **Phase B — Empirical mining.** Generate ~500–1000 AI texts in the target language via API across all 5 domains. Assemble a human corpus (Wikipedia revisions pre-2022 + public-domain literature). Run `mine_patterns.py` with TF-IDF / log-likelihood-ratio scoring to surface top divergent tokens / bigrams / trigrams.
+- **Phase B — Empirical mining.** Generate ~500–1000 AI texts in the target language across all 6 domains *(Drift 2026-05-27: 5 → 6 with career added in v3.4.1)*. Assemble a human corpus (Wikipedia revisions pre-2022 + public-domain literature). Run `mine_patterns.py` with TF-IDF / log-likelihood-ratio scoring to surface top divergent tokens / bigrams / trigrams. *(Drift 2026-05-27: corpus generation refactored to $0 via free sources — Wikipedia DE AI-Cleanup tagged articles + claude CLI subscription + Opus main-thread synthesis — see `docs/plans/2026-05-27-phase-2-de-pack.md` Task 4. Original $10–30 paid-API approach superseded.)*
 - **Phase C — Manual curation.** Review candidates linguist-style. Filter false positives (technical terms, domain vocabulary). Cluster by era (which words are GPT-4 era vs. GPT-4o vs. GPT-5). Decide domain applicability.
 - **Phase D — Cross-reference.** Existing NLP papers on AI detection in the target language, public AI-detection tools' indicator lists, community PR feedback after release.
 
@@ -229,7 +229,7 @@ Deliverables: working eval runners, EN baseline report committed to `evals/repor
 
 ### Phase 2 — DE language pack
 
-Run `mine_patterns.py` against a generated DE AI corpus + DE human corpus (Wikipedia DE revisions pre-2022 + public-domain DE literature). Curate `patterns/de.md` from the DE Wikipedia seed + mining candidates + DE-only patterns (#100+). Build `domains/de_overrides.md` from DE register knowledge. Build `evals/corpus/de/` parallel to `en/`. Iterate on patterns and overrides until: pattern detection ≥ 0.85, false-positive ≤ 0.10, e2e quality ≥ EN baseline.
+Run `mine_patterns.py` against a generated DE AI corpus + DE human corpus (Wikipedia DE revisions pre-2022 + public-domain DE literature). Curate `patterns/de.md` from the DE Wikipedia seed + mining candidates + DE-only patterns (#100+). Build `domains/de_overrides.md` from DE register knowledge **including DE career register** *(Drift 2026-05-27: career added in v3.4.1; DE Anschreiben uses opposite register from US/UK — formal "Sie" + factual-modest, the reverse of EN career persona)*. Build `evals/corpus/de/` parallel to `en/`. Iterate on patterns and overrides until first-iteration targets: pattern detection ≥ **0.70** *(Drift 2026-05-27: relaxed from 0.85 since this is the first language extension; EN reached 0.619 → trajectory toward 0.85 through iteration; DE starts at 0.70 floor)*, false-positive ≤ **0.15** *(relaxed from 0.10 for first iteration)*, e2e per-case meaning ≥ **8.0** on all 6 domain cases.
 
 Deliverables: `patterns/de.md`, `domains/de_overrides.md`, full DE corpus, passing DE eval reports. Ships as v3.5.0 (EN + DE release on the multi-lingual architecture).
 
@@ -257,7 +257,7 @@ The Opus parent thread orchestrates spawns, validates output, and handles lingui
 
 ## 9. Open questions
 
-- **API budget for Phase 2 corpus mining.** Generating ~500–1000 DE AI texts across 5 domains via multiple model families (Claude / GPT / Gemini) needs a budget cap. Estimate ≈ $10–30 depending on model mix and output lengths. Decide before Phase 2 starts.
+- ~~**API budget for Phase 2 corpus mining.** Generating ~500–1000 DE AI texts across 5 domains via multiple model families (Claude / GPT / Gemini) needs a budget cap. Estimate ≈ $10–30 depending on model mix and output lengths. Decide before Phase 2 starts.~~ **RESOLVED 2026-05-27** — session /goal set budget to $0 via free sources (Wikipedia DE AI-Cleanup tagged articles + claude CLI subscription + Opus main-thread synthesis). Optional $5 escape hatch if mining quality demands GPT/Gemini diversity. See `docs/plans/2026-05-27-phase-2-de-pack.md` Task 4.
 - **DE human corpus license.** Tagesschau archive looks tempting but licensing is unclear. Default fallback: Wikipedia DE revisions pre-2022 (CC-BY-SA) + Project Gutenberg DE pre-1923. Confirm fallback is sufficient or pursue Tagesschau permission.
 - **Pattern coverage gap between EN (40) and DE (~30 seeded + mining).** Acceptable as long as universal patterns close the gap and EN IDs without DE equivalents are documented in `patterns/de.md` as "no DE equivalent — universal patterns and EN context apply if mixing languages".
 - **`--audit-only` mode** (detect + report without rewriting) — punted to v4.1 unless trivially cheap to add during Phase 0.
