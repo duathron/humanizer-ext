@@ -96,11 +96,15 @@ def test_mine_patterns_extracts_diff_signal():
 | **technical** | ubuntuusers.de Wiki articles pre-2022 | CC-BY-SA | Real DE technical documentation, command-line + step-by-step register. URL: `https://wiki.ubuntuusers.de/` |
 | **technical (supplement)** | translatewiki.net DE-translated FOSS software UI strings + docs | various FOSS-compatible | Tech vocabulary, imperative mood. URL: `https://translatewiki.net/wiki/Special:LanguageStats?language=de` |
 | **technical (supplement)** | Linuxwiki.de articles + DE man page translations | GFDL / LGPL | Reference-style technical prose |
-| **marketing** | Bundespresseamt federal government press releases | PD per §5 UrhG | Promotional-adjacent register (PR / announcement style). URL: `https://www.bundesregierung.de/breg-de/aktuelles/pressemitteilungen` |
-| **marketing (supplement)** | Wikipedia DE articles about commercial products pre-2022 | CC-BY-SA | Product positioning prose, encyclopedic but with feature-focused register |
-| **career** | arbeitsagentur.de Bewerbungs-Mustervorlagen + sample documents | PD (federal agency) | Real DE Anschreiben / CV exemplars at multiple register levels. URL: `https://www.arbeitsagentur.de/bildung/ausbildung/bewerbung` |
-| **career (supplement)** | Public DE university faculty CVs (`.de` academic faculty pages) | varies (often PD per §5 if civil servants; per-page check) | Real academic-career CV prose |
-| **career (supplement)** | Bundeswehr / öffentlicher Dienst Stellenanzeigen archive | PD per §5 UrhG | Job posting prose (mirror of cover-letter target) |
+| **marketing** | Wikipedia DE articles about commercial products + brand launches pre-2022 | CC-BY-SA | Product-positioning prose, feature-focused encyclopedic style. Filter for product / brand / app categories. Best real-world DE marketing-adjacent register available under clear license. |
+| **marketing (supplement)** | GitHub READMEs of major DE-language open-source products | MIT / Apache / GPL (per repo) | First-party product marketing copy by definition — READMEs are self-promotion. Tech-marketing register. Filter for repos with German README content (search GitHub for `language:Markdown stars:>100` + DE filter). |
+| **marketing (supplement)** | Startnext.com (DE crowdfunding) campaign descriptions pre-2022 | per-campaign (often permissive) | Real product-launch copy at small-business scale — features, audience hook, CTA. Per-page license check; many campaigns explicitly grant reuse. URL: `https://www.startnext.com/` |
+| **marketing (supplement)** | Wikipedia DE Wirtschaft / Marken / Werbung articles pre-2022 | CC-BY-SA | Brand-history articles with positioning excerpts (often quoted marketing copy + analysis) |
+| **career** | Wikipedia DE Lebensläufe of public figures pre-2022 (politicians / executives / academics / authors) | CC-BY-SA | Real DE career-narrative prose at the third-person remove — "X studierte in Y, arbeitete bei Z, leitet seit 20XX W". Mirror of the register a humanized first-person Lebenslauf should land. Diverse seniority + industry coverage. |
+| **career (supplement)** | Bundesregierung.de Lebensläufe of ministers + Staatssekretäre | PD per §5 UrhG | Official factual career biographies. Concise, formal-modest DE register (the opposite of US/UK puffery — exactly the register DE Anschreiben should aim for). |
+| **career (supplement)** | GitHub DE profile README files (`<user>/<user>` repos with DE-language content) | typically MIT / per-repo | First-person developer self-positioning — tech stack + role + interests. Real-world DE engineering career voice. |
+| **career (supplement)** | Stack Exchange DE user "About me" profile sections | CC-BY-SA | Professional self-description, technical-domain DE. Verbose but authentic. |
+| **career (supplement)** | DE faculty `<chair>/personen/<professor>` pages on university websites | per-uni (often PD per §5 if civil servant; per-page check) | Real academic career CV prose, more detailed than Wikipedia bio summaries |
 
 **Files:**
 - Create: `evals/scripts/fetch_de_human_corpus.py` — multi-source fetcher (one function per source category)
@@ -114,8 +118,12 @@ def test_mine_patterns_extracts_diff_signal():
 - Create: `evals/corpus/de/human/bundestag_protocols/` (legal/speech supplement; optional)
 - Create: `evals/corpus/de/human/ubuntuusers_technical/` (technical)
 - Create: `evals/corpus/de/human/translatewiki_technical/` (technical supplement)
-- Create: `evals/corpus/de/human/bundespresseamt_marketing/` (marketing-adjacent)
-- Create: `evals/corpus/de/human/arbeitsagentur_career/` (career)
+- Create: `evals/corpus/de/human/wikipedia_marketing/` (Wikipedia DE product/brand articles)
+- Create: `evals/corpus/de/human/github_marketing/` (GitHub README files of DE OSS products)
+- Create: `evals/corpus/de/human/startnext_marketing/` (DE crowdfunding campaign descriptions)
+- Create: `evals/corpus/de/human/wikipedia_lebenslauf_career/` (Wikipedia DE bios of public figures)
+- Create: `evals/corpus/de/human/bundesregierung_career/` (federal minister Lebensläufe)
+- Create: `evals/corpus/de/human/github_profile_career/` (GitHub DE profile READMEs)
 - Create: `evals/corpus/de/human/synthetic/` — **fallback only** for any domain where the real-world fetcher fails or produces < 3 usable samples after manual quality check. Synthetic count target: **0 if all fetchers succeed; ≤1 per domain otherwise**.
 - Create: per-source `_LICENSE` + `_SOURCE` sidecars (license string + URL + fetch date + access conditions)
 
@@ -132,8 +140,12 @@ def test_mine_patterns_extracts_diff_signal():
   - `fetch_ssoar_academic(n=10)` — SSOAR OAI-PMH endpoint or REST search API
   - `fetch_bgbl_legal(n=8)` — BGBl bulk download / RSS feed
   - `fetch_ubuntuusers_technical(n=10)` — ubuntuusers.de MediaWiki API (it runs on MediaWiki)
-  - `fetch_bundespresseamt_marketing(n=8)` — press release HTML scraping, RSS feed if available
-  - `fetch_arbeitsagentur_career(n=8)` — sample document PDFs → extracted text
+  - `fetch_wikipedia_marketing(n=10)` — Wikipedia DE category fetch (e.g., `Kategorie:Markenname`, `Kategorie:Smartphone`, `Kategorie:Softwareprodukt`) → article body excerpts pre-2022
+  - `fetch_github_marketing(n=8)` — GitHub API search for repos with DE README content (`q=language:Markdown+stars:>50` + filter README for DE), fetch README.md raw text
+  - `fetch_startnext_marketing(n=8)` — Startnext campaign listing scrape → campaign description + features section
+  - `fetch_wikipedia_lebenslauf_career(n=10)` — Wikipedia DE Personenartikel via category (e.g., `Kategorie:Deutscher_Unternehmer`, `Kategorie:Hochschullehrer_(Deutschland)`) → bio + career sections pre-2022
+  - `fetch_bundesregierung_career(n=8)` — Bundesregierung.de minister Lebenslauf pages → biographical text
+  - `fetch_github_profile_career(n=6)` — GitHub API search for `<user>/<user>` profile repos with DE README → first-person developer narrative
 
 - [ ] **Step 2:** Run fetcher. Per file: trim to representative passage (~200-500 words). Total target: **~300 KB raw text** across all 8+ sources (revised up from 150 KB given broader source mix).
 
