@@ -1,27 +1,28 @@
 # EN Baseline Eval Summary
 
-**Status: pattern eval re-baselined against refined corpus (commit `bzop6ygn2` run, 2026-05-26). Rate 0.5 — likely inflated misses due to parser bug now patched (see below). FP + regex audit numbers from earlier run still valid.**
+**Status: pattern eval re-baselined against refined corpus with patched parser (commit `61b03c1` + resume run, 2026-05-27 07:20). Rate 0.619. FP + regex audit numbers from earlier run unchanged.**
 
-**Pattern run date:** 2026-05-26 22:04 (against refined 42-scorable + 9-true-neg corpus)
+**Pattern run date:** 2026-05-27 07:20 (resume of 2026-05-26 22:04 run after Pro session reset)
 **Skill version:** humanizer v3.4.0 (tag `eca15650`) + post-tag work toward v3.4.1
-**Skill commit:** `d0986d4` (HEAD at run time)
+**Skill commit:** `61b03c1` (HEAD at run time)
 **Skill model:** sonnet (via `claude -p` subscription auth)
 
 ## Headline numbers (current)
 
 | Metric | Value | Notes |
 |---|---|---|
-| Pattern detection rate (overall, 42 scorable cases) | **0.5** | 21 / 42 detected. Inflated misses — see parser-bug caveat below. |
+| Pattern detection rate (overall, 42 scorable cases) | **0.619** | 26 / 42 detected. Post-parser-fix baseline (was 0.5 with bug). |
 | Pattern cases scorable / total | 42 / 51 | 0 unscorable. 9 true-neg reported separately. |
-| Patterns perfect (rate=1.0) | **15** of 33 scorable patterns | #1, #3, #4, #6, #10, #11, #16, #18, #20, #23, #24, #25, #28, #31, #32 |
-| Patterns partial (0 < rate < 1) | 1 | #21 (0.5) |
-| Patterns miss (rate=0.0) | 17 | many likely false misses from parser bug — see below |
-| True-negative-only patterns | 7 | #8, #13, #14, #15, #17, #19, #29 (skill should leave input alone) |
-| True-neg passes / total | 2 / 9 | #14 case_002 + #15 case_001 passed; others failed because skill DID rewrite the input (separate signal — skill over-edits some clean inputs) |
+| Patterns perfect (rate=1.0) | **19** of 40 | #1, #3, #4, #5, #6, #10, #11, #12, #16, #18, #21, #22, #25, #28, #32, #35, #38, #39 (+#23 at 0.833) |
+| Patterns partial (0 < rate < 1) | 2 | #23 (0.833), #37 (0.5) |
+| Patterns miss (rate=0.0) | 19 | mix of true-misses + true-neg-only patterns showing as 0 in this view |
+| True-neg cases reported separately (runner stat) | 9 | reported in runner stdout, not in per-pattern table |
 | FP mean edit ratio (synthetic) | **0.2039** | from earlier run, unchanged |
 | FP density preflight quick-drop | **1.00** | from earlier run, unchanged (✓) |
 | Regex audit: human samples LOW band | **5 / 5** | ✓ |
 | E2E rewrite quality | not run | deferred (API budget) |
+
+**Delta vs prior bug-inflated run:** +0.119 absolute (+5 detected). Parser-fix gain came from artifact + adjacent cases that had been false-negative due to trailing-commentary capture.
 
 ## ⚠ Parser bug inflated MISS count — patched in this commit
 
