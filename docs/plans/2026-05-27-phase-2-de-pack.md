@@ -78,22 +78,75 @@ def test_mine_patterns_extracts_diff_signal():
 
 ---
 
-## Task 3: DE human corpus assembly
+## Task 3: DE human corpus assembly — per-domain real sources
+
+**Goal (revised 2026-05-27 per session /goal "find more human corpus resources for each domain and synthesize as little as possible"):** assemble real-world DE human corpus with per-domain source mapping. Synthetic samples reduced to fallback role — only used where no licensed real-world source exists for a domain.
+
+**Per-domain source map (all $0, all clear-license, all pre-2022 where applicable for AI-contamination safety):**
+
+| Domain | Primary source | License | Why suited |
+|--------|----------------|---------|------------|
+| **casual** | Wikipedia DE talk pages + project namespace (Wikipedia:, Diskussion:) pre-2022 | CC-BY-SA | Informal register, opinion, varied rhythm — same register profile as blog prose |
+| **casual (supplement)** | DE Wikisource autobiographies / personal letters / memoirs (PD pre-1923) | PD | First-person, register variety |
+| **academic** | SSOAR (Social Science Open Access Repository — DE social science papers) | CC-BY (most) | Real academic prose, hedging + passive, citation register. URL: `https://www.ssoar.info/` |
+| **academic (supplement)** | DNB DE-language open-access dissertations + habilitations | varies (mostly CC) | Real thesis / paper prose |
+| **legal** | Bundesgesetzblatt (BGBl) — federal laws | PD per §5 UrhG | Real legal register, shall/may/notwithstanding equivalents |
+| **legal (supplement)** | Rechtsprechung-im-Internet — federal court decisions | PD per §5 UrhG | Brief-style prose. URL: `https://www.rechtsprechung-im-internet.de/` |
+| **legal (supplement)** | Bundestag plenary protocols (Plenarprotokolle) — parliamentary speeches | PD per §5 UrhG | Formal speech register adjacent to legal. URL: `https://www.bundestag.de/services/opendata` |
+| **technical** | ubuntuusers.de Wiki articles pre-2022 | CC-BY-SA | Real DE technical documentation, command-line + step-by-step register. URL: `https://wiki.ubuntuusers.de/` |
+| **technical (supplement)** | translatewiki.net DE-translated FOSS software UI strings + docs | various FOSS-compatible | Tech vocabulary, imperative mood. URL: `https://translatewiki.net/wiki/Special:LanguageStats?language=de` |
+| **technical (supplement)** | Linuxwiki.de articles + DE man page translations | GFDL / LGPL | Reference-style technical prose |
+| **marketing** | Bundespresseamt federal government press releases | PD per §5 UrhG | Promotional-adjacent register (PR / announcement style). URL: `https://www.bundesregierung.de/breg-de/aktuelles/pressemitteilungen` |
+| **marketing (supplement)** | Wikipedia DE articles about commercial products pre-2022 | CC-BY-SA | Product positioning prose, encyclopedic but with feature-focused register |
+| **career** | arbeitsagentur.de Bewerbungs-Mustervorlagen + sample documents | PD (federal agency) | Real DE Anschreiben / CV exemplars at multiple register levels. URL: `https://www.arbeitsagentur.de/bildung/ausbildung/bewerbung` |
+| **career (supplement)** | Public DE university faculty CVs (`.de` academic faculty pages) | varies (often PD per §5 if civil servants; per-page check) | Real academic-career CV prose |
+| **career (supplement)** | Bundeswehr / öffentlicher Dienst Stellenanzeigen archive | PD per §5 UrhG | Job posting prose (mirror of cover-letter target) |
 
 **Files:**
-- Create: `evals/scripts/fetch_de_human_corpus.py`
-- Create: `evals/corpus/de/human/wikipedia_de_pre2022/` (directory)
-- Create: `evals/corpus/de/human/gutenberg_de/` (directory)
-- Create: `evals/corpus/de/human/_LICENSE` (CC-BY-SA for Wikipedia, public domain for Gutenberg)
-- Create: `evals/corpus/de/human/synthetic/` with 1 sample per domain (5+ samples covering casual, academic, legal, technical, marketing — career synthetic deferred until §6)
+- Create: `evals/scripts/fetch_de_human_corpus.py` — multi-source fetcher (one function per source category)
+- Create: `evals/corpus/de/human/wikipedia_de_pre2022/` (general encyclopedic)
+- Create: `evals/corpus/de/human/wikisource_de/` (literary + personal-letter PD)
+- Create: `evals/corpus/de/human/gutenberg_de/` (PD literary)
+- Create: `evals/corpus/de/human/ssoar_academic/` (academic)
+- Create: `evals/corpus/de/human/dnb_dissertations/` (academic supplement; optional, larger fetch)
+- Create: `evals/corpus/de/human/bgbl_legal/` (legal)
+- Create: `evals/corpus/de/human/rechtsprechung_legal/` (legal supplement)
+- Create: `evals/corpus/de/human/bundestag_protocols/` (legal/speech supplement; optional)
+- Create: `evals/corpus/de/human/ubuntuusers_technical/` (technical)
+- Create: `evals/corpus/de/human/translatewiki_technical/` (technical supplement)
+- Create: `evals/corpus/de/human/bundespresseamt_marketing/` (marketing-adjacent)
+- Create: `evals/corpus/de/human/arbeitsagentur_career/` (career)
+- Create: `evals/corpus/de/human/synthetic/` — **fallback only** for any domain where the real-world fetcher fails or produces < 3 usable samples after manual quality check. Synthetic count target: **0 if all fetchers succeed; ≤1 per domain otherwise**.
+- Create: per-source `_LICENSE` + `_SOURCE` sidecars (license string + URL + fetch date + access conditions)
 
-- [ ] **Step 1:** Implement `fetch_de_human_corpus.py`:
-  - Wikipedia DE revisions API (`https://de.wikipedia.org/w/api.php`) with `rvend=2022-11-30T00:00:00Z` to constrain to pre-ChatGPT
-  - Sample ~50 article revisions across diverse topics (use `random` page IDs in a fixed-seed sample for reproducibility)
-  - Project Gutenberg DE: `https://www.projekt-gutenberg.org/` — fetch ~20 random texts via their index
-- [ ] **Step 2:** Run fetcher. Store output under `evals/corpus/de/human/{source}/`. Trim each to a representative paragraph (~200-500 words). Total target: ~150 KB raw text.
-- [ ] **Step 3:** Write 5 synthetic DE human samples (one per non-career domain, ~150 words each). Use the EN synthetic samples as a structural template. These exist for `run_false_positive_eval` FP testing.
-- [ ] **Step 4:** Commit fetched corpus + synthetic samples + `_LICENSE`.
+**Steps:**
+
+- [ ] **Step 1:** Implement `fetch_de_human_corpus.py` with one function per primary source. Schema for each function:
+  ```python
+  def fetch_<source>() -> list[Document]:
+      """Fetch ~5-10 documents from <source>. Returns Document(id, text, license, source_url, fetch_date)."""
+  ```
+  - `fetch_wikipedia_de_pre2022(n=15)` — Wikipedia DE revisions API, `rvend=2022-11-30T00:00:00Z`, fixed random seed for reproducibility
+  - `fetch_wikisource_de(n=10)` — Wikisource API (same MediaWiki schema) limited to PD content
+  - `fetch_gutenberg_de(n=10)` — `https://www.projekt-gutenberg.org/` index scrape + author/title sampling
+  - `fetch_ssoar_academic(n=10)` — SSOAR OAI-PMH endpoint or REST search API
+  - `fetch_bgbl_legal(n=8)` — BGBl bulk download / RSS feed
+  - `fetch_ubuntuusers_technical(n=10)` — ubuntuusers.de MediaWiki API (it runs on MediaWiki)
+  - `fetch_bundespresseamt_marketing(n=8)` — press release HTML scraping, RSS feed if available
+  - `fetch_arbeitsagentur_career(n=8)` — sample document PDFs → extracted text
+
+- [ ] **Step 2:** Run fetcher. Per file: trim to representative passage (~200-500 words). Total target: **~300 KB raw text** across all 8+ sources (revised up from 150 KB given broader source mix).
+
+- [ ] **Step 3:** Manual quality check: skim 2-3 samples per source category. Flag any that look LLM-tainted (post-2022 Wikipedia edits, press releases mentioning ChatGPT, etc.). Drop tainted samples.
+
+- [ ] **Step 4 (fallback only):** For any domain where real-source fetch produced < 3 usable samples after Step 3 quality check, write **at most 1** synthetic sample per such domain (~150 words). Source field marked `synthesis: opus_inline` with date. Synthetic samples are explicitly marked so FP eval reports can isolate their contribution.
+
+- [ ] **Step 5:** Commit fetched corpus + sidecar `_LICENSE` + `_SOURCE` files + any fallback synthetic samples. Include in commit message a summary: `corpus N=X files Y KB across Z sources, S synthetic fallbacks`.
+
+**Notes:**
+- All primary sources are German federal/government (PD per §5 UrhG) OR CC-BY-SA Wikimedia properties OR explicit CC academic repositories. Zero copyright risk for redistribution as eval corpus.
+- Per the `feedback-url-search-via-search-engine` saved memory: if any URL guess fails, use `site:domain.de keywords` via WebSearch before retrying. URLs in the table above are all verified entry points but exact API endpoints may need search-engine confirmation per source.
+- DNB OAI-PMH + Bundestag opendata are optional supplements; skip if Step 1 implementation effort exceeds plan budget.
 
 ---
 
