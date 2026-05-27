@@ -8,7 +8,7 @@
     {
       "name": "humanizer-ext",
       "source": "./",
-      "description": "Remove signs of AI-generated writing from text. Detects 40 patterns from Wikipedia's Signs of AI writing guide, with domain-aware overrides for casual, academic, legal, technical, and marketing.",
+      "description": "Remove signs of AI-generated writing from text. Detects 41 patterns from Wikipedia's Signs of AI writing guide, with domain-aware overrides for casual, academic, legal, technical, marketing, and career (cover letter / CV / LinkedIn).",
       "homepage": "https://github.com/duathron/humanizer-ext",
       "license": "MIT",
       "category": "writing",

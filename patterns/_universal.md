@@ -208,3 +208,24 @@ If you do not know the value, delete the sentence rather than ship the placehold
 > ## Background
 >
 > The company was founded in 1994.
+
+
+### 41. Diff-Anchored Writing
+
+**Problem:** Documentation, comments, or prose written as if narrating a change rather than describing the thing as it is. Reads as if the author still has the previous version in mind. Unless the document is inherently version-scoped (changelogs, release notes, migration guides, PR descriptions, blog posts about a refactor), it should make sense without any knowledge of what the prior version looked like. "This was changed to X" / "Previously the system did Y" / "We moved away from Z" all leak a diff frame into prose that should describe the current state. (Ported from upstream `blader/humanizer` v2.7.0 pattern #30.)
+
+**Words to watch:** was added to, was changed to, was replaced by, now uses (where "now" implies a contrast with an unstated "before"), previously, used to, no longer (without naming the deprecated thing), moved away from, the old approach, the legacy implementation
+
+**Before (code comment):**
+> This function was added to replace the previous approach of iterating through all items, which caused O(n²) performance issues at scale.
+
+**After:**
+> This function uses a hash map for O(1) lookups, avoiding the O(n²) cost of naive iteration.
+
+**Before (project README):**
+> The CLI now uses YAML for configuration. Previously it used a custom format that was difficult to parse.
+
+**After:**
+> The CLI reads its configuration from YAML.
+
+**Skip this pattern when:** the document is a CHANGELOG, release notes file, migration guide, PR description, or a blog post explicitly framed as "what changed in v2.0". Version-scoped documents are *supposed* to read as diffs.

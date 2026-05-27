@@ -30,7 +30,7 @@ def test_skill_md_description_under_plugin_limit():
     )
 
 
-UNIVERSAL_PATTERN_IDS = {6, 14, 15, 17, 18, 19, 25, 26, 29, 38, 39, 40}
+UNIVERSAL_PATTERN_IDS = {6, 14, 15, 17, 18, 19, 25, 26, 29, 38, 39, 40, 41}
 
 
 def _pattern_ids_in_file(path: Path) -> set[int]:
@@ -94,7 +94,7 @@ def test_en_overrides_contains_override_table_and_guidance():
     assert "Domain overrides" in text
     assert "Domain-specific guidance" in text
     # Override table must mention all 5 domain columns
-    for domain in ["academic", "legal", "technical", "marketing", "casual"]:
+    for domain in ["academic", "legal", "technical", "marketing", "casual", "career"]:
         assert domain in text.lower(), f"missing domain mention: {domain}"
 
 
