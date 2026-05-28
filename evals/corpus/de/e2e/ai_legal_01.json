@@ -1,0 +1,8 @@
+{
+  "id": "e2e_de_legal_01",
+  "lang": "de",
+  "domain": "legal",
+  "source": "manual_synthesis: prototypical AI-generated DE legal clause (Datenschutz / Vertraulichkeit). Tests DE legal-register handling: #13 Passive SKIP + #24 hedging SKIP + #104 Nominalstil SKIP (DE Behördendeutsch is conventional). Real legal content (DSGVO compliance, 72-Stunden-Meldepflicht, Drittstaatenübermittlung) MUST survive. AI tells to strip: chatbot framing + #100 Akademische Rahmen-Floskel + #7 vocabulary.",
+  "input": "Selbstverständlich! Hier ist die gewünschte Datenschutzklausel. Lassen Sie mich wissen, ob Sie weitere Anpassungen benötigen.\n\nIm Rahmen der vorliegenden Datenschutzvereinbarung verpflichten sich die Vertragsparteien, insbesondere im Hinblick auf die ganzheitliche Sicherstellung der Vertraulichkeit personenbezogener Daten, zur Einhaltung der einschlägigen gesetzlichen Bestimmungen sowie zur Implementierung umfassender technischer und organisatorischer Maßnahmen.\n\nSofern sich im Verlauf der Vertragsbeziehung eine Verarbeitung personenbezogener Daten als erforderlich erweisen sollte, wäre diese ausschließlich unter Beachtung der grundlegenden Prinzipien der Datenminimierung, der Zweckbindung und der Transparenz zulässig. Darüber hinaus ist festzuhalten, dass die Übermittlung personenbezogener Daten an Drittstaaten nur dann erfolgen darf, wenn ein angemessenes Datenschutzniveau im Empfängerstaat gewährleistet ist.\n\nIm Falle eines Datenschutzvorfalls würden die Vertragsparteien unverzüglich, jedoch spätestens innerhalb von 72 Stunden, die zuständigen Aufsichtsbehörden gemäß Art. 33 DSGVO informieren und sämtliche erforderlichen Maßnahmen zur ganzheitlichen Schadensbegrenzung ergreifen.",
+  "reference_rewrite": null
+}

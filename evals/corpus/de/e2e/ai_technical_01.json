@@ -1,0 +1,8 @@
+{
+  "id": "e2e_de_technical_01",
+  "lang": "de",
+  "domain": "technical",
+  "source": "manual_synthesis: prototypical AI-generated DE technical README intro for a CLI tool. Tests technical-domain handling: #15/#16 boldface + inline-headers SKIP (legitimate docs scaffolding). #7 AI vocabulary + #103 Anglizismen-Leakage core targets. Concrete technical claims (Backoff-Strategie, Microservices, Skalierbarkeit, Kubernetes, Go, PostgreSQL) MUST survive — fabrication check applies (don't invent 'exponential' if source said 'backoff').",
+  "input": "# DataFlow CLI\n\n**DataFlow** ist eine umfassende, intuitive und nahtlose Open-Source-Lösung für die ganzheitliche Verarbeitung datenintensiver Workloads. Im Rahmen modernster Software-Architektur bietet das Tool eine robuste und skalierbare Plattform, die sich vor diesem Hintergrund als zentraler Baustein für anspruchsvolle Data-Pipelines etabliert hat.\n\n## Features\n\n- **Performance-orientiert:** Optimierte Engine für maximalen Throughput und minimale Latenz\n- **Developer-friendly:** Intuitive API, umfassende Dokumentation, nahtlose Integration\n- **Enterprise-ready:** Robuste Architektur, ganzheitliches Monitoring, nahtlose Skalierbarkeit\n\nEs lässt sich festhalten, dass DataFlow nicht nur eine technische Lösung darstellt, sondern darüber hinaus auch ein zukunftsweisendes Ecosystem für moderne Data-Engineering-Praktiken etabliert. Im Hinblick auf die vielfältigen Anwendungsfälle würde DataFlow eine zentrale Rolle für Teams spielen, die ihre Datenverarbeitungsprozesse auf das nächste Level heben möchten.\n\nDie Implementierung basiert auf Kubernetes, Go und PostgreSQL und nutzt eine bewährte Backoff-Strategie für transiente Fehler.",
+  "reference_rewrite": null
+}

@@ -1,0 +1,8 @@
+{
+  "id": "e2e_de_academic_01",
+  "lang": "de",
+  "domain": "academic",
+  "source": "manual_synthesis: prototypical AI-generated DE academic abstract. #100 Akademische Rahmen-Floskel + #101 Impersonales Reflexiv + #104 Nominalstil-Inflation + #7 vocabulary. The core scientific claims (Transformer-Architekturen, cross-lingual transfer learning, multilingual corpora, low-resource fine-tuning framework) must survive any rewrite — academic register softening is OK for #101 / #104 per de_overrides; #100 is strict everywhere.",
+  "input": "Im Rahmen der vorliegenden Untersuchung wird die Anwendung transformerbasierter Architekturen im Hinblick auf ihre Eignung für cross-linguale Transfer-Lern-Aufgaben evaluiert. Vor diesem Hintergrund lässt sich feststellen, dass die Berücksichtigung mehrsprachiger Korpora eine zentrale Rolle für die ganzheitliche Performance-Optimierung in nachgelagerten Aufgaben spielt.\n\nEs lässt sich darüber hinaus festhalten, dass die Durchführung umfassender Vergleichsexperimente eine differenzierte Bewertung der jeweiligen Modellarchitekturen erforderlich macht. Im Rahmen der vorliegenden Arbeit wird daher ein ganzheitliches Framework für das Fine-Tuning vortrainierter Modelle auf ressourcenarmen Zielsprachen vorgeschlagen, welches eine signifikante Verbesserung der Klassifikationsgenauigkeit ermöglicht.\n\nZusammenfassend lässt sich sagen, dass die vorliegende Untersuchung einen wesentlichen Beitrag zur facettenreichen Forschungslandschaft des cross-lingualen Transfer Learnings leistet und vielfältige Perspektiven für zukünftige Untersuchungen eröffnet.",
+  "reference_rewrite": null
+}
