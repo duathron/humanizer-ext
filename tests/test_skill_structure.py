@@ -138,3 +138,33 @@ def test_skill_md_no_longer_contains_pattern_definitions():
     assert not pattern_headings, (
         f"SKILL.md still contains pattern definitions: {pattern_headings[:3]}..."
     )
+
+
+DE_PATTERN_IDS = {
+    1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 16, 20, 21, 22, 23, 24,
+    27, 28, 30, 31, 32, 33, 34, 35, 36, 37,    # EN-PARALLEL
+    100, 101, 102, 103, 104,                    # DE-only
+}
+
+
+def test_de_pack_exists():
+    assert (REPO_ROOT / "patterns" / "de.md").is_file()
+
+
+def test_de_pack_contains_expected_patterns():
+    ids = _pattern_ids_in_file(REPO_ROOT / "patterns" / "de.md")
+    assert ids == DE_PATTERN_IDS, (
+        f"de.md pattern IDs differ from spec: "
+        f"missing {DE_PATTERN_IDS - ids}, extra {ids - DE_PATTERN_IDS}"
+    )
+
+
+def test_de_pack_includes_personality_section():
+    text = (REPO_ROOT / "patterns" / "de.md").read_text(encoding="utf-8")
+    assert "## PERSONALITY AND SOUL" in text
+
+
+def test_universal_and_de_packs_are_disjoint():
+    universal = _pattern_ids_in_file(REPO_ROOT / "patterns" / "_universal.md")
+    de = _pattern_ids_in_file(REPO_ROOT / "patterns" / "de.md")
+    assert universal & de == set(), f"overlapping pattern IDs: {universal & de}"
