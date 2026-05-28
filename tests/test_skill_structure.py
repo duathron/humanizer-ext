@@ -168,3 +168,30 @@ def test_universal_and_de_packs_are_disjoint():
     universal = _pattern_ids_in_file(REPO_ROOT / "patterns" / "_universal.md")
     de = _pattern_ids_in_file(REPO_ROOT / "patterns" / "de.md")
     assert universal & de == set(), f"overlapping pattern IDs: {universal & de}"
+
+
+def test_de_overrides_exists():
+    assert (REPO_ROOT / "domains" / "de_overrides.md").is_file()
+
+
+def test_de_overrides_contains_override_table_and_guidance():
+    text = (REPO_ROOT / "domains" / "de_overrides.md").read_text(encoding="utf-8")
+    assert "Domain overrides" in text
+    assert "Domain-specific guidance" in text
+    for domain in ["academic", "legal", "technical", "marketing", "casual", "career"]:
+        assert domain in text.lower(), f"missing domain mention: {domain}"
+
+
+def test_de_overrides_pattern_ids_exist_in_packs():
+    overrides_text = (REPO_ROOT / "domains" / "de_overrides.md").read_text(encoding="utf-8")
+    referenced = {int(m.group(1)) for m in re.finditer(r"#(\d+)\b", overrides_text)}
+    de_ids = _pattern_ids_in_file(REPO_ROOT / "patterns" / "de.md")
+    universal_ids = _pattern_ids_in_file(REPO_ROOT / "patterns" / "_universal.md")
+    valid = de_ids | universal_ids
+    # Allow references to #38-#41 universal patterns + #100-#104 DE-only
+    unknown = referenced - valid
+    # Some references may be to EN-PARALLEL numbering on patterns not in either pack
+    # (e.g., #11 if elegant variation is in en.md only); skip those.
+    en_ids = _pattern_ids_in_file(REPO_ROOT / "patterns" / "en.md")
+    unknown -= en_ids
+    assert not unknown, f"de_overrides.md references unknown pattern IDs: {unknown}"
