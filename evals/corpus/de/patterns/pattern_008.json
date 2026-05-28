@@ -1,0 +1,15 @@
+{
+  "pattern_id": 8,
+  "pattern_name": "Kopula-Vermeidung (\"ist\"/\"sind\" umschreiben)",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_008_de_001",
+      "input": "Die Stadtbibliothek fungiert als zentraler Anlaufpunkt für Bürgerinnen und Bürger. Sie stellt eine unverzichtbare Ressource dar und gilt als kulturelles Herz der Stadt.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

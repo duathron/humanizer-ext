@@ -1,0 +1,15 @@
+{
+  "pattern_id": 3,
+  "pattern_name": "Oberflächliche Analysen mit Partizip-I-Endungen",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_003_de_001",
+      "input": "Die Farbpalette des Tempels in Blau, Grün und Gold resoniert mit der natürlichen Schönheit der Region, die Verbundenheit der Gemeinschaft widerspiegelnd und gleichzeitig ihr reiches kulturelles Erbe betonend.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

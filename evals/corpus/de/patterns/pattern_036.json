@@ -1,0 +1,15 @@
+{
+  "pattern_id": 36,
+  "pattern_name": "Gestapelte Konditionalkonstruktionen",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_036_de_001",
+      "input": "Wenn das Argument stimmt, und wenn die Evidenz diese Lesart stützt, dann könnte die Politik eine gewisse Wirkung gehabt haben — wenn, das sei hinzugefügt, der Kontext so war wie beschrieben.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

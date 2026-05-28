@@ -1,0 +1,18 @@
+{
+  "pattern_id": 100,
+  "pattern_name": "Akademische Rahmen-Floskel (\"Im Rahmen der vorliegenden ...\")",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_100_de_001",
+      "input": "Im Rahmen der vorliegenden Arbeit wird die Implementierung neuronaler Netzwerke zur Erkennung sprachlicher Muster vergleichend evaluiert.",
+      "expected_changes": [
+        "im Rahmen der vorliegenden Arbeit",
+        "im Rahmen dieser"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

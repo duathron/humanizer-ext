@@ -1,0 +1,15 @@
+{
+  "pattern_id": 12,
+  "pattern_name": "Falsche Bereiche / False Ranges",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_012_de_001",
+      "input": "Unsere Reise durch das Universum hat uns von der Singularität des Urknalls bis hin zum kosmischen Netz geführt, von der Geburt und dem Tod der Sterne bis zum enigmatischen Tanz der dunklen Materie.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

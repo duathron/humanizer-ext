@@ -1,0 +1,15 @@
+{
+  "pattern_id": 34,
+  "pattern_name": "Angehängte Betonung / Trailing Emphasis Fragments",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_034_de_001",
+      "input": "Das System verarbeitet Anfragen in weniger als 50 ms. Das ist der Kern. Und das ist entscheidend.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

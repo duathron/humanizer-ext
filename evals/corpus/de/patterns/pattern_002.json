@@ -1,0 +1,15 @@
+{
+  "pattern_id": 2,
+  "pattern_name": "Übertriebene Betonung von Bekanntheit und Medienberichterstattung",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_002_de_001",
+      "input": "Ihre Ansichten wurden in der Frankfurter Allgemeinen Zeitung, der ARD, der Financial Times und dem Spiegel zitiert. Sie unterhält eine aktive Social-Media-Präsenz mit über 500.000 Followern.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "pattern_id": 16,
+  "pattern_name": "Inline-Header-Aufzählungslisten",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_016_de_001",
+      "input": "- **Benutzererfahrung:** Die Benutzererfahrung wurde durch eine neue Oberfläche erheblich verbessert. - **Leistung:** Die Leistung wurde durch optimierte Algorithmen gesteigert. - **Sicherheit:** Die Sicherheit wurde durch Ende-zu-Ende-Verschlüsselung verstärkt.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

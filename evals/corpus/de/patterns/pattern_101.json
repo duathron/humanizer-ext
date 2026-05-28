@@ -1,0 +1,18 @@
+{
+  "pattern_id": 101,
+  "pattern_name": "Impersonales Reflexiv (\"Es lässt sich ...\")",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_101_de_001",
+      "input": "Zusammenfassend lässt sich feststellen, dass die Implementierung moderner Lösungen eine zentrale Rolle spielt.",
+      "expected_changes": [
+        "es lässt sich feststellen",
+        "es lässt sich sagen"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "pattern_id": 103,
+  "pattern_name": "Anglizismen-Leakage (\"Denglisch overuse\")",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_103_de_001",
+      "input": "Wir alignen unsere Stakeholder, um die Pain Points unserer Customer Journey ganzheitlich zu adressieren und einen seamlessen Insight in die User Experience zu liefern.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

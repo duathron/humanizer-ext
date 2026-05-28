@@ -1,0 +1,17 @@
+{
+  "pattern_id": 39,
+  "pattern_name": "Phrasal Templates and Placeholder Text",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_039_de_001",
+      "input": "Founded in [YEAR], [COMPANY NAME] is a leading provider of [INDUSTRY] solutions. Accessed 2025-xx-xx.",
+      "expected_changes": [
+        "\"fill in the blank\""
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

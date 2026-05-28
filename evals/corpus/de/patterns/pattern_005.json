@@ -1,0 +1,15 @@
+{
+  "pattern_id": 5,
+  "pattern_name": "Vage Autoritäten und Weasel Words",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_005_de_001",
+      "input": "Laut Experten und Branchenberichten hat die Entwicklung weitreichende Folgen. Einige Kritiker argumentieren, dass der Ansatz grundlegende Mängel aufweist.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

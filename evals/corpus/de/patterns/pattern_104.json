@@ -1,0 +1,17 @@
+{
+  "pattern_id": 104,
+  "pattern_name": "Nominalstil-Inflation",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_104_de_001",
+      "input": "Die Durchführung einer ganzheitlichen Evaluierung im Rahmen der Berücksichtigung sämtlicher relevanter Faktoren erfordert eine umfassende Vorbereitung.",
+      "expected_changes": [
+        "substantivreiche bürokratische Verbalisierung"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "pattern_id": 11,
+  "pattern_name": "Elegante Variation (Synonymrotation)",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_011_de_001",
+      "input": "Die Protagonistin begegnet vielen Herausforderungen. Die Hauptfigur muss Hindernisse überwinden. Die zentrale Gestalt triumphiert schließlich. Die Heldin kehrt nach Hause zurück.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

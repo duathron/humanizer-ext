@@ -1,0 +1,17 @@
+{
+  "pattern_id": 102,
+  "pattern_name": "Konjunktiv-II-Stacking (\"würde / wäre / hätte ...\")",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_102_de_001",
+      "input": "Im Hinblick auf die digitale Transformation wäre es zielführend, wenn Unternehmen ihre Prozesse evaluieren würden, sodass sie moderne Praktiken implementieren könnten.",
+      "expected_changes": [
+        "3+ Konjunktiv-II-Formen in engem Kontext (würde"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

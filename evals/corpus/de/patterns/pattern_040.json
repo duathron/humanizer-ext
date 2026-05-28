@@ -1,0 +1,17 @@
+{
+  "pattern_id": 40,
+  "pattern_name": "Markdown / Wikitext Contamination",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_040_de_001",
+      "input": "```markdown ## Background --- The company was founded in 1994. ``` Would you like me to expand the Background section, add citations, or convert this into wikitext?",
+      "expected_changes": [
+        "- Triple-backtick fences left in prose: ` ```markdown `"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

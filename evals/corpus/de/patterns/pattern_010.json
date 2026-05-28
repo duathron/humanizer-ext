@@ -1,0 +1,15 @@
+{
+  "pattern_id": 10,
+  "pattern_name": "Übermäßiger Trikolon (Dreierkonstruktionen)",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_010_de_001",
+      "input": "Die Region ist bekannt für ihre atemberaubende Landschaft, ihr reiches kulturelles Erbe und ihre herzliche Gastfreundschaft. Besucher können Innovation, Inspiration und Brancheneinblicke erwarten.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

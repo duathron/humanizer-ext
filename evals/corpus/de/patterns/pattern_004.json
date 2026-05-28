@@ -1,0 +1,15 @@
+{
+  "pattern_id": 4,
+  "pattern_name": "Werbesprache und werbliche Formulierungen",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_004_de_001",
+      "input": "Im Herzen Bayerns liegt diese atemberaubende Stadt mit einem reichen kulturellen Erbe und einer beeindruckenden natürlichen Schönheit, die man unbedingt besucht haben muss.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

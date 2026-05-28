@@ -1,0 +1,27 @@
+{
+  "pattern_id": 38,
+  "pattern_name": "Reference-Markup Artifacts",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_038_de_001",
+      "input": "The 2024 election turned on three states turn0search0, with margins under 1% in each0. Analysts have called it the closest race in modern history :contentReference[oaicite:2]{index=2}.",
+      "expected_changes": [
+        "- ChatGPT: `turn0search0`"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    },
+    {
+      "id": "pattern_038_de_002",
+      "input": "See the [official report](https://example.com/report?utm_source=chatgpt.com) for details.",
+      "expected_changes": [
+        "- ChatGPT: `turn0search0`"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

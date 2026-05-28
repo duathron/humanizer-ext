@@ -1,0 +1,15 @@
+{
+  "pattern_id": 15,
+  "pattern_name": "Overuse of Boldface",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_015_de_001",
+      "input": "It blends **OKRs (Objectives and Key Results)**, **KPIs (Key Performance Indicators)**, and visual strategy tools such as the **Business Model Canvas (BMC)** and **Balanced Scorecard (BSC)**.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

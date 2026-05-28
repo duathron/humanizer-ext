@@ -1,0 +1,15 @@
+{
+  "pattern_id": 24,
+  "pattern_name": "Übermäßige Absicherung",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_024_de_001",
+      "input": "Es könnte möglicherweise argumentiert werden, dass die Politik einen gewissen Einfluss auf die Ergebnisse haben könnte.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

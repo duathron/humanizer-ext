@@ -1,0 +1,17 @@
+{
+  "pattern_id": 29,
+  "pattern_name": "Fragmented Headers",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_029_de_001",
+      "input": "## Performance > Speed matters. > When users hit a slow page, they leave.",
+      "expected_changes": [
+        "A heading followed by a one-line paragraph that simply restates the heading before the real content begins"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

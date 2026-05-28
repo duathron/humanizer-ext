@@ -1,0 +1,15 @@
+{
+  "pattern_id": 32,
+  "pattern_name": "Gestapelte Intensivierer-Adjektive",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_032_de_001",
+      "input": "Diese innovative, umfassende und zukunftsorientierte Lösung erfüllt die Anforderungen moderner Organisationen.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

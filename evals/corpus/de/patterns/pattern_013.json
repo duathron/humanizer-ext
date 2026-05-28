@@ -1,0 +1,15 @@
+{
+  "pattern_id": 13,
+  "pattern_name": "Passivkonstruktionen und subjektlose Fragmente",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_013_de_001",
+      "input": "Keine Konfigurationsdatei erforderlich. Die Ergebnisse werden automatisch gespeichert.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

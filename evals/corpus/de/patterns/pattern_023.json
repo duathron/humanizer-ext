@@ -1,0 +1,65 @@
+{
+  "pattern_id": 23,
+  "pattern_name": "Floskelphrasen",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_023_de_001",
+      "input": "Um dieses Ziel zu erreichen, muss aufgrund der Tatsache, dass es regnete, ein neuer Termin gefunden werden. Zu diesem Zeitpunkt sind alle Räume belegt.",
+      "expected_changes": [
+        "um dieses Ziel zu erreichen",
+        "aufgrund der Tatsache, dass",
+        "zu diesem Zeitpunkt"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_curation_from_pattern_pack_inline_list"
+    },
+    {
+      "id": "pattern_023_de_002",
+      "input": "Es ist wichtig zu beachten, dass die Daten zeigen, dass das System die Fähigkeit hat zu verarbeiten. Es sei darauf hingewiesen, dass die Ergebnisse vorliegen.",
+      "expected_changes": [
+        "es ist wichtig zu beachten, dass",
+        "die Fähigkeit hat zu",
+        "es sei darauf hingewiesen, dass"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_curation_from_pattern_pack_inline_list"
+    },
+    {
+      "id": "pattern_023_de_003",
+      "input": "Beachten Sie, dass das System erfordert, regelmäßig gewartet zu werden. Es sollte daran erinnert werden, dass die Logs aufbewahrt werden. Wie immer, konsultieren Sie einen Fachmann.",
+      "expected_changes": [
+        "beachten Sie, dass",
+        "es sollte daran erinnert werden, dass",
+        "wie immer, konsultieren Sie einen Fachmann"
+      ],
+      "expected_unchanged": [],
+      "domain": "technical",
+      "source": "manual_curation_from_pattern_pack_inline_list"
+    },
+    {
+      "id": "pattern_023_de_004",
+      "input": "Für den Fall, dass Sie Hilfe benötigen, kontaktieren Sie unseren Support. Insofern bestätigen die Ergebnisse die Annahme, dass die Strategie greift.",
+      "expected_changes": [
+        "für den Fall, dass",
+        "insofern bestätigen die Ergebnisse"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_curation_from_pattern_pack_inline_list"
+    },
+    {
+      "id": "pattern_023_de_005",
+      "input": "Es ist wichtig zu betonen, dass die Studie umfassend war. Es sei darauf hingewiesen, dass die Resultate signifikant sind.",
+      "expected_changes": [
+        "es ist wichtig zu betonen, dass",
+        "es sei darauf hingewiesen, dass"
+      ],
+      "expected_unchanged": [],
+      "domain": "academic",
+      "source": "manual_curation_from_pattern_pack_inline_list"
+    }
+  ]
+}

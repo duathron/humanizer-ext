@@ -1,0 +1,15 @@
+{
+  "pattern_id": 35,
+  "pattern_name": "Entlarvungs-Pose in Überschriften",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_035_de_001",
+      "input": "## Was die Forschung eigentlich sagt ## Die wahre Architektur eines überzeugenden Briefs ## Die Wahrheit über Preismodelle, erklärt",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

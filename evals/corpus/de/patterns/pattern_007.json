@@ -1,0 +1,19 @@
+{
+  "pattern_id": 7,
+  "pattern_name": "Übernutzte KI-Vokabeln",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_007_de_001",
+      "input": "Darüber hinaus bietet die ganzheitliche Lösung eine nachhaltige und umfassende Grundlage für die kontinuierliche Weiterentwicklung der vielfältigen Stakeholder-Interessen.",
+      "expected_changes": [
+        "darüber hinaus",
+        "zusammenfassend",
+        "ganzheitlich /"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

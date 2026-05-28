@@ -1,0 +1,19 @@
+{
+  "pattern_id": 28,
+  "pattern_name": "Ankündigungen und Wegweiser",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_028_de_001",
+      "input": "Lassen Sie uns eintauchen, wie Caching in Next.js funktioniert. Hier ist, was Sie wissen müssen.",
+      "expected_changes": [
+        "Lassen Sie uns eintauchen",
+        "schauen wir uns an",
+        "lassen"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

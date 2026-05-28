@@ -1,0 +1,15 @@
+{
+  "pattern_id": 22,
+  "pattern_name": "Schmeichelhafte / unterwürfige Sprache",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_022_de_001",
+      "input": "Super Frage! Sie haben absolut Recht, dass das ein komplexes Thema ist. Das ist ein ausgezeichneter Punkt bezüglich der wirtschaftlichen Faktoren.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

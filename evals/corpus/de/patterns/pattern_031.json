@@ -1,0 +1,15 @@
+{
+  "pattern_id": 31,
+  "pattern_name": "Rhetorische und selbstbeantwortende Fragen",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_031_de_001",
+      "input": "Was macht diesen Ansatz effektiv? Die Art, wie er die kognitive Last reduziert. Warum ist das wichtig? Weil Nutzer Werkzeuge aufgeben, die schwer zu bedienen sind.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

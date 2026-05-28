@@ -1,0 +1,15 @@
+{
+  "pattern_id": 17,
+  "pattern_name": "Title Case in Headings",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_017_de_001",
+      "input": "## Strategic Negotiations And Global Partnerships",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

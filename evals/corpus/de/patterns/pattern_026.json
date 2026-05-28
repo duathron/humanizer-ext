@@ -1,0 +1,24 @@
+{
+  "pattern_id": 26,
+  "pattern_name": "Hyphenated Word Pair Overuse",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_026_de_001",
+      "input": "The cross-functional team delivered a high-quality, data-driven report on our client-facing tools. Their decision-making process was well-known for being thorough and detail-oriented.",
+      "expected_changes": [
+        "cross-functional",
+        "client-facing",
+        "data-driven",
+        "decision-making",
+        "well-known",
+        "high-quality",
+        "real-time",
+        "long-term"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

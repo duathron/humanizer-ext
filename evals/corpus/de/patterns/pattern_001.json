@@ -1,0 +1,15 @@
+{
+  "pattern_id": 1,
+  "pattern_name": "Übertriebene Betonung von Bedeutung, Vermächtnis und allgemeinen Trends",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_001_de_001",
+      "input": "Das Statistische Institut Kataloniens wurde 1989 offiziell gegründet und markiert damit einen Wendepunkt in der Entwicklung der Regionalstatistik in Spanien. Diese Initiative war Teil einer breiteren Bewegung zur Dezentralisierung von Verwaltungsfunktionen in ganz Spanien.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

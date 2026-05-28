@@ -1,0 +1,19 @@
+{
+  "pattern_id": 27,
+  "pattern_name": "Überzeugende Autoritäts-Tropen",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_027_de_001",
+      "input": "Die eigentliche Frage ist, ob Teams sich anpassen können. Im Kern geht es wirklich darum, ob die Organisation bereit ist.",
+      "expected_changes": [
+        "Die eigentliche Frage ist",
+        "im Kern geht es um",
+        "in"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

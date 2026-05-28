@@ -1,0 +1,15 @@
+{
+  "pattern_id": 20,
+  "pattern_name": "Artefakte aus kollaborativer Kommunikation / Brief-Stil",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_020_de_001",
+      "input": "Natürlich! Hier ist eine Übersicht der Französischen Revolution. Ich hoffe, das hilft! Lassen Sie mich wissen, wenn Sie mehr möchten.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

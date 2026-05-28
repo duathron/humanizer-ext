@@ -1,0 +1,41 @@
+{
+  "pattern_id": 41,
+  "pattern_name": "Diff-Anchored Writing",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_041_de_001",
+      "input": "This function was added to replace the previous approach of iterating through all items, which caused O(n²) performance issues at scale.",
+      "expected_changes": [
+        "was added to",
+        "was changed to",
+        "was replaced by",
+        "now uses (where \"now\" implies a contrast with an unstated \"before\")",
+        "previously",
+        "used to",
+        "no longer (without naming the deprecated thing)",
+        "moved away from"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    },
+    {
+      "id": "pattern_041_de_002",
+      "input": "The CLI now uses YAML for configuration. Previously it used a custom format that was difficult to parse.",
+      "expected_changes": [
+        "was added to",
+        "was changed to",
+        "was replaced by",
+        "now uses (where \"now\" implies a contrast with an unstated \"before\")",
+        "previously",
+        "used to",
+        "no longer (without naming the deprecated thing)",
+        "moved away from"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

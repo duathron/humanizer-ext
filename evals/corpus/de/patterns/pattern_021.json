@@ -1,0 +1,23 @@
+{
+  "pattern_id": 21,
+  "pattern_name": "Wissens-Cutoff-Hinweise und spekulative Lückenfüllung",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_021_de_001",
+      "input": "Basierend auf verfügbaren Informationen und bis zu meinem letzten Update war die Situation wie folgt. Obwohl spezifische Details nicht allgemein dokumentiert sind, wurde das Unternehmen scheinbar irgendwann in den 1990ern gegründet.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    },
+    {
+      "id": "pattern_021_de_002",
+      "input": "Informationen über ihre frühe Kindheit sind nicht öffentlich verfügbar, was darauf hindeutet, dass sie ein zurückgezogenes Leben führt und persönliche Details privat hält. Sie dürfte in einem Mittelschicht- Haushalt aufgewachsen sein, was ihr späteres Interesse an der Bildungsreform geprägt haben dürfte.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

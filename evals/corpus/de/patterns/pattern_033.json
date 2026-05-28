@@ -1,0 +1,19 @@
+{
+  "pattern_id": 33,
+  "pattern_name": "Mengenunbestimmtheit",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_033_de_001",
+      "input": "Eine breite Palette von Faktoren trug zum Ergebnis bei. Zahlreiche Studien haben diese Erkenntnisse in verschiedenen Kontexten bestätigt.",
+      "expected_changes": [
+        "eine breite Palette von",
+        "eine Vielzahl von",
+        "zahlreich"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

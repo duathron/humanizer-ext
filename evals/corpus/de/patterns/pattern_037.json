@@ -1,0 +1,23 @@
+{
+  "pattern_id": 37,
+  "pattern_name": "Falsch kalibriertes epistemisches Vertrauen",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_037_de_001",
+      "input": "Die Daten beweisen eindeutig, dass Remote-Arbeit die Produktivität in allen Sektoren fundamental verändert hat.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    },
+    {
+      "id": "pattern_037_de_002",
+      "input": "Es scheint, dass die Politik möglicherweise einen gewissen Einfluss auf die Ergebnisse gehabt haben könnte, was möglicherweise auf eine bescheidene Verschiebung hindeutet.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}

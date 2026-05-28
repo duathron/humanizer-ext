@@ -1,0 +1,23 @@
+{
+  "pattern_id": 14,
+  "pattern_name": "Em Dash Overuse and Paired Bracketing",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_014_de_001",
+      "input": "The term is primarily promoted by Dutch institutions—not by the people themselves. You don't say \"Netherlands, Europe\" as an address—yet this mislabeling continues—even in official documents.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    },
+    {
+      "id": "pattern_014_de_002",
+      "input": "The report—which covered three continents and twelve case studies—concluded that demand had shifted.",
+      "expected_changes": [],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "seeded_from_pattern_pack"
+    }
+  ]
+}
