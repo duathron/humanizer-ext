@@ -1,0 +1,7 @@
+source_name: wikipedia_tagged
+license_class: redistributable
+license: CC-BY-SA-3.0
+fetch_date: 2026-05-28
+doc_count: 30
+url: https://de.wikipedia.org/wiki/Vorlage:KI-generiert
+template: Vorlage:KI-generiert

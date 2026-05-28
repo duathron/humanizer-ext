@@ -1,0 +1,7 @@
+source_name: claude_cli_marketing_haiku
+license_class: redistributable
+license: MIT
+generated_via: claude -p subscription
+generated_date: 2026-05-28
+domain: marketing
+model: haiku

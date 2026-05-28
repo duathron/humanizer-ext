@@ -1,0 +1,12 @@
+License: MIT
+Source: Opus main-thread inline synthesis (Phase 2 v3.5.0 corpus work, 2026-05-28)
+Author: Christian Huhn / Claude Opus 4.7
+
+These DE-language samples were written deliberately to contain prototypical
+AI-generated writing tells (AI vocabulary, Nominalstil-Inflation, Konjunktiv II
+stacking, formulaic transitions, generic puffery). They function as calibration
+anchors for pattern eval per-pattern testing — each sample is engineered to
+exercise specific AI tells documented in patterns/de.md.
+
+All samples are original work created for this corpus; no external sources were
+copied or paraphrased. Released MIT for downstream use.
