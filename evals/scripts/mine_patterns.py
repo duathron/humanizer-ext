@@ -275,11 +275,27 @@ def mine(
 # Corpus ingestion from directories
 # ---------------------------------------------------------------------------
 
+_YAML_FRONTMATTER_RE = re.compile(r"^---\s*\n.*?\n---\s*\n", re.DOTALL)
+
+
+def _strip_yaml_frontmatter(text: str) -> str:
+    """Strip leading YAML frontmatter block (between ``---`` fences at the
+    top of the file). Returns text unchanged if no frontmatter is detected.
+
+    Added 2026-05-28: corpus files written by the fetcher / generator scripts
+    include rich YAML metadata (id, license_class, source, model, fetch_date,
+    etc.). Without stripping, mining surfaces metadata tokens (``redistributable``,
+    ``sonnet``, ``model opus``, ``fetch_date 2026-05-28``) as top-ranked
+    "AI tells" — which they obviously are not.
+    """
+    return _YAML_FRONTMATTER_RE.sub("", text, count=1)
+
+
 def _read_corpus_dir(corpus_dir: Path) -> list[str]:
     """Recursively read text from all eligible files in *corpus_dir*.
 
     File types:
-    - ``.txt`` / ``.md``: returned verbatim.
+    - ``.txt`` / ``.md``: returned verbatim (YAML frontmatter stripped if present).
     - ``.json``: if the parsed object has an ``"input"`` key, that value is
       used (matches ``evals/corpus/<lang>/e2e/*.json`` schema); otherwise the
       entire file text is used.
@@ -304,6 +320,8 @@ def _read_corpus_dir(corpus_dir: Path) -> list[str]:
                 # else fall through and use the whole text
             except json.JSONDecodeError:
                 pass  # malformed JSON — treat as plain text
+        else:
+            raw = _strip_yaml_frontmatter(raw)
         docs.append(raw)
     return docs
 
