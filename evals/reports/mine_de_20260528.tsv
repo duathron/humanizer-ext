@@ -1,0 +1,103 @@
+[mine_patterns] lang=de  ai_docs=132  human_docs=46  ngrams=1-4  top=100  min_count=3
+[mine_patterns] 100 candidates surfaced.
+rank	ngram	n	ai_count	human_count	ai_freq_ppm	human_freq_ppm	llr
+1	dass	1	261	33	8884.5	1664.9	122.6701
+2	hinaus	1	105	1	3574.22	50.45	98.7854
+3	darüber hinaus	2	104	1	3540.18	50.45	97.7732
+4	ich	1	139	8	4731.59	403.61	95.7616
+5	lässt sich	2	100	1	3404.02	50.45	93.7261
+6	darüber	1	105	2	3574.22	100.9	92.0399
+7	lässt	1	101	5	3438.06	252.26	72.9502
+8	meine	1	63	0	2144.53	0.0	64.9708
+9	rahmen	1	73	3	2484.94	151.35	55.4655
+10	im rahmen	2	72	3	2450.9	151.35	54.5153
+11	dass die	2	65	2	2212.62	100.9	52.6839
+12	zusammenfassend	1	46	0	1565.85	0.0	47.4390
+13	hedging	1	43	0	1463.73	0.0	44.3451
+14	zusammenfassend lässt	2	40	0	1361.61	0.0	41.2513
+15	zusammenfassend lässt sich	3	40	0	1361.61	0.0	41.2513
+16	queens	1	39	0	1327.57	0.0	40.2200
+17	bin	1	46	1	1565.85	50.45	39.5783
+18	es lässt	2	38	0	1293.53	0.0	39.1887
+19	es lässt sich	3	38	0	1293.53	0.0	39.1887
+20	vorliegenden	1	37	0	1259.49	0.0	38.1574
+21	mich	1	49	2	1667.97	100.9	37.2940
+22	sich sagen	2	35	0	1191.41	0.0	36.0949
+23	lässt sich sagen	3	35	0	1191.41	0.0	36.0949
+24	überzeugt	1	34	0	1157.37	0.0	35.0636
+25	substantivketten	1	34	0	1157.37	0.0	35.0636
+26	rahmen der	2	41	1	1395.65	50.45	34.6494
+27	im rahmen der	3	41	1	1395.65	50.45	34.6494
+28	der vorliegenden	2	33	0	1123.33	0.0	34.0323
+29	zusammenfassend lässt sich sagen	4	32	0	1089.29	0.0	33.0010
+30	übergänge	1	31	0	1055.25	0.0	31.9697
+31	rahmen der vorliegenden	3	31	0	1055.25	0.0	31.9697
+32	im rahmen der vorliegenden	4	31	0	1055.25	0.0	31.9697
+33	feststellen	1	30	0	1021.21	0.0	30.9385
+34	sich feststellen	2	30	0	1021.21	0.0	30.9385
+35	dass eine	2	30	0	1021.21	0.0	30.9385
+36	lässt sich feststellen	3	30	0	1021.21	0.0	30.9385
+37	es ist	2	37	1	1259.49	50.45	30.7270
+38	wichtig	1	28	0	953.13	0.0	28.8759
+39	umfassende	1	35	1	1191.41	50.45	28.7741
+40	es	1	212	72	7216.53	3632.51	27.9589
+41	ihre	1	67	10	2280.7	504.52	27.8126
+42	implementierung	1	34	1	1157.37	50.45	27.8000
+43	sich	1	207	70	7046.33	3531.61	27.5801
+44	rolle	1	33	1	1123.33	50.45	26.8275
+45	position	1	33	1	1123.33	50.45	26.8275
+46	zentrale	1	26	0	885.05	0.0	26.8133
+47	ganzheitliche	1	26	0	885.05	0.0	26.8133
+48	wichtig zu	2	26	0	885.05	0.0	26.8133
+49	bietet	1	37	2	1259.49	100.9	26.0166
+50	darstellt	1	25	0	851.01	0.0	25.7820
+51	innovative	1	25	0	851.01	0.0	25.7820
+52	nahtlose	1	25	0	851.01	0.0	25.7820
+53	jamaica	1	25	0	851.01	0.0	25.7820
+54	digitale	1	31	1	1055.25	50.45	24.8881
+55	möglicherweise	1	30	1	1021.21	50.45	23.9213
+56	transformative	1	23	0	782.93	0.0	23.7195
+57	sagen dass	2	23	0	782.93	0.0	23.7195
+58	hinblick	1	22	0	748.89	0.0	22.6882
+59	im hinblick	2	22	0	748.89	0.0	22.6882
+60	hinblick auf	2	22	0	748.89	0.0	22.6882
+61	der heutigen	2	22	0	748.89	0.0	22.6882
+62	im hinblick auf	3	22	0	748.89	0.0	22.6882
+63	sich sagen dass	3	22	0	748.89	0.0	22.6882
+64	lässt sich sagen dass	4	22	0	748.89	0.0	22.6882
+65	new	1	37	3	1259.49	151.35	22.3013
+66	nachhaltige	1	21	0	714.84	0.0	21.6569
+67	mit großem	2	21	0	714.84	0.0	21.6569
+68	großem interesse	2	21	0	714.84	0.0	21.6569
+69	dass ich	2	21	0	714.84	0.0	21.6569
+70	gemäß den	2	21	0	714.84	0.0	21.6569
+71	mit großem interesse	3	21	0	714.84	0.0	21.6569
+72	in der heutigen	3	21	0	714.84	0.0	21.6569
+73	es lässt sich feststellen	4	21	0	714.84	0.0	21.6569
+74	sagen	1	36	3	1225.45	151.35	21.4280
+75	city	1	32	2	1089.29	100.9	21.4246
+76	daten	1	43	5	1463.73	252.26	21.3585
+77	wörter	1	20	0	680.8	0.0	20.6256
+78	wohlbefinden	1	20	0	680.8	0.0	20.6256
+79	ausgeprägte	1	20	0	680.8	0.0	20.6256
+80	festhalten	1	20	0	680.8	0.0	20.6256
+81	vereinbarung	1	20	0	680.8	0.0	20.6256
+82	geltenden	1	20	0	680.8	0.0	20.6256
+83	viertel	1	20	0	680.8	0.0	20.6256
+84	überzeugt dass	2	20	0	680.8	0.0	20.6256
+85	nicht zuletzt	2	20	0	680.8	0.0	20.6256
+86	es sei	2	20	0	680.8	0.0	20.6256
+87	york	1	34	3	1157.37	151.35	19.6945
+88	new york	2	34	3	1157.37	151.35	19.6945
+89	drin	1	19	0	646.76	0.0	19.5944
+90	moderne	1	19	0	646.76	0.0	19.5944
+91	feststellen dass	2	19	0	646.76	0.0	19.5944
+92	darauf hin	2	19	0	646.76	0.0	19.5944
+93	ist wichtig	2	19	0	646.76	0.0	19.5944
+94	festhalten dass	2	19	0	646.76	0.0	19.5944
+95	sich feststellen dass	3	19	0	646.76	0.0	19.5944
+96	es ist wichtig	3	19	0	646.76	0.0	19.5944
+97	ist wichtig zu	3	19	0	646.76	0.0	19.5944
+98	lässt sich feststellen dass	4	19	0	646.76	0.0	19.5944
+99	es ist wichtig zu	4	19	0	646.76	0.0	19.5944
+100	passiv	1	25	1	851.01	50.45	19.1230
