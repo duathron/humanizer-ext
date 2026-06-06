@@ -1,0 +1,40 @@
+{
+  "pattern_id": 31,
+  "pattern_name": "Rhetorische und selbstbeantwortende Fragen",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_031_de_001",
+      "input": "Was macht diesen Ansatz effektiv? Die Art, wie er die kognitive Last reduziert. Warum ist das wichtig? Weil Nutzer Werkzeuge aufgeben, die schwer zu bedienen sind.",
+      "expected_changes": [
+        "Was macht diesen Ansatz effektiv?",
+        "Warum ist das wichtig?"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_031_de_002",
+      "input": "Wie lässt sich das erklären? Die Antwort liegt in der Komplexität der Ausgangssituation. Welche Rolle spielt dabei die Politik? Eine entscheidende.",
+      "expected_changes": [
+        "Wie lässt sich das erklären?",
+        "Welche Rolle spielt dabei die Politik?"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_031_de_003",
+      "input": "Was bedeutet das für die Nutzer? Es bedeutet mehr Kontrolle und weniger Aufwand. Warum ist Datenschutz so wichtig? Weil Vertrauen das Fundament der digitalen Wirtschaft ist.",
+      "expected_changes": [
+        "Was bedeutet das für die Nutzer?",
+        "Warum ist Datenschutz so wichtig?"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

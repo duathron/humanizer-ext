@@ -1,0 +1,40 @@
+{
+  "pattern_id": 13,
+  "pattern_name": "Passivkonstruktionen und subjektlose Fragmente",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_013_de_001",
+      "input": "Keine Konfigurationsdatei erforderlich. Die Ergebnisse werden automatisch gespeichert.",
+      "expected_changes": [
+        "Keine Konfigurationsdatei erforderlich",
+        "werden automatisch gespeichert"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_013_de_002",
+      "input": "Keine Anmeldung erforderlich. Die Daten werden sicher verschlüsselt und im Hintergrund synchronisiert.",
+      "expected_changes": [
+        "Keine Anmeldung erforderlich",
+        "werden sicher verschlüsselt"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_013_de_003",
+      "input": "Keine Installation notwendig. Die Ergebnisse werden automatisch gespeichert und bei Bedarf exportiert.",
+      "expected_changes": [
+        "Keine Installation notwendig",
+        "werden automatisch gespeichert"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

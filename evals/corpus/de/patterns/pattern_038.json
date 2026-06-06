@@ -1,0 +1,39 @@
+{
+  "pattern_id": 38,
+  "pattern_name": "Reference-Markup Artifacts",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_038_de_001",
+      "input": "Die Bundestagswahl 2021 hing von drei Bundesländern ab turn0search0, mit Margen unter 1 % in jedem davon0. Analysten bezeichneten sie als das knappste Rennen der modernen Geschichte :contentReference[oaicite:2]{index=2}.",
+      "expected_changes": [
+        "turn0search0",
+        ":contentReference[oaicite:2]{index=2}"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_038_de_002",
+      "input": "Den offiziellen Bericht finden Sie unter [Jahresbericht 2024](https://example.com/bericht?utm_source=chatgpt.com).",
+      "expected_changes": [
+        "utm_source=chatgpt.com"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_038_de_003",
+      "input": "Der Wirtschaftsbericht wurde am 15. März veröffentlicht turn0search3 und enthält Daten aus dem Beobachtungszeitraum 2024-xx-xx.",
+      "expected_changes": [
+        "turn0search3",
+        "2024-xx-xx"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

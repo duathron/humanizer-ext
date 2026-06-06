@@ -1,0 +1,42 @@
+{
+  "pattern_id": 4,
+  "pattern_name": "Werbesprache und werbliche Formulierungen",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_004_de_001",
+      "input": "Im Herzen Bayerns liegt diese atemberaubende Stadt mit einem reichen kulturellen Erbe und einer beeindruckenden natürlichen Schönheit, die man unbedingt besucht haben muss.",
+      "expected_changes": [
+        "Im Herzen Bayerns",
+        "atemberaubende Stadt",
+        "unbedingt besucht haben muss"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_004_de_002",
+      "input": "Im Herzen der pulsierenden Metropole liegt dieses einzigartige Restaurant, das mit einem atemberaubenden Ambiente und einer vielfältigen kulinarischen Auswahl begeistert.",
+      "expected_changes": [
+        "Im Herzen der pulsierenden Metropole",
+        "atemberaubenden Ambiente"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_004_de_003",
+      "input": "Entdecken Sie das reiche kulturelle Erbe dieser faszinierenden Region mit ihren beeindruckenden historischen Stätten, die man einfach besucht haben muss.",
+      "expected_changes": [
+        "reiche kulturelle Erbe",
+        "beeindruckenden historischen Stätten",
+        "besucht haben muss"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

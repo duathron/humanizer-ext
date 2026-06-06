@@ -271,6 +271,148 @@ def test_verify_skill_install_missing_installed(tmp_path):
         verify_skill_install(repo_skill_path=repo_skill, installed_skill_path=installed_skill)
 
 
+# ---------------------------------------------------------------------------
+# Bug 1 — parser must strip trailing skill commentary from the rewrite
+# ---------------------------------------------------------------------------
+
+# Verbatim köln example from a live DE eval run
+_KOELN_QUICK_OUTPUT = (
+    "wohnungsmangel und stau kennt köln wie jede andere großstadt. "
+    "wirtschaftlich ist die stadt gut aufgestellt.\n\n"
+    "**changes:** killed the formulaic double-\"trotz\" structure (universal #6). "
+    "cut \"guten Zukunftsaussichten\""
+)
+
+def test_parse_skill_output_quick_mode_strips_trailing_commentary():
+    """Quick-mode output (no Final rewrite header) must not include trailing **changes:** block."""
+    parsed = parse_skill_output(_KOELN_QUICK_OUTPUT)
+    # Commentary block must be gone
+    assert "changes:" not in parsed["final"].lower()
+    assert "Zukunftsaussichten" not in parsed["final"]
+    # The rewrite body must be present
+    assert "wohnungsmangel und stau" in parsed["final"]
+    assert "wirtschaftlich ist die stadt gut aufgestellt" in parsed["final"]
+
+
+def test_parse_skill_output_final_header_strips_trailing_commentary():
+    """**Final rewrite:** block followed by **changes:** — commentary must be stripped."""
+    out = (
+        "**Final rewrite:**\n"
+        "> wohnungsmangel und stau kennt köln wie jede andere großstadt.\n"
+        "> wirtschaftlich ist die stadt gut aufgestellt.\n\n"
+        "**changes:** cut \"guten Zukunftsaussichten\""
+    )
+    parsed = parse_skill_output(out)
+    assert "changes:" not in parsed["final"].lower()
+    assert "Zukunftsaussichten" not in parsed["final"]
+    assert "wirtschaftlich ist die stadt gut aufgestellt" in parsed["final"]
+
+
+def test_parse_skill_output_commentary_mid_sentence_not_truncated():
+    """A rewrite that contains the word 'changes' mid-sentence must NOT be truncated."""
+    # No newline + **heading** before 'changes' → should not be cut
+    out = "Die Anzahl der Änderungen blieb gleich. Das changes nichts an der Lage.\n"
+    parsed = parse_skill_output(out)
+    assert "Das changes nichts an der Lage" in parsed["final"]
+
+
+def test_parse_skill_output_various_commentary_headers_stripped():
+    """All known commentary-header variants should be stripped from Quick-mode output."""
+    variants = [
+        ("**What changed:** removed pivot", "**What changed:**"),
+        ("**Summary:** short", "**Summary:**"),
+        ("**Notes:** some notes here", "**Notes:**"),
+        ("**Rationale:** because reasons", "**Rationale:**"),
+        ("concept-noun check: none found", "concept-noun check"),
+        ("fabrication check: ok", "fabrication check"),
+    ]
+    rewrite_body = "Der Rewrite steht hier.\n"
+    for commentary, label in variants:
+        text = rewrite_body + "\n" + commentary
+        parsed = parse_skill_output(text)
+        assert label.lower() not in parsed["final"].lower(), (
+            f"Commentary header '{label}' leaked into final for variant: {commentary!r}"
+        )
+        assert "Der Rewrite steht hier" in parsed["final"], (
+            f"Rewrite body missing for variant: {commentary!r}"
+        )
+
+
+def test_parse_skill_output_blockquoted_rewrite_strips_commentary():
+    """Blockquote-fallback path must also strip trailing commentary."""
+    messy = (
+        "**Pre-flight:** 3 Tier-1 tells → AI-heavy.\n\n"
+        "> The rewrite goes here.\n\n"
+        "**changes:** removed 'pivotal'\n"
+    )
+    parsed = parse_skill_output(messy)
+    assert "changes:" not in parsed["final"].lower()
+    assert "The rewrite goes here" in parsed["final"]
+
+
+# ---------------------------------------------------------------------------
+# Bug 2 — _PACK_FILES must include DE packs
+# ---------------------------------------------------------------------------
+
+def test_pack_files_includes_de_md():
+    """_PACK_FILES must include patterns/de.md so stale DE packs are caught."""
+    from evals.scripts._shared import _PACK_FILES
+    flat = [item for tup in _PACK_FILES for item in tup]
+    assert "patterns/de.md" in flat, f"patterns/de.md missing from _PACK_FILES: {flat}"
+
+
+def test_pack_files_includes_de_overrides():
+    """_PACK_FILES must include domains/de_overrides.md so stale DE overrides are caught."""
+    from evals.scripts._shared import _PACK_FILES
+    flat = [item for tup in _PACK_FILES for item in tup]
+    assert "domains/de_overrides.md" in flat, (
+        f"domains/de_overrides.md missing from _PACK_FILES: {flat}"
+    )
+
+
+def test_verify_skill_install_detects_stale_de_pack(tmp_path, monkeypatch):
+    """verify_skill_install must raise SkillInstallMismatch when de.md differs."""
+    import hashlib
+    from evals.scripts._shared import verify_skill_install, SkillInstallMismatch, _DEFAULT_INSTALL_ROOT
+
+    # Build a fake install root that mirrors the expected layout
+    install_root = tmp_path / "install"
+    repo_root = tmp_path / "repo"
+    for d in [
+        install_root / "patterns",
+        install_root / "domains",
+        repo_root / "patterns",
+        repo_root / "domains",
+    ]:
+        d.mkdir(parents=True)
+
+    # Matching SKILL.md
+    skill_content = b"SKILL content v3.5.0\n"
+    (install_root / "SKILL.md").write_bytes(skill_content)
+    (repo_root / "SKILL.md").write_bytes(skill_content)
+
+    # Matching EN packs
+    for rel in ("patterns/_universal.md", "patterns/en.md", "domains/en_overrides.md"):
+        content = f"# {rel}\n".encode()
+        (install_root / rel).write_bytes(content)
+        (repo_root / rel).write_bytes(content)
+
+    # Matching de_overrides.md but MISMATCHED de.md
+    (install_root / "domains" / "de_overrides.md").write_bytes(b"# de overrides\n")
+    (repo_root / "domains" / "de_overrides.md").write_bytes(b"# de overrides\n")
+    (repo_root / "patterns" / "de.md").write_bytes(b"# de patterns v2\n")
+    (install_root / "patterns" / "de.md").write_bytes(b"# de patterns v1 (stale)\n")
+
+    # Monkeypatch the module-level _DEFAULT_INSTALL_ROOT so the pack check runs
+    monkeypatch.setattr("evals.scripts._shared._DEFAULT_INSTALL_ROOT", install_root)
+
+    with pytest.raises(SkillInstallMismatch, match="de.md"):
+        verify_skill_install(
+            repo_skill_path=repo_root / "SKILL.md",
+            installed_skill_path=install_root / "SKILL.md",
+        )
+
+
 @patch("evals.scripts.run_pattern_eval.run_skill")
 def test_pattern_eval_scores_detection(mock_run_skill, tmp_path, monkeypatch):
     from evals.scripts.run_pattern_eval import score_case
@@ -354,3 +496,81 @@ def test_e2e_eval_aggregates_three_runs(mock_run_skill, mock_judge):
     assert score["mean"]["length"] == pytest.approx(8.0, abs=0.01)
     assert score["stddev"]["human_ness"] > 0
     assert len(score["runs"]) == 3
+
+
+# ---------------------------------------------------------------------------
+# CHANGE 1 — force_full option in _build_humanizer_prompt and run_skill
+# ---------------------------------------------------------------------------
+
+def test_build_humanizer_prompt_force_full_false_unchanged():
+    """force_full=False (default) produces byte-identical output to previous behaviour."""
+    from evals.scripts._shared import _build_humanizer_prompt
+
+    result_no_flag = _build_humanizer_prompt("Hello world.", lang="en", mode="full", domain="casual", samples_dir=None)
+    result_false = _build_humanizer_prompt("Hello world.", lang="en", mode="full", domain="casual", samples_dir=None, force_full=False)
+    assert result_no_flag == result_false
+
+
+def test_build_humanizer_prompt_force_full_contains_override_directive():
+    """force_full=True appends the override directive on its own line before the text."""
+    from evals.scripts._shared import _build_humanizer_prompt
+
+    result = _build_humanizer_prompt("Hello world.", lang="en", mode="full", domain="casual", samples_dir=None, force_full=True)
+    assert "(Run a full pass" in result
+    assert "do NOT switch to Quick mode" in result
+    assert "explicit user override" in result
+
+
+def test_build_humanizer_prompt_force_full_directive_before_text():
+    """The override directive appears between the command header and the text body."""
+    from evals.scripts._shared import _build_humanizer_prompt
+
+    text = "Some AI-generated prose here."
+    result = _build_humanizer_prompt(text, lang="en", mode="full", domain=None, samples_dir=None, force_full=True)
+    directive_pos = result.index("do NOT switch to Quick mode")
+    text_pos = result.index(text)
+    header_pos = result.index("/humanizer")
+    assert header_pos < directive_pos < text_pos, (
+        "Expected: header ... directive ... text body"
+    )
+
+
+def test_build_humanizer_prompt_force_full_false_has_no_directive():
+    """force_full=False must not insert the override directive anywhere in the prompt."""
+    from evals.scripts._shared import _build_humanizer_prompt
+
+    result = _build_humanizer_prompt("Some text.", lang="en", mode="full", domain=None, samples_dir=None, force_full=False)
+    assert "do NOT switch to Quick mode" not in result
+    assert "explicit user override" not in result
+
+
+@patch("subprocess.run")
+def test_run_skill_force_full_true_injects_directive(mock_run):
+    """run_skill(force_full=True) passes the override directive into the prompt."""
+    from evals.scripts._shared import run_skill
+
+    mock_run.return_value = MagicMock(
+        stdout="**Final rewrite:**\n> Cleaned.\n",
+        stderr="",
+        returncode=0,
+    )
+    run_skill("Some text.", lang="en", mode="full", domain="casual", force_full=True)
+    cmd = mock_run.call_args[0][0]
+    full_prompt = cmd[cmd.index("-p") + 1]
+    assert "do NOT switch to Quick mode" in full_prompt
+
+
+@patch("subprocess.run")
+def test_run_skill_force_full_false_no_directive(mock_run):
+    """run_skill(force_full=False) (default) does NOT inject the override directive."""
+    from evals.scripts._shared import run_skill
+
+    mock_run.return_value = MagicMock(
+        stdout="**Final rewrite:**\n> Cleaned.\n",
+        stderr="",
+        returncode=0,
+    )
+    run_skill("Some text.", lang="en", mode="full", domain="casual", force_full=False)
+    cmd = mock_run.call_args[0][0]
+    full_prompt = cmd[cmd.index("-p") + 1]
+    assert "do NOT switch to Quick mode" not in full_prompt

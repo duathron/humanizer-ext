@@ -1,0 +1,14 @@
+---
+id: wiki_career_emil_franzel
+source_url: "https://de.wikipedia.org/wiki/Emil_Franzel"
+license: "CC-BY-SA-3.0"
+license_class: redistributable
+fetch_date: "2026-05-27"
+metadata:
+  title: Emil Franzel
+  wiki: de.wikipedia
+  domain: career
+  pre_date_cutoff: "2022-11-30T00:00:00Z"
+---
+
+Emil Franzel (* 29. Mai 1901 in Háj u Duchcova Haan bei Dux in Böhmen, Österreich-Ungarn; † 29. Juni 1976) war ein deutscher Historiker, Journalist, Buchautor und sudetendeutscher Politiker. Franzel studierte Geschichte, Germanistik, Geographie und Staatswissenschaften. 1925 erlangte er das Staatsexamen und wurde promoviert. Von 1924 bis 1937 war er freier Schriftsteller, bis 1937 gehörte er der Deutsche sozialdemokratische Arbeiterpartei in der Tschechoslowakischen Republik Deutschen Sozialdemokratischen Arbeiterpartei in der Tschechoslowakei an und publizierte teilweise unter dem Pseudonym Karl von Boeheim. 1936 übernahm er das Prager Volksbildungshaus Urania. Ab 1939 war er im Protektorat Böhmen und Mähren deutsch besetzten Prag Bibliothekar am Böhmischen Landesmuseum und Geschichtslehrer an der Prager Polizeischule. Im Juli 1941 wurde er zur Ordnungspolizei Schutzpolizei-Reserve eingezogen, die der Schutzstaffel SS unterstellt war. Franzel war nach Krieg und Vertreibung der Deutschen aus der Tschechoslowakei u.&nbsp;a. Mitglied der katholischen Ackermann-Gemeinde und ein wichtiger und meinungsgebender Vertreter der sudetendeutschen Nachkriegspublizistik. In seinen historischen Veröffentlichungen blieb er begrifflich auch nach dem Zweiter Weltkrieg Zweiten Weltkrieg in der „Herrenvolk“-Rhetorik verhaftet; so ist etwa in seiner Sudetendeutschen Geschichte von 1958 von einer möglichen „Übereinanderschichtung von Herrenvölkern und Niedervölkern“ in Bezug auf die Geschichte Böhmens#Vor- und Frühgeschichte Vor- und Frühgeschichte Böhmens und Mährens die Rede. Beruflich war er von 1951 bis zur Pensionierung 1963 Mitarbeiter der Bayerische Staatsbibliothek Bayerischen Staatsbibliothek in München. Von 1953 bis 1963 war er Ministerialbeauftragter für das staatliche Büchereiwesen in Bayern. Er war Gründungsmitglied der Sudetendeutsche Landsmannschaft Sudetendeutschen Landsmannschaft und des Sudetendeutscher Rat Sudetendeutschen Rates. 1962 erhielt er den sudetendeutschen Förderpreis. 1968 wurde er mit dem Konrad-Adenauer-Preis der Deutschland-Stiftung ausgezeichnet. Er war seit dem Sommersemester 1951 Mitglied der Katholische Studentenverbindung katholischen Studentenverbindung KBStV Rhaetia München. * König Heinrich VII. von Hohenstaufen. Diss. phil. Prag 1929. * Erik Falkner (Pseudonym): Der letzte Sommer. Roman. Illustrationen G. H. Trapp. Bratislava : Prager, 1934 * Abendländische Revolution : Geist und Schicksal Europas, Bratislava : Prager, 1936 * Geschichte unserer Zeit 1870–1950.

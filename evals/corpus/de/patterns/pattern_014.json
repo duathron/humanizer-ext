@@ -1,0 +1,39 @@
+{
+  "pattern_id": 14,
+  "pattern_name": "Em Dash Overuse and Paired Bracketing",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_014_de_001",
+      "input": "Der Begriff wird vor allem von niederländischen Institutionen gepflegt—nicht von den Menschen selbst. Im Alltag sagt man nicht Niederlande, Europa als Adresse—und doch setzt sich diese Fehlbezeichnung fort—sogar in offiziellen Dokumenten.",
+      "expected_changes": [
+        "gepflegt—nicht von den Menschen selbst",
+        "fort—sogar in offiziellen Dokumenten"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_014_de_002",
+      "input": "Der Bericht—der drei Kontinente und zwölf Fallstudien umfasste—kam zu dem Schluss, dass sich die Nachfrage verschoben hatte.",
+      "expected_changes": [
+        "Bericht—der drei Kontinente und zwölf Fallstudien umfasste—kam"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_014_de_003",
+      "input": "Die Studie—die über drei Jahre und in fünf Ländern durchgeführt wurde—belegt, was viele bereits vermuteten—nämlich dass der Effekt messbar ist.",
+      "expected_changes": [
+        "Studie—die über drei Jahre und in fünf Ländern durchgeführt wurde—belegt",
+        "vermuteten—nämlich dass der Effekt"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

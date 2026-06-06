@@ -1,0 +1,14 @@
+---
+id: wiki_career_hans_von_der_groeben
+source_url: "https://de.wikipedia.org/wiki/Hans_von_der_Groeben"
+license: "CC-BY-SA-3.0"
+license_class: redistributable
+fetch_date: "2026-05-27"
+metadata:
+  title: Hans von der Groeben
+  wiki: de.wikipedia
+  domain: career
+  pre_date_cutoff: "2022-11-30T00:00:00Z"
+---
+
+in Bonn]] Hans Georg Max Joachim von der Groeben (* 14. Mai 1907 in Łankiejmy Langheim, Kreis Rastenburg; † 6. März 2005 in Rheinbach) war ein deutscher Diplomat, Rechtswissenschaftler und Publizist und von 1958 bis 1970 Europäische Kommission EWG-Kommissar. ]] Hans von der Groeben (Adelsgeschlecht) Groeben war der Sohn des Ostpreußen ostpreußischen Gutsbesitzers Georg von der Groeben und dessen Ehefrau Eva Mirbach (Adelsgeschlecht) von Mirbach. Sein älterer Bruder Klaus von der Groeben wurde Verwaltungsjurist. Hans besuchte Gymnasien in Königsberg (Preußen) Königsberg und in der ostpreußischen Stadt Reszel. Nach dem Abitur im Jahr 1925 war er zunächst Praktikant bei Siemens-Schuckertwerke Siemens-Schuckert und studierte dann zwei Semester an der Technische Universität Berlin Technischen Hochschule Charlottenburg Elektrotechnik und Betriebswirtschaft. Schließlich nahm er ein Studium der Rechtswissenschaften und Volkswirtschaftslehre an der Rheinische Friedrich-Wilhelms-Universität Bonn Universität Bonn und der Georg-August-Universität Göttingen Universität Göttingen auf. Während des Studiums wurde er Mitglied der Göttinger Gesellschaft, einer nicht-farbentragenden Studentenverbindung. Nach der großen juristischen Staatsprüfung trat er als Oberregierungsrat 1933 in das Reichsministerium für Ernährung und Landwirtschaft Reichsernährungsministerium ein, wo er 1937 die Leitung des Referats für das Kredit- und Genossenschaftswesen übernahm, zuletzt als Oberregierungsrat. Am 21. Januar 1938 beantragte er die Aufnahme in die Nationalsozialistische Deutsche Arbeiterpartei NSDAP und wurde rückwirkend zum 1. Mai 1937 aufgenommen (Liste von NSDAP-Parteimitgliedsnummern Mitgliedsnummer 7.041.828). 1941 wurde er stellvertretender Kommissar der Reichsregierung bei der Deutsche Rentenbank-Kreditanstalt Deutschen Rentenbank-Kreditanstalt. Von Ende 1939 und von 1942 bis 1945 diente er in der Wehrmacht, zuletzt als Oberleutnant der Reserve. Zugleich arbeitete von der Groeben während des Krieges als Ministerialbeamter im Reichsernährungsministerium, das unter der Leitung von Walther Darré stand. Nach dem Sturz von Darré im Mai 1942 wurde Herbert Backe dessen kommissarischer Nachfolger, woraufhin er von der Groeben absetzte und Fritz-Dietlof von der Schulenburg, ein Mann des aktiven Widerstandes gegen Adolf Hitler, sein Amt übernahm. Noch im Sommer 1942 wurde von der Groeben erneut einberufen und im Herbst des Jahres nach Südfrankreich versetzt; sein letzter Dienstgrad war Oberleutnant der Reserve (Militärwesen) Reserve.

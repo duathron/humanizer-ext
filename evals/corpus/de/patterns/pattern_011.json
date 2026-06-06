@@ -1,0 +1,43 @@
+{
+  "pattern_id": 11,
+  "pattern_name": "Elegante Variation (Synonymrotation)",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_011_de_001",
+      "input": "Die Protagonistin begegnet vielen Herausforderungen. Die Hauptfigur muss Hindernisse überwinden. Die zentrale Gestalt triumphiert schließlich. Die Heldin kehrt nach Hause zurück.",
+      "expected_changes": [
+        "Die Hauptfigur",
+        "Die zentrale Gestalt",
+        "Die Heldin"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_011_de_002",
+      "input": "Der Forscher stellte seine Ergebnisse vor. Der Wissenschaftler betonte die Bedeutung der Methode. Der Akademiker zog weitreichende Schlussfolgerungen. Der Experte forderte weitere Studien.",
+      "expected_changes": [
+        "Der Wissenschaftler",
+        "Der Akademiker",
+        "Der Experte"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_011_de_003",
+      "input": "Das neue System wurde eingeführt. Die Lösung hat viele Vorteile. Der Ansatz vereinfacht Abläufe. Das Framework wird bereits genutzt.",
+      "expected_changes": [
+        "Die Lösung",
+        "Der Ansatz",
+        "Das Framework"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

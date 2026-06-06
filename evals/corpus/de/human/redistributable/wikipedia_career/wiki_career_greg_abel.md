@@ -1,0 +1,14 @@
+---
+id: wiki_career_greg_abel
+source_url: "https://de.wikipedia.org/wiki/Greg_Abel"
+license: "CC-BY-SA-3.0"
+license_class: redistributable
+fetch_date: "2026-05-27"
+metadata:
+  title: Greg Abel
+  wiki: de.wikipedia
+  domain: career
+  pre_date_cutoff: "2022-11-30T00:00:00Z"
+---
+
+Gregory Edward „Greg“ Abel (* 1. Juni 1962 in Edmonton, Alberta) ist ein kanadischer Geschäftsmann, Aufsichtsratsmitglied, und seit 2026 Nachfolger von Warren Buffett als Chief executive officer CEO von Berkshire Hathaway. Abel wurde 1962 in Edmonton, Alberta geboren. In seiner Kindheit ging er Gelegenheitsjobs wie dem Austragen von Werbung und dem Sammeln von Pfandflaschen nach. Er arbeitete zudem für ein Forstunternehmen. Zu seinen Hobbys zählte das Spielen von Hockey und Canadian Football Football. 1984 schloss er ein Bachelor-Studium des Rechnungswesen an der University of Alberta ab. Er ist zudem zertifizierter Wirtschaftsprüfer. Abel begann seine berufliche Laufbahn in San Francisco als Wirtschaftsprüfer in der Niederlassung von PricewaterhouseCoopers. 1992 stieg er beim Geothermie-Unternehmen CalEnergy ein. . 2014 wurde das Unternehmen in Berkshire Hathaway Energy umbenannt. Abel ist zudem Vize-Vorsitzender des Edison Electric Institutes und Mitglied der Unternehmensleitung von AEGIS Limited, Kraft Heinz, Nuclear Electric Insurance Limited, der Hockey Canada Foundation, den Mid-Iowa Council Boy Scouts of America und der American Football Coaches Foundation. Früher war er auch Mitglied des Kuratoriums der Duke University und der Drake University. Im Mai 2021 bestätigte Warren Buffett in einem Interview, dass Abel sein designierter Nachfolger als CEO von Berkshire Hathaway sei. Abels Leistungen bei der Übernahme eines britischen Stromversorgers durch CalEnergy in den 1990ern wird als Anfang seines Aufstiegs bezeichnet. Im Juni 2022 veräußerte Abel seinen einprozentigen Anteil an Berkshire Hathaway Energy in Höhe von 870 Millionen US-Dollar. Im Oktober 2022 erwarb Abel 168 A-Aktien von Berkshire im Wert von ungefähr 68 Millionen US-Dollar. Dies entspricht einem ungefähren Mittelwert von 404.761,90 US-Dollar pro erworbenem Anteil. Laut früheren Anmeldungen hatte Abel zuvor 5 A- und 2.363 B-Aktien erworben. Am 3. Mai 2025 läutete Warren Buffett mit der Aussage „Die Zeit ist gekommen, zu der Greg zum Jahresende der Chief Executive Officer des Unternehmens werden soll“ den Weg für seinen Nachfolger als Vorsitzender von Berkshire Hathaway ein. Associated Press meldete, dass bis dahin nur Buffetts Kinder über diese Bekanntgabe Bescheid wussten. Abel selbst war vorab nicht informiert. 2018 wurde Abel mit dem Horatio Alger Award ausgezeichnet. Kategorie:Berkshire Hathaway Kategorie:Kanadier Kategorie:Geboren 1962 Kategorie:Mann Kategorie:Manager

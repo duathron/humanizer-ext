@@ -1,0 +1,43 @@
+{
+  "pattern_id": 35,
+  "pattern_name": "Entlarvungs-Pose in Überschriften",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_035_de_001",
+      "input": "## Was die Forschung eigentlich sagt ## Die wahre Architektur eines überzeugenden Briefs ## Die Wahrheit über Preismodelle, erklärt",
+      "expected_changes": [
+        "eigentlich sagt",
+        "Die wahre Architektur",
+        "Die Wahrheit über"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_035_de_002",
+      "input": "## Was KI wirklich bedeutet ## Die wahre Kraft der Daten ## Die Wahrheit über Führung, erklärt",
+      "expected_changes": [
+        "wirklich bedeutet",
+        "Die wahre Kraft",
+        "Die Wahrheit über"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_035_de_003",
+      "input": "## Was die Zahlen eigentlich verraten ## Die echte Herausforderung der Digitalisierung ## Der wahre Preis von Bequemlichkeit",
+      "expected_changes": [
+        "eigentlich verraten",
+        "Die echte Herausforderung",
+        "Der wahre Preis"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

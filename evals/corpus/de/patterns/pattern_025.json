@@ -1,0 +1,43 @@
+{
+  "pattern_id": 25,
+  "pattern_name": "Generic Positive Conclusions",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_025_de_001",
+      "input": "Die Zukunft des Unternehmens sieht vielversprechend aus. Spannende Zeiten liegen vor uns, während sie ihre Reise in Richtung Exzellenz fortsetzen. Dies stellt einen bedeutenden Schritt in die richtige Richtung dar.",
+      "expected_changes": [
+        "Die Zukunft des Unternehmens sieht vielversprechend aus",
+        "ihre Reise in Richtung Exzellenz",
+        "einen bedeutenden Schritt in die richtige Richtung"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_025_de_002",
+      "input": "Die Aussichten für das Projekt sind äußerst vielversprechend. Das Team setzt seine Reise in Richtung Erfolg fort. Das ist ein bedeutender Schritt in die richtige Richtung.",
+      "expected_changes": [
+        "äußerst vielversprechend",
+        "Reise in Richtung Erfolg",
+        "bedeutender Schritt in die richtige Richtung"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_025_de_003",
+      "input": "Trotz aller Herausforderungen blickt das Unternehmen optimistisch in die Zukunft. Spannende Zeiten liegen vor uns. Der Weg zur Exzellenz ist geebnet.",
+      "expected_changes": [
+        "optimistisch in die Zukunft",
+        "Spannende Zeiten liegen vor uns",
+        "Weg zur Exzellenz"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

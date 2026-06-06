@@ -1,0 +1,37 @@
+{
+  "pattern_id": 2,
+  "pattern_name": "Übertriebene Betonung von Bekanntheit und Medienberichterstattung",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_002_de_001",
+      "input": "Ihre Ansichten wurden in der Frankfurter Allgemeinen Zeitung, der ARD, der Financial Times und dem Spiegel zitiert. Sie unterhält eine aktive Social-Media-Präsenz mit über 500.000 Followern.",
+      "expected_changes": [
+        "eine aktive Social-Media-Präsenz mit über 500.000 Followern"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "denoise+brittle-fix"
+    },
+    {
+      "id": "pattern_002_de_002",
+      "input": "Er wurde in der Süddeutschen Zeitung, dem Tagesspiegel, dem ZDF und der Zeit zitiert und gilt als Stimme seiner Generation.",
+      "expected_changes": [
+        "in der Süddeutschen Zeitung, dem Tagesspiegel, dem ZDF und der Zeit zitiert"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_002_de_003",
+      "input": "Das Startup hat bereits eine beeindruckende Social-Media-Präsenz mit über 200.000 Followern aufgebaut und wird regelmäßig in führenden Fachmedien erwähnt.",
+      "expected_changes": [
+        "eine beeindruckende Social-Media-Präsenz mit über 200.000 Followern"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

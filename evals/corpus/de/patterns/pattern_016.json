@@ -1,0 +1,43 @@
+{
+  "pattern_id": 16,
+  "pattern_name": "Inline-Header-Aufzählungslisten",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_016_de_001",
+      "input": "- **Benutzererfahrung:** Die Benutzererfahrung wurde durch eine neue Oberfläche erheblich verbessert. - **Leistung:** Die Leistung wurde durch optimierte Algorithmen gesteigert. - **Sicherheit:** Die Sicherheit wurde durch Ende-zu-Ende-Verschlüsselung verstärkt.",
+      "expected_changes": [
+        "**Benutzererfahrung:**",
+        "**Leistung:**",
+        "**Sicherheit:**"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_016_de_002",
+      "input": "- **Kosten:** Die Kosten wurden durch effizientes Ressourcenmanagement gesenkt. - **Zeit:** Die Zeit für die Bearbeitung wurde halbiert. - **Qualität:** Die Qualität der Ergebnisse konnte deutlich verbessert werden.",
+      "expected_changes": [
+        "**Kosten:**",
+        "**Zeit:**",
+        "**Qualität:**"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_016_de_003",
+      "input": "- **Planung:** Die Planung erfolgt in enger Abstimmung mit dem Team. - **Durchführung:** Die Durchführung wird von erfahrenen Fachkräften begleitet. - **Auswertung:** Die Auswertung liefert verwertbare Erkenntnisse.",
+      "expected_changes": [
+        "**Planung:**",
+        "**Durchführung:**",
+        "**Auswertung:**"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

@@ -3,6 +3,7 @@ import pytest
 
 from evals.scripts.regex_scorer import (
     PATTERNS_BY_LANG,
+    PATTERNS_DE,
     PATTERNS_EN,
     THRESHOLD_PATTERNS,
     UNIVERSAL_MECHANICS_KEYS,
@@ -317,3 +318,123 @@ def test_new_patterns_registered_in_dimension_map_or_extensions_section():
     ]
     for k in new_keys:
         assert k in PATTERNS_EN, f"new key {k} not registered in PATTERNS_EN"
+
+
+# ---------------------------------------------------------------------------
+# DE language pack — catalogue + registry
+# ---------------------------------------------------------------------------
+
+def test_patterns_de_registered():
+    assert "de" in PATTERNS_BY_LANG
+    assert PATTERNS_BY_LANG["de"] is PATTERNS_DE
+
+
+def test_get_patterns_returns_de_pack():
+    assert get_patterns("de") is PATTERNS_DE
+
+
+def test_universal_mechanics_keys_present_in_de():
+    for key in UNIVERSAL_MECHANICS_KEYS:
+        assert key in PATTERNS_DE, f"universal mechanic {key} missing from PATTERNS_DE"
+
+
+def test_threshold_patterns_reference_real_patterns():
+    """Every THRESHOLD_PATTERNS key must exist in at least one registered pack."""
+    all_keys = set()
+    for pack in PATTERNS_BY_LANG.values():
+        all_keys.update(pack.keys())
+    for key in THRESHOLD_PATTERNS:
+        assert key in all_keys, f"threshold for unknown pattern {key}"
+
+
+# --- DE pattern firing tests ------------------------------------------------
+
+def test_de_significance_inflation_fires():
+    text = "Diese Initiative spielt eine entscheidende Rolle in der Entwicklung."
+    hits = scan(text, lang="de")
+    assert hits["de_significance_inflation"] >= 1
+
+
+def test_de_puffery_fires():
+    text = "Unsere Lösung verfügt über nahtlose und bahnbrechende Funktionen."
+    hits = scan(text, lang="de")
+    assert hits["de_puffery"] >= 2
+
+
+def test_de_vague_attribution_fires():
+    text = "Laut Experten und Branchenberichten hat die Entwicklung weitreichende Folgen."
+    hits = scan(text, lang="de")
+    assert hits["de_vague_attribution"] >= 1
+
+
+def test_de_ai_vocab_fires():
+    text = "Darüber hinaus bietet die ganzheitliche Lösung eine nachhaltige Grundlage."
+    hits = scan(text, lang="de")
+    assert hits["de_ai_vocab"] >= 2
+
+
+def test_de_copula_avoidance_fires():
+    text = "Die Bibliothek fungiert als zentraler Anlaufpunkt und gilt als kulturelles Herz."
+    hits = scan(text, lang="de")
+    assert hits["de_copula_avoidance"] >= 2
+
+
+def test_de_sycophancy_fires():
+    text = "Natürlich! Das ist eine sehr gute Frage. Vielen Dank für Ihre Frage!"
+    hits = scan(text, lang="de")
+    assert hits["de_sycophancy"] >= 2
+
+
+def test_de_filler_fires():
+    text = "Es ist wichtig zu beachten, dass die Daten das belegen. Ich hoffe, das hilft."
+    hits = scan(text, lang="de")
+    assert hits["de_filler"] >= 2
+
+
+def test_de_signposting_fires():
+    text = "Lassen Sie uns eintauchen, wie das System funktioniert."
+    hits = scan(text, lang="de")
+    assert hits["de_signposting"] >= 1
+
+
+def test_de_sentence_opener_intensifier_fires():
+    text = "Letztendlich, zählt vor allem die Umsetzung.\nTatsächlich, bestätigen die Daten das."
+    hits = scan(text, lang="de")
+    assert hits["de_sentence_opener_intensifier"] >= 2
+
+
+def test_de_quantity_vagueness_fires():
+    text = "Eine breite Palette von Faktoren trug zum Ergebnis bei. Zahlreiche Studien bestätigen das."
+    hits = scan(text, lang="de")
+    assert hits["de_quantity_vagueness"] >= 2
+
+
+def test_de_academic_frame_fires():
+    text = "Im Rahmen der vorliegenden Arbeit wird die Implementierung evaluiert."
+    hits = scan(text, lang="de")
+    assert hits["de_academic_frame"] >= 1
+
+
+def test_de_impersonal_reflexive_fires():
+    text = "Es lässt sich feststellen, dass die Ergebnisse positiv sind. Zusammenfassend lässt sich sagen, dass das System funktioniert."
+    hits = scan(text, lang="de")
+    assert hits["de_impersonal_reflexive"] >= 2
+
+
+def test_de_denglisch_fires():
+    text = "Wir alignen unsere Stakeholder, um Pain Points zu adressieren und Insights zu liefern."
+    hits = scan(text, lang="de")
+    assert hits["de_denglisch"] >= 2
+
+
+def test_de_clean_prose_no_lang_specific_hits():
+    """Clean, natural German prose should produce zero DE lang-specific hits."""
+    text = (
+        "Ich verbrachte den Morgen damit, mein Fahrrad zu reparieren. "
+        "Die Kette war gerissen, was mich eine Stunde kostete. "
+        "Danach fuhr ich zum Markt und kaufte Gemüse für das Abendessen."
+    )
+    hits = scan(text, lang="de")
+    lang_specific_keys = [k for k in PATTERNS_DE if k not in UNIVERSAL_MECHANICS_KEYS]
+    total_lang_specific = sum(hits.get(k, 0) for k in lang_specific_keys)
+    assert total_lang_specific == 0, f"False positives on clean German: {hits}"

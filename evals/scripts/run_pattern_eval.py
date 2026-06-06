@@ -9,12 +9,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from collections import defaultdict
 from pathlib import Path
 
 from evals.scripts._shared import (
     Case,
+    SkillRunError,
     load_pattern_corpus,
     run_skill,
     verify_skill_install,
@@ -26,20 +28,31 @@ DEFAULT_THRESHOLD = 0.85
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
-def score_case(case: Case, *, model: str = "sonnet") -> dict:
+def score_case(case: Case, *, model: str = "sonnet", force_full: bool = False) -> dict:
     """Run one case through the skill and report which expected_changes survived.
 
     Three case categories:
       - `true_negative=True`: skill should leave the input ~unchanged. Scored
         by edit-distance ratio against input; passes if ratio ≤ 0.10. Reported
-        separately from detection rate.
+        separately from detection rate. Always uses the real pre-flight (never
+        forces full) so over-edit restraint is tested accurately.
       - `expected_changes` empty AND not true_negative: unscorable; surfaces a
         corpus gap (case author forgot to populate).
       - `expected_changes` populated: scorable. `detected=True` iff every
-        present-in-input term is absent from rewrite.
+        present-in-input term is absent from rewrite. When ``force_full=True``,
+        the override directive is passed to run_skill so the Tier-1 density
+        pre-flight quick-drop cannot mask a detection miss.
+
+    The returned dict for scorable cases includes three additional keys:
+      - ``terms_present``: count of expected_changes terms found in the input
+      - ``terms_removed``: count of those terms absent from the rewrite
+      - ``preflight``: raw preflight string from the skill response
+    These power the per-term removal rate metric in ``run()``.
     """
     if case.true_negative:
-        # Pre-flight: skill should leave human-like input mostly intact.
+        # True-negative: skill should leave human-like input mostly intact.
+        # Always keep force_full=False here — these cases test over-edit restraint
+        # with the real pre-flight, not detection capability.
         from rapidfuzz.distance import Levenshtein
         result = run_skill(
             case.input,
@@ -47,6 +60,7 @@ def score_case(case: Case, *, model: str = "sonnet") -> dict:
             mode="full",
             domain=case.domain,
             model=model,
+            force_full=False,
         )
         rewritten = result.get("final") or result.get("draft") or ""
         edit_distance = Levenshtein.distance(case.input, rewritten)
@@ -95,6 +109,7 @@ def score_case(case: Case, *, model: str = "sonnet") -> dict:
         mode="full",
         domain=case.domain,
         model=model,
+        force_full=force_full,
     )
     rewritten = (result.get("final") or result.get("draft") or "").lower()
 
@@ -115,15 +130,28 @@ def score_case(case: Case, *, model: str = "sonnet") -> dict:
         "removed_terms": removed,
         "retained_terms": retained,
         "rewrite_preview": rewritten[:200],
+        "terms_present": len(present_in_input),
+        "terms_removed": len(removed),
+        "preflight": result.get("preflight", ""),
     }
 
 
 PARTIALS_SUBDIR = "_partial"
 
 
-def _partial_path(lang: str, case_id: str) -> Path:
-    """Per-case intermediate report path. Allows resume across sessions."""
-    return REPO_ROOT / "evals" / "reports" / PARTIALS_SUBDIR / f"pattern_{lang}_{case_id}.json"
+def _partial_path(lang: str, case_id: str, *, _partial_dir: Path | None = None) -> Path:
+    """Per-case intermediate report path. Allows resume across sessions.
+
+    ``_partial_dir`` overrides the default location; used by tests to avoid
+    writing into the real evals/reports/_partial/ directory.
+    """
+    base_dir = _partial_dir if _partial_dir is not None else REPO_ROOT / "evals" / "reports" / PARTIALS_SUBDIR
+    return base_dir / f"pattern_{lang}_{case_id}.json"
+
+
+def _is_session_limit_error(exc: SkillRunError) -> bool:
+    """Return True when the error message indicates a Pro-plan session limit."""
+    return "session limit" in str(exc).lower()
 
 
 def run(
@@ -133,27 +161,46 @@ def run(
     threshold: float = DEFAULT_THRESHOLD,
     force: bool = False,
     aggregate_only: bool = False,
+    *,
+    _corpus_dir_override: Path | None = None,
+    _partial_dir_override: Path | None = None,
 ) -> dict:
     """Run pattern eval. Idempotent across sessions: each case's score is
     written to evals/reports/_partial/pattern_<lang>_<case_id>.json immediately
     after scoring. Re-running picks up cached partials and only scores missing
     cases — handles claude CLI subscription session-limit interruptions
     without re-burning quota on already-completed cases.
+
+    Per-item error isolation: a single ``subprocess.TimeoutExpired`` or
+    non-session-limit ``SkillRunError`` is recorded in ``summary['failed']``
+    and the loop continues.  A session-limit error breaks the loop immediately
+    (every subsequent call would also fail) and sets
+    ``summary['session_limit_hit'] = True``.  Both failure kinds leave
+    ``summary['is_complete'] = False`` so the run is resumable.
     """
     if not aggregate_only:
         verify_skill_install()
-    corpus_dir = REPO_ROOT / "evals" / "corpus" / lang / "patterns"
+    if _corpus_dir_override is not None:
+        corpus_dir = _corpus_dir_override
+    else:
+        corpus_dir = REPO_ROOT / "evals" / "corpus" / lang / "patterns"
     cases = load_pattern_corpus(corpus_dir)
     if pattern is not None:
         cases = [c for c in cases if c.metadata.get("pattern_id") == pattern]
 
-    partial_dir = _partial_path(lang, "_").parent
+    if _partial_dir_override is not None:
+        partial_dir = _partial_dir_override
+    else:
+        partial_dir = REPO_ROOT / "evals" / "reports" / PARTIALS_SUBDIR
     partial_dir.mkdir(parents=True, exist_ok=True)
 
     by_pattern: dict[int, list[dict]] = defaultdict(list)
-    skipped_no_partial = []
+    skipped_no_partial: list[str] = []
+    failed: list[dict] = []
+    session_limit_hit = False
+
     for case in cases:
-        partial = _partial_path(lang, case.id)
+        partial = _partial_path(lang, case.id, _partial_dir=partial_dir)
         if partial.exists() and not force:
             score = json.loads(partial.read_text(encoding="utf-8"))
             by_pattern[score["pattern_id"]].append(score)
@@ -162,7 +209,22 @@ def run(
             skipped_no_partial.append(case.id)
             continue
 
-        score = score_case(case, model=model)
+        try:
+            score = score_case(case, model=model, force_full=True)
+        except SkillRunError as exc:
+            if _is_session_limit_error(exc):
+                print(
+                    f"Session limit hit on case {case.id} — stopping; "
+                    "re-run after reset to resume from partials."
+                )
+                session_limit_hit = True
+                break
+            failed.append({"case_id": case.id, "error": str(exc)[:300]})
+            continue
+        except subprocess.TimeoutExpired as exc:
+            failed.append({"case_id": case.id, "error": f"timeout after {exc.timeout}s"})
+            continue
+
         partial.write_text(json.dumps(score, indent=2, ensure_ascii=False) + "\n")
         by_pattern[score["pattern_id"]].append(score)
 
@@ -198,6 +260,27 @@ def run(
         sum(s["detected"] for s in all_scorable) / len(all_scorable)
     ) if all_scorable else 0.0
     total_unscorable = sum(p["unscorable"] for p in per_pattern_summary)
+    is_complete = (
+        not skipped_no_partial and not failed and not session_limit_hit
+    )
+
+    # Per-term removal rate: de-deflated companion to the all-or-nothing
+    # overall_detection_rate. Counts individual terms removed vs. present
+    # across all scored cases. Old partials lacking the new keys are excluded
+    # from both numerator and denominator (not inferred) to avoid silent bias.
+    total_terms_present = sum(
+        s.get("terms_present", 0) for s in all_scorable
+        if "terms_present" in s
+    )
+    total_terms_removed = sum(
+        s.get("terms_removed", 0) for s in all_scorable
+        if "terms_present" in s  # only include when both keys came from same scored run
+    )
+    per_term_removal_rate = (
+        round(total_terms_removed / total_terms_present, 3)
+        if total_terms_present > 0
+        else 0.0
+    )
 
     return {
         "eval_type": "pattern",
@@ -206,6 +289,8 @@ def run(
         "threshold": threshold,
         "summary": {
             "overall_detection_rate": round(overall, 3),
+            "per_term_removal_rate": per_term_removal_rate,
+            "forced_full": True,
             "patterns_below_threshold": sum(
                 1 for p in per_pattern_summary if p["below_threshold"]
             ),
@@ -213,6 +298,9 @@ def run(
             "total_cases": sum(p["total"] for p in per_pattern_summary),
             "unscorable_cases": total_unscorable,
             "skipped_no_partial": skipped_no_partial,
+            "failed": failed,
+            "session_limit_hit": session_limit_hit,
+            "is_complete": is_complete,
         },
         "per_pattern": per_pattern_summary,
     }
@@ -253,13 +341,30 @@ def main() -> None:
         f"Overall detection rate: {report['summary']['overall_detection_rate']} "
         f"({report['summary']['patterns_below_threshold']}/{report['summary']['total_patterns']} below {args.threshold})"
     )
+    print(
+        f"Per-term removal rate: {report['summary'].get('per_term_removal_rate', 'n/a')} "
+        f"(de-deflated; forced_full={report['summary'].get('forced_full', False)})"
+    )
     if report["summary"].get("skipped_no_partial"):
         print(
             f"Skipped (no partial yet): {len(report['summary']['skipped_no_partial'])} cases — "
             f"re-run without --aggregate-only after next session reset."
         )
-    is_complete = not report["summary"].get("skipped_no_partial")
-    sys.exit(1 if is_complete and report["summary"]["patterns_below_threshold"] > 0 else 0)
+    if report["summary"].get("failed"):
+        print(
+            f"Per-item failures ({len(report['summary']['failed'])} cases — will retry on re-run): "
+            + ", ".join(f["case_id"] for f in report["summary"]["failed"])
+        )
+    if report["summary"].get("session_limit_hit"):
+        print(
+            "Session limit hit — stopping; re-run after reset to resume from partials."
+        )
+    is_complete = report["summary"].get("is_complete", True)
+    # Non-zero exit when: run is incomplete (any failures / session limit) OR
+    # run is complete but patterns fell below the detection threshold.
+    if not is_complete:
+        sys.exit(1)
+    sys.exit(1 if report["summary"]["patterns_below_threshold"] > 0 else 0)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,43 @@
+{
+  "pattern_id": 102,
+  "pattern_name": "Konjunktiv-II-Stacking (\"würde / wäre / hätte ...\")",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_102_de_001",
+      "input": "Im Hinblick auf die digitale Transformation wäre es zielführend, wenn Unternehmen ihre Prozesse evaluieren würden, sodass sie moderne Praktiken implementieren könnten.",
+      "expected_changes": [
+        "wäre es zielführend",
+        "evaluieren würden",
+        "implementieren könnten"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_102_de_002",
+      "input": "Es wäre ratsam, wenn Organisationen ihre internen Strukturen überprüfen würden, damit sie effizienter werden könnten und ressourcenschonender agieren dürften.",
+      "expected_changes": [
+        "wäre ratsam",
+        "überprüfen würden",
+        "effizienter werden könnten"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_102_de_003",
+      "input": "Für eine nachhaltige Entwicklung wäre es sinnvoll, wenn die beteiligten Akteure enger zusammenarbeiten würden, sodass Synergien entstehen könnten.",
+      "expected_changes": [
+        "wäre es sinnvoll",
+        "zusammenarbeiten würden",
+        "Synergien entstehen könnten"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

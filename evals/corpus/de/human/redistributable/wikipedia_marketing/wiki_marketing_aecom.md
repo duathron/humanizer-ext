@@ -1,0 +1,14 @@
+---
+id: wiki_marketing_aecom
+source_url: "https://de.wikipedia.org/wiki/AECOM"
+license: "CC-BY-SA-3.0"
+license_class: redistributable
+fetch_date: "2026-05-27"
+metadata:
+  title: AECOM
+  wiki: de.wikipedia
+  domain: marketing
+  pre_date_cutoff: "2022-11-30T00:00:00Z"
+---
+
+AECOM (englische Aussprache: /eɪ.iːˈkɒm, US dict: ā·ē·kŏm) ist ein Anbieter technischer Dienste und Unterstützungsleistungen für Unternehmensführungen. Der Name AECOM ist ein Akronym für die Fachgebiete Architecture, Engineering, Consulting, Operations und Maintenance. AECOM entstand 1990 durch Fusion von mehreren ehemaligen Tochterunternehmen der Ashland Inc. Ashland Oil & Refinering in Lexington, Kentucky. Seit Mai 2007 ist AECOM an der New York Stock Exchange notiert. Im Oktober 2010 fusionierte AECOM mit dem internationalen Beratungsunternehmen für Arbeitsplatzstrategieentwicklung DEGW und ist seit Oktober 2012 als AECOM Deutschland GmbH am deutschen Markt präsent. 2014 wurde die URS Corporation für 6 Mrd. Dollar übernommen. AECOM und URS haben zusammen etwa 100.000 Mitarbeiter, davon ca. 350 in Deutschland. Seit 2010 gehört das Bauunternehmen Tishman Construction zu AECOM. In der Fortune 500-Liste der größten amerikanischen Unternehmen steht AECOM im Jahr 2024 auf Rang 291. Durch verschiedene Fusionen und Übernahmen von Ingenieurs-, Design-, Bau-, Beratungs-, Planungs- und Umweltunternehmen sowie technologische Weiterentwicklungen wuchs AECOM in den Bereichen Chemie, Petrochemie, Straßen- und Hochbau, Architektur, Design, Engineering und Beratung. Das Unternehmen berichtet in den Segmenten Professional Technical Services, das 2013 etwa 90 % des Umsatzes erwirtschaftete, und Management Support Services mit etwa 10 % des Umsatzes. Schwerpunkte der Geschäftstätigkeit liegen in den Regionen Amerika, Asien-Pazifik und Mittlerer Osten. Etwa 5 % der Mitarbeiter arbeiten in rund 80 Niederlassungen in Europa. In Deutschland ist AECOM mit etwa 350 Mitarbeitern auf arbeitsplatzbezogene Dienstleistungen, beispielsweise Gestaltung von Arbeitsräumen und Umzüge, spezialisiert. Laut Geschäftsbericht 2013 wurden etwa 18 % der Umsätze im Auftrag von US-Regierungsbehörden erwirtschaftet, darunter Verteidigungsministerium der Vereinigten Staaten Verteidigungsministerium, Energieministerium der Vereinigten Staaten Energieministerium, Justizministerium der Vereinigten Staaten Justizministerium und Ministerium für Innere Sicherheit der Vereinigten Staaten Ministerium für Innere Sicherheit. Insgesamt werden etwa 60 % der Umsätze für öffentliche Auftraggeber, darunter lokale und bundesstaatliche US-Behörden sowie ausländische Behörden, erbracht, etwa 40 % für Private Auftraggeber, darunter internationale Konzerne.

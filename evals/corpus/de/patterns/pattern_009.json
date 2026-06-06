@@ -1,0 +1,38 @@
+{
+  "pattern_id": 9,
+  "pattern_name": "Negative Parallelismen, angehängte Verneinungen und \"Statt\"-Abweisung",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_009_de_001",
+      "input": "Es geht nicht nur um wirtschaftliche Faktoren, sondern auch um kulturelle und soziale Dimensionen. Es ist nicht lediglich eine Studie, es ist eine Aussage.",
+      "expected_changes": [
+        "nicht nur um wirtschaftliche Faktoren, sondern auch um",
+        "nicht lediglich eine Studie, es ist eine Aussage"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_009_de_002",
+      "input": "Die Optionen stammen aus dem ausgewählten Element, kein Rätselraten.",
+      "expected_changes": [
+        "kein Rätselraten"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_009_de_003",
+      "input": "Das Ziel ist, klar zu schreiben, statt den Leser mit Komplexität zu beeindrucken.",
+      "expected_changes": [
+        "statt den Leser mit Komplexität zu beeindrucken"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    }
+  ]
+}

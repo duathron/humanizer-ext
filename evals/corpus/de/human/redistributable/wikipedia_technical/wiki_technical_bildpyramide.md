@@ -1,0 +1,14 @@
+---
+id: wiki_technical_bildpyramide
+source_url: "https://de.wikipedia.org/wiki/Bildpyramide"
+license: "CC-BY-SA-3.0"
+license_class: redistributable
+fetch_date: "2026-05-27"
+metadata:
+  title: Bildpyramide
+  wiki: de.wikipedia
+  domain: technical
+  pre_date_cutoff: "2022-11-30T00:00:00Z"
+---
+
+Eine Bildpyramide ist eine Form mehrskaliger Signaldarstellung, entwickelt in Bereichen des Maschinelles Sehen Maschinellen Sehens (engl. „computer vision“), Bildverarbeitung und Signalverarbeitung, in denen auf ein Signal oder Bild mehrmalig Glätten (Mathematik) Glättung und Downsampling angewendet wird. Die Pyramiden-Darstellung ist eine Vorstufe zur Scale-Space-Darstellung (Skalenraum-Darstellung) und Multiskalenanalyse. Es gibt zwei Arten von Bildpyramiden: Tiefpass und Bandpass. Eine Tiefpass-Pyramide entsteht durch Glätten des Bildes mit einem entsprechenden Glättungs-Filter und dem darauf folgenden Downsampling des geglätteten Bildes, meistens durch einen Faktor zwei entlang jeder Koordinatenachse. Auf das resultierende Bild wird dann dieselbe Prozedur angewendet und dieser Zyklus mehrere Male wiederholt. Jeder Zyklus dieses Prozesses erzeugt ein kleineres Bild mit höherer Glättung, aber geringerer Abtastdichte (daher geringerer Bildauflösung). Bildlich dargestellt, sieht die gesamte, mehrskalige Darstellung wie eine Pyramide aus, mit dem Originalbild als Basis, auf der die aus jeden Zyklus resultierenden, schmaler werdenden Bilder aufeinander gestapelt werden. Eine Bandpass-Pyramide wird erzeugt, indem zwischen benachbarten Auflösungs-Ebenen der Pyramide die Abweichungen erfasst und eine Art der Bildinterpolation angewendet wird, um pixelweise die Differenzen zu errechnen. Für die Erstellung von Pyramiden wird eine Vielzahl an Faltungsmatrix Faltungsmatrizen vorgeschlagen. Unter den Vorschlägen stechen Binomial-Faltungsmatrizen, die aus Binomialkoeffizienten entstehen, als besonders nützliche und theoretisch gut fundierte Klasse hervor. Dabei wird in einem zweidimensionalen Bild der (normalisierte) Binomialfilter (1/4, 1/2, 1/4) typischerweise zweimal oder entlang jeder räumlichen Dimension angewendet und dann ein Downsampling des Bildes mit dem Faktor zwei vorgenommen. Diese Operation wird so oft wie gewünscht durchgeführt, was zu einer kompakten und effizienten multiskaligen Darstellung führt. Wenn für bestimmte Anforderungen benötigt, können Zwischen-Skalierungsebenen generiert werden, wobei der Downsampling-Schritt manchmal ausgelassen wird, was zu einer Oversampled- oder Hybridpyramide führt. Mit der wachsenden Recheneffizienz von heute verfügbaren Prozessoren ist es in manchen Situationen auch möglich, bei der Erstellung der Pyramidenstufen weiter verbreitete Gauß-Filter als Faltungsmatrix für die Glättung zu verwenden. In einer Gauß-Pyramide werden aufeinander folgende Bilder durch den Mittelwert der Gauß-Verteilung (Gaußscher Weichzeichner) heruntergewichtet und dann herunterskaliert.

@@ -1,0 +1,40 @@
+{
+  "pattern_id": 27,
+  "pattern_name": "Überzeugende Autoritäts-Tropen",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_027_de_001",
+      "input": "Die eigentliche Frage ist, ob Teams sich anpassen können. Im Kern geht es wirklich darum, ob die Organisation bereit ist.",
+      "expected_changes": [
+        "Die eigentliche Frage ist",
+        "Im Kern geht es wirklich darum"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_027_de_002",
+      "input": "Im Kern geht es wirklich darum, ob wir bereit sind, alte Strukturen aufzugeben. Das tiefere Problem ist nicht die Technik, sondern der Wandel.",
+      "expected_changes": [
+        "Im Kern geht es wirklich darum",
+        "Das tiefere Problem ist"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_027_de_003",
+      "input": "Die eigentliche Frage ist nicht, wie viel Geld investiert wird, sondern ob der Wille zur Veränderung vorhanden ist. Was wirklich zählt, ist die langfristige Perspektive.",
+      "expected_changes": [
+        "Die eigentliche Frage ist",
+        "Was wirklich zählt"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

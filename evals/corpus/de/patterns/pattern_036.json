@@ -1,0 +1,40 @@
+{
+  "pattern_id": 36,
+  "pattern_name": "Gestapelte Konditionalkonstruktionen",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_036_de_001",
+      "input": "Wenn das Argument stimmt, und wenn die Evidenz diese Lesart stützt, dann könnte die Politik eine gewisse Wirkung gehabt haben — wenn, das sei hinzugefügt, der Kontext so war wie beschrieben.",
+      "expected_changes": [
+        "Wenn das Argument stimmt, und wenn die Evidenz diese Lesart stützt",
+        "wenn, das sei hinzugefügt, der Kontext so war wie beschrieben"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_036_de_002",
+      "input": "Wenn die Methode valide ist, und wenn die Stichprobe repräsentativ war, dann lässt sich das Ergebnis verallgemeinern — wenn, wie angenommen, die Daten korrekt erhoben wurden.",
+      "expected_changes": [
+        "Wenn die Methode valide ist, und wenn die Stichprobe repräsentativ war",
+        "wenn, wie angenommen, die Daten korrekt erhoben wurden"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_036_de_003",
+      "input": "Wenn das Modell stimmt und wenn die Rahmenbedingungen konstant bleiben, könnte die Prognose zutreffen — wenn der Kontext unverändert ist.",
+      "expected_changes": [
+        "Wenn das Modell stimmt und wenn die Rahmenbedingungen konstant bleiben",
+        "wenn der Kontext unverändert ist"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

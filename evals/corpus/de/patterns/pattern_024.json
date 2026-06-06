@@ -1,0 +1,41 @@
+{
+  "pattern_id": 24,
+  "pattern_name": "Übermäßige Absicherung",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_024_de_001",
+      "input": "Es könnte möglicherweise argumentiert werden, dass die Politik einen gewissen Einfluss auf die Ergebnisse haben könnte.",
+      "expected_changes": [
+        "Es könnte möglicherweise argumentiert werden",
+        "einen gewissen Einfluss",
+        "haben könnte"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_024_de_002",
+      "input": "Es ließe sich möglicherweise argumentieren, dass der Ansatz gewisse Vorteile haben könnte, wobei dies natürlich von den jeweiligen Umständen abhängen dürfte.",
+      "expected_changes": [
+        "Es ließe sich möglicherweise argumentieren",
+        "gewisse Vorteile haben könnte"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_024_de_003",
+      "input": "Die Maßnahme könnte unter Umständen möglicherweise einen bescheidenen positiven Effekt haben, sofern die Rahmenbedingungen einigermaßen stimmen könnten.",
+      "expected_changes": [
+        "könnte unter Umständen möglicherweise",
+        "bescheidenen positiven Effekt haben"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

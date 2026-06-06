@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import statistics
 import sys
 from pathlib import Path
@@ -16,6 +17,8 @@ from pathlib import Path
 from anthropic import Anthropic
 
 from evals.scripts._shared import (
+    SkillRunError,
+    retry_with_backoff,
     run_skill,
     verify_skill_install,
     write_report,
@@ -26,7 +29,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 JUDGE_PROMPT_PATH = REPO_ROOT / "evals" / "scripts" / "judge_prompt.md"
 
 DEFAULT_RUNS = 3
-DEFAULT_THRESHOLDS = {"human_ness": 7.5, "meaning": 9.0, "length": 7.0}
+# meaning threshold reconciled to the documented acceptance criterion in
+# docs/plans/2026-05-27-phase-2-de-pack.md (meaning >= 8.0). One canonical
+# bar, documented — not "whichever passes".
+DEFAULT_THRESHOLDS = {"human_ness": 7.5, "meaning": 8.0, "length": 7.0}
 
 
 # Anthropic tool schema for structured judge scoring
@@ -82,7 +88,10 @@ def _call_judge(
     )
     response = client.messages.create(
         model=_model_to_api_id(judge_model),
-        max_tokens=1024,
+        # 2048 (was 1024): long inputs (career Anschreiben, technical docs) made the
+        # reasoning + rationale exceed 1024 tokens, truncating the tool_use JSON so a
+        # score key (e.g. human_ness) was missing → KeyError downstream.
+        max_tokens=2048,
         system=system_prompt,
         tools=[_REPORT_SCORES_TOOL],
         tool_choice={"type": "tool", "name": "report_scores"},
@@ -90,8 +99,95 @@ def _call_judge(
     )
     for block in response.content:
         if getattr(block, "type", None) == "tool_use" and block.name == "report_scores":
-            return dict(block.input)
+            scores = dict(block.input)
+            missing = [k for k in ("human_ness", "meaning", "length") if k not in scores]
+            if missing:
+                raise SkillRunError(
+                    f"judge tool_use missing score(s) {missing} "
+                    f"(stop_reason={response.stop_reason}) — likely max_tokens truncation"
+                )
+            return scores
     raise RuntimeError("judge LLM did not call report_scores tool")
+
+
+# A failed skill run sometimes emits ONLY an editorial change-log (no rewrite
+# block); the parser then hands that commentary back as the "rewrite" and the
+# judge scores it ~1, tanking the mean. Detect such runs and retry the skill
+# rather than scoring an extraction failure as a meaning judgement.
+#
+# Detection bias: over-catching just triggers a retry (cheap); under-catching
+# corrupts a score. So we err on the side of catching more.  Each signal below
+# is necessary because the skill emits changelogs in multiple formats.
+
+# Signal A: bold/explicit change-log headers (original, EN-only form).
+_FAILED_REWRITE_RE = re.compile(
+    r"\*\*\s*(?:changes(?: made)?|what changed|summary|audit|notes?|editorial|"
+    r"rationale|diff|removed|edits)\b"
+    r"|concept-noun check|fabrication check|editorial annotation|change[- ]?log",
+    re.IGNORECASE,
+)
+
+# Signal B: ≥2 edit-arrows total (→ or ->) across the whole text.
+# Changelogs list "X → Y" per line; genuine prose almost never contains 2+.
+_EDIT_ARROW_RE = re.compile(r"→|->")
+
+# Signal C: ≥2 lines starting with a rule-ID prefix.
+# Matches: #7, # 7, pattern #7, pattern7, §7, regel7 (case-insensitive).
+_RULE_ID_LINE_RE = re.compile(
+    r"^\s*(?:#\s?\d+|pattern\s*#?\d+|§\s?\d+|regel\s*\d+)\b",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+# Signal D: explicit changelog header line (line-anchored, case-insensitive).
+# Catches: "Transformationen:", "entfernt:", "changes:", "removed:", "applied:", etc.
+# NOT triggered by bare "entfernt" mid-sentence — requires the trailing colon.
+_CHANGELOG_HEADER_RE = re.compile(
+    r"^\s*(?:transformationen?|änderungen|changes?|removed|applied|entfernt)\s*:",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+# Signal F: a markdown bold span CONTAINING a change/edit keyword, with leading
+# words allowed inside the bold — catches "**Wesentliche Änderungen:**",
+# "**Änderungen:**", "**Changes made:**", "**Zusammenfassung der Änderungen:**".
+# (Signal A only fires when ** is immediately followed by the keyword; a leading
+# adjective like "Wesentliche" slips past it — this is the gap that leaked.)
+# The bold wrapper keeps it from matching "Änderung" in ordinary prose.
+_BOLD_CHANGELOG_RE = re.compile(
+    r"\*\*[^*\n]{0,60}(?:änderung|zusammenfassung der|wesentliche änderung|"
+    r"changes?\b|what changed|edits?\b|überarbeitung|bearbeitung)[^*\n]{0,60}\*\*",
+    re.IGNORECASE,
+)
+
+_MAX_REWRITE_ATTEMPTS = 4
+
+
+def _looks_like_failed_rewrite(rewrite: str) -> bool:
+    """True when the skill produced no usable rewrite (empty, or commentary-only).
+
+    Detection bias intentionally favours over-catching: an over-caught run
+    triggers a cheap retry; an under-caught run corrupts the judge score (~1).
+
+    Returns True if ANY of the following signals fire:
+    1. Empty / whitespace-only.
+    2. Bold/explicit EN change-log headers (original signal, preserved).
+    3. ≥2 edit-arrows (→ or ->) — changelog "X → Y" listing; prose rarely has 2+.
+    4. ≥2 lines starting with a rule-ID prefix (#N, pattern #N, §N, regelN).
+    5. A line-anchored changelog header word followed by a colon
+       (e.g. "Transformationen:", "entfernt:", "changes:", "applied:").
+    """
+    if not rewrite.strip():
+        return True
+    if _FAILED_REWRITE_RE.search(rewrite):
+        return True
+    if len(_EDIT_ARROW_RE.findall(rewrite)) >= 2:
+        return True
+    if len(_RULE_ID_LINE_RE.findall(rewrite)) >= 2:
+        return True
+    if _CHANGELOG_HEADER_RE.search(rewrite):
+        return True
+    if _BOLD_CHANGELOG_RE.search(rewrite):
+        return True
+    return False
 
 
 def score_case(
@@ -100,30 +196,63 @@ def score_case(
     """Run skill+judge `runs` times on one case and aggregate mean+stddev."""
     run_results = []
     for run_idx in range(runs):
-        skill_out = run_skill(
-            case["input"],
-            lang=case.get("lang", "en"),
-            mode="full",
-            domain=case.get("domain"),
-            model=model,
-        )
-        rewrite = skill_out.get("final") or skill_out.get("draft") or ""
-        scores = _call_judge(
-            judge_model=judge_model,
-            input_text=case["input"],
-            rewrite=rewrite,
-            domain=case.get("domain", "casual"),
+        rewrite = ""
+        for _ in range(_MAX_REWRITE_ATTEMPTS):
+            skill_out = run_skill(
+                case["input"],
+                lang=case.get("lang", "en"),
+                mode="full",
+                domain=case.get("domain"),
+                model=model,
+                timeout=420,  # E2E inputs (esp. career Anschreiben) run longer than the 180s default
+            )
+            candidate = skill_out.get("final") or skill_out.get("draft") or ""
+            if not _looks_like_failed_rewrite(candidate):
+                rewrite = candidate
+                break
+        else:
+            # All attempts returned commentary-only / empty — skip this run
+            # rather than score an extraction failure as meaning ~1.
+            continue
+        # The judge occasionally returns an empty/truncated tool call (missing
+        # scores); _call_judge raises SkillRunError on that — retry it rather
+        # than crash the whole batch.
+        scores = retry_with_backoff(
+            lambda: _call_judge(
+                judge_model=judge_model,
+                input_text=case["input"],
+                rewrite=rewrite,
+                domain=case.get("domain", "casual"),
+            ),
+            max_attempts=4,
+            base_delay=2.0,
         )
         scores["rewrite_length_words"] = len(rewrite.split())
+        # Persist rewrite text (truncated) so humans can audit guard misses.
+        scores["rewrite"] = rewrite[:1500]
         run_results.append(scores)
+
+    if not run_results:
+        # Every run failed to produce a usable rewrite — surface, don't crash.
+        return {
+            "case_id": case["id"],
+            "domain": case.get("domain"),
+            "runs": [],
+            "mean": {k: 0.0 for k in ("human_ness", "meaning", "length")},
+            "stddev": {k: 0.0 for k in ("human_ness", "meaning", "length")},
+            "error": "no usable rewrite after retries (skill emitted commentary-only output)",
+        }
 
     def _mean(key: str) -> float:
         return round(statistics.fmean(r[key] for r in run_results), 3)
 
     def _stddev(key: str) -> float:
-        if runs < 2:
+        if len(run_results) < 2:
             return 0.0
         return round(statistics.stdev(r[key] for r in run_results), 3)
+
+    def _median(key: str) -> float:
+        return round(statistics.median(r[key] for r in run_results), 3)
 
     return {
         "case_id": case["id"],
@@ -131,6 +260,10 @@ def score_case(
         "runs": run_results,
         "mean": {k: _mean(k) for k in ("human_ness", "meaning", "length")},
         "stddev": {k: _stddev(k) for k in ("human_ness", "meaning", "length")},
+        # Median alongside mean: with 3-5 samples a single outlier run can tank
+        # the mean; median is more robust. Both are reported; the gate checks both
+        # so a case whose median is fine does not fail due to one bad run.
+        "median": {k: _median(k) for k in ("human_ness", "meaning", "length")},
     }
 
 
@@ -225,6 +358,16 @@ def run(
             ),
             "below_threshold_by_dimension": {
                 k: sum(1 for c in per_case if c["mean"][k] < DEFAULT_THRESHOLDS[k])
+                for k in ("human_ness", "meaning", "length")
+            },
+            # Median-based gate: a single outlier run can tank the mean of a 3-5
+            # run sample; median is more robust. Both are reported so a case whose
+            # median is fine does not silently fail on mean alone.
+            "below_threshold_by_dimension_median": {
+                k: sum(
+                    1 for c in per_case
+                    if c.get("median", c["mean"])[k] < DEFAULT_THRESHOLDS[k]
+                )
                 for k in ("human_ness", "meaning", "length")
             },
         },

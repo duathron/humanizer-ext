@@ -1,0 +1,40 @@
+{
+  "pattern_id": 10,
+  "pattern_name": "Übermäßiger Trikolon (Dreierkonstruktionen)",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_010_de_001",
+      "input": "Die Region ist bekannt für ihre atemberaubende Landschaft, ihr reiches kulturelles Erbe und ihre herzliche Gastfreundschaft. Besucher können Innovation, Inspiration und Brancheneinblicke erwarten.",
+      "expected_changes": [
+        "atemberaubende Landschaft, ihr reiches kulturelles Erbe und ihre herzliche Gastfreundschaft",
+        "Innovation, Inspiration und Brancheneinblicke"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_010_de_002",
+      "input": "Die Veranstaltung bietet Vernetzung, Wissenstransfer und gegenseitige Inspiration. Das Konzept basiert auf Vertrauen, Transparenz und Nachhaltigkeit.",
+      "expected_changes": [
+        "Vernetzung, Wissenstransfer und gegenseitige Inspiration",
+        "Vertrauen, Transparenz und Nachhaltigkeit"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_010_de_003",
+      "input": "Die Methode fördert Kreativität, Eigenverantwortung und Teamgeist. Teilnehmende gewinnen Einblick, Überblick und Weitblick.",
+      "expected_changes": [
+        "Kreativität, Eigenverantwortung und Teamgeist",
+        "Einblick, Überblick und Weitblick"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

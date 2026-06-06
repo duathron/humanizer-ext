@@ -1,0 +1,46 @@
+{
+  "pattern_id": 15,
+  "pattern_name": "Overuse of Boldface",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_015_de_001",
+      "input": "Das System verbindet **OKRs (Objectives and Key Results)**, **KPIs (Key Performance Indicators)** und visuelle Strategieinstrumente wie das **Business Model Canvas (BMC)** und die **Balanced Scorecard (BSC)**.",
+      "expected_changes": [
+        "**OKRs (Objectives and Key Results)**",
+        "**KPIs (Key Performance Indicators)**",
+        "**Business Model Canvas (BMC)**",
+        "**Balanced Scorecard (BSC)**"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_015_de_002",
+      "input": "Die Lösung umfasst **Datenmigration**, **Systemintegration** und **Qualitätssicherung**. Jeder Schritt wird durch unser **Expertenteam** begleitet.",
+      "expected_changes": [
+        "**Datenmigration**",
+        "**Systemintegration**",
+        "**Qualitätssicherung**",
+        "**Expertenteam**"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_015_de_003",
+      "input": "Im Workshop lernen Sie **Design Thinking**, **Agile Methoden** und **Stakeholder-Management**. Besondere Aufmerksamkeit gilt dem **Feedback-Loop**.",
+      "expected_changes": [
+        "**Design Thinking**",
+        "**Agile Methoden**",
+        "**Stakeholder-Management**",
+        "**Feedback-Loop**"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

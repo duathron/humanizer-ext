@@ -8,11 +8,19 @@
     {
       "name": "humanizer-ext",
       "source": "./",
-      "description": "Remove signs of AI-generated writing from text. Detects 41 patterns from Wikipedia's Signs of AI writing guide, with domain-aware overrides for casual, academic, legal, technical, marketing, and career (cover letter / CV / LinkedIn).",
+      "description": "Remove signs of AI-generated writing from English and German text (auto-detected). 41 patterns from Wikipedia's Signs of AI writing guide + DE-only tells + domain-aware overrides for casual, academic, legal, technical, marketing, and career (cover letter / CV / Anschreiben).",
       "homepage": "https://github.com/duathron/humanizer-ext",
       "license": "MIT",
       "category": "writing",
-      "keywords": ["writing", "editing", "ai-detection", "humanizer", "skill"],
+      "keywords": [
+        "writing",
+        "editing",
+        "ai-detection",
+        "humanizer",
+        "skill",
+        "german",
+        "de"
+      ],
       "author": {
         "name": "Christian Huhn (duathron)"
       }

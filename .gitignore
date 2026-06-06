@@ -23,3 +23,6 @@ evals/reports/*.md
 
 # Per-case E2E partial caches — regenerable, user-session-specific
 evals/reports/_partial/
+
+# DE corpus — research-only fair-use excerpts (per docs/de-corpus-sources.md, kept local, not redistributed)
+evals/corpus/de/human/research_only/

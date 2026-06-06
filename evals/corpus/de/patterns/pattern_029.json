@@ -1,0 +1,37 @@
+{
+  "pattern_id": 29,
+  "pattern_name": "Fragmented Headers",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_029_de_001",
+      "input": "## Leistung Geschwindigkeit ist entscheidend. Wenn Nutzer auf eine langsame Seite treffen, verlassen sie diese sofort.",
+      "expected_changes": [
+        "Geschwindigkeit ist entscheidend."
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_029_de_002",
+      "input": "## Skalierbarkeit Flexibilität ist der Schlüssel. Nur skalierbare Systeme können mit wachsenden Anforderungen Schritt halten.",
+      "expected_changes": [
+        "Flexibilität ist der Schlüssel."
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_029_de_003",
+      "input": "## Vertrauen Vertrauen ist die Grundlage jeder Zusammenarbeit. Ohne gegenseitiges Vertrauen scheitert jedes Projekt.",
+      "expected_changes": [
+        "Vertrauen ist die Grundlage jeder Zusammenarbeit."
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "pattern_id": 26,
+  "pattern_name": "Hyphenated Word Pair Overuse",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_026_de_001",
+      "input": "Das cross-functional Team lieferte einen high-quality, data-driven Bericht über unsere client-facing Tools. Ihr decision-making-Prozess war well-known für seine Gründlichkeit und detail-oriented Herangehensweise.",
+      "expected_changes": [
+        "cross-functional",
+        "high-quality",
+        "data-driven",
+        "client-facing",
+        "decision-making",
+        "well-known",
+        "detail-oriented"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_026_de_002",
+      "input": "Das state-of-the-art System bietet end-to-end Verschlüsselung und eine user-friendly Oberfläche für alle best-practice Szenarien.",
+      "expected_changes": [
+        "state-of-the-art",
+        "end-to-end",
+        "user-friendly",
+        "best-practice"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_026_de_003",
+      "input": "Unser hands-on Workshop vermittelt real-world Erfahrungen und fördert out-of-the-box Denken in einem safe-space Umfeld.",
+      "expected_changes": [
+        "hands-on",
+        "real-world",
+        "out-of-the-box",
+        "safe-space"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

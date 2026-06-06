@@ -1,0 +1,40 @@
+{
+  "pattern_id": 33,
+  "pattern_name": "Mengenunbestimmtheit",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_033_de_001",
+      "input": "Eine breite Palette von Faktoren trug zum Ergebnis bei. Zahlreiche Studien haben diese Erkenntnisse in verschiedenen Kontexten bestätigt.",
+      "expected_changes": [
+        "Eine breite Palette von",
+        "Zahlreiche"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_033_de_002",
+      "input": "Eine Vielzahl von Studien belegt den Zusammenhang. Unzählige Experten haben auf diese Problematik hingewiesen und verschiedene Lösungsansätze vorgeschlagen.",
+      "expected_changes": [
+        "Eine Vielzahl von",
+        "Unzählige"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_033_de_003",
+      "input": "Das System unterstützt eine breite Palette von Formaten. Zahlreiche Unternehmen haben von dieser Lösung profitiert.",
+      "expected_changes": [
+        "eine breite Palette von",
+        "Zahlreiche"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

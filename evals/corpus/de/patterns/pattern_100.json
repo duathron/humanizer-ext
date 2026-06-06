@@ -1,0 +1,37 @@
+{
+  "pattern_id": 100,
+  "pattern_name": "Akademische Rahmen-Floskel (\"Im Rahmen der vorliegenden ...\")",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_100_de_001",
+      "input": "Im Rahmen der vorliegenden Arbeit wird die Implementierung neuronaler Netzwerke zur Erkennung sprachlicher Muster vergleichend evaluiert.",
+      "expected_changes": [
+        "Im Rahmen der vorliegenden Arbeit"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_100_de_002",
+      "input": "Im Rahmen der vorliegenden Untersuchung werden drei Fallstudien aus dem deutschen Bildungssektor vergleichend analysiert.",
+      "expected_changes": [
+        "Im Rahmen der vorliegenden Untersuchung"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_100_de_003",
+      "input": "Im Rahmen dieser Studie wird untersucht, wie Sprachmodelle bürokratische Texte generieren und ob sich dies von menschlicher Amtssprache unterscheidet.",
+      "expected_changes": [
+        "Im Rahmen dieser Studie"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

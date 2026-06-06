@@ -1,0 +1,42 @@
+{
+  "pattern_id": 8,
+  "pattern_name": "Kopula-Vermeidung (\"ist\"/\"sind\" umschreiben)",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_008_de_001",
+      "input": "Die Stadtbibliothek fungiert als zentraler Anlaufpunkt für Bürgerinnen und Bürger. Sie stellt eine unverzichtbare Ressource dar und gilt als kulturelles Herz der Stadt.",
+      "expected_changes": [
+        "fungiert als",
+        "stellt eine unverzichtbare Ressource dar",
+        "gilt als"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_008_de_002",
+      "input": "Das neue Konzept erweist sich als wegweisend für die Branche. Es repräsentiert einen Paradigmenwechsel und verkörpert die Werte einer modernen Gesellschaft.",
+      "expected_changes": [
+        "erweist sich als",
+        "repräsentiert",
+        "verkörpert"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_008_de_003",
+      "input": "Das Projekt dient als Vorlage für zukünftige Initiativen und stellt ein Musterbeispiel für gelungene Zusammenarbeit dar.",
+      "expected_changes": [
+        "dient als",
+        "stellt ein Musterbeispiel für gelungene Zusammenarbeit dar"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

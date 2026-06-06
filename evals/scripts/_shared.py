@@ -84,6 +84,27 @@ _BANNER_RE = re.compile(
     re.MULTILINE,
 )
 
+# Matches the start of a trailing skill-commentary block on a new line.
+# Anchored to a newline so mid-sentence occurrences of "changes" etc. are safe.
+_COMMENTARY_RE = re.compile(
+    r"\n[ \t>]*(?:\*\*\s*(?:changes(?: made)?|what changed|summary|notes?|audit|"
+    r"rationale|why this works|comparison|diff|removed|edits|final ai audit|draft)\b"
+    r"|concept-noun check|fabrication check|new authorial position)",
+    re.IGNORECASE,
+)
+
+
+def _strip_trailing_commentary(s: str) -> str:
+    """Cut a trailing skill-commentary block off a rewrite.
+
+    Matches patterns like ``**changes:** …``, ``**Summary:** …``,
+    ``concept-noun check: …`` that the skill appends after the rewrite text.
+    The regex is anchored to a leading newline so ordinary prose containing
+    the word "changes" mid-sentence is never truncated.
+    """
+    m = _COMMENTARY_RE.search(s)
+    return s[: m.start()].rstrip() if m else s
+
 
 def _strip_blockquote_markers(text: str) -> str:
     """Remove leading `> ` from each line of a blockquote block."""
@@ -108,8 +129,8 @@ def parse_skill_output(text: str) -> dict[str, str]:
     result = {
         "domain": domain_match.group(1).lower() if domain_match else "",
         "preflight": preflight_match.group(1) if preflight_match else "",
-        "draft": _strip_blockquote_markers(draft_match.group(1)) if draft_match else "",
-        "final": _strip_blockquote_markers(final_match.group(1)) if final_match else "",
+        "draft": _strip_trailing_commentary(_strip_blockquote_markers(draft_match.group(1))) if draft_match else "",
+        "final": _strip_trailing_commentary(_strip_blockquote_markers(final_match.group(1))) if final_match else "",
     }
     if result["final"] or result["draft"]:
         return result
@@ -125,23 +146,23 @@ def parse_skill_output(text: str) -> dict[str, str]:
         text, re.DOTALL,
     )
     if alt_headers:
-        result["final"] = _strip_blockquote_markers(alt_headers.group(1))
+        result["final"] = _strip_trailing_commentary(_strip_blockquote_markers(alt_headers.group(1)))
         return result
 
     blockquotes = list(_BLOCKQUOTE_RE.finditer(text))
     if blockquotes:
-        result["final"] = _strip_blockquote_markers(blockquotes[-1].group(0))
+        result["final"] = _strip_trailing_commentary(_strip_blockquote_markers(blockquotes[-1].group(0)))
         return result
 
     if "---" in text:
         last_segment = text.rsplit("---", 1)[-1].strip()
         if last_segment and not _BANNER_RE.search(last_segment):
-            result["final"] = last_segment
+            result["final"] = _strip_trailing_commentary(last_segment)
             return result
 
     # Pure Quick-mode output with no banners or markdown structure.
     if not _BANNER_RE.search(text):
-        result["final"] = text.strip()
+        result["final"] = _strip_trailing_commentary(text.strip())
         return result
 
     # Text has banners but no extractable rewrite — leave final empty so
@@ -157,9 +178,22 @@ class SkillRunError(RuntimeError):
 
 
 def _build_humanizer_prompt(
-    text: str, *, lang: str | None, mode: str, domain: str | None, samples_dir: str | None
+    text: str,
+    *,
+    lang: str | None,
+    mode: str,
+    domain: str | None,
+    samples_dir: str | None,
+    force_full: bool = False,
 ) -> str:
-    """Compose the user prompt that invokes the humanizer skill on `text`."""
+    """Compose the user prompt that invokes the humanizer skill on `text`.
+
+    When ``force_full=True``, an explicit override directive is inserted on its
+    own line between the command header and the text body. This overrides the
+    skill's Tier-1 density pre-flight quick-drop so the full pass always runs,
+    regardless of input density. When ``force_full=False`` (default), output is
+    byte-identical to the previous behaviour.
+    """
     parts = ["/humanizer"]
     if mode and mode != "full":
         parts.append(mode)
@@ -170,6 +204,12 @@ def _build_humanizer_prompt(
     if samples_dir:
         parts.append(f"--samples-dir {samples_dir}")
     header = " ".join(parts)
+    if force_full:
+        override = (
+            "(Run a full pass — do NOT switch to Quick mode regardless of pre-flight density. "
+            "This is an explicit user override.)"
+        )
+        return f"{header}\n{override}\n\n{text}"
     return f"{header}\n\n{text}"
 
 
@@ -183,6 +223,7 @@ def run_skill(
     model: str = "sonnet",
     timeout: int = 180,
     max_attempts: int = 3,
+    force_full: bool = False,
 ) -> dict[str, str]:
     """Invoke the humanizer skill via `claude -p` and return the parsed output.
 
@@ -192,9 +233,16 @@ def run_skill(
 
     Retries up to `max_attempts` times on SkillRunError to absorb intermittent
     claude CLI hiccups (occasional exit 1 with empty stderr, seen in practice).
+
+    When ``force_full=True``, the prompt includes an explicit override directive
+    that prevents the skill from downgrading to Quick mode via the Tier-1 density
+    pre-flight. Use this in detection evals to ensure the skill's full pattern
+    detection is exercised, not the routing logic. Callers that legitimately want
+    the real pre-flight (FP eval, true-negative cases) keep the default False.
     """
     prompt = _build_humanizer_prompt(
-        text, lang=lang, mode=mode, domain=domain, samples_dir=samples_dir
+        text, lang=lang, mode=mode, domain=domain, samples_dir=samples_dir,
+        force_full=force_full,
     )
     cmd = ["claude", "-p", prompt, "--model", model]
 
@@ -279,6 +327,8 @@ _PACK_FILES = (
     ("patterns/_universal.md",),
     ("patterns/en.md",),
     ("domains/en_overrides.md",),
+    ("patterns/de.md",),
+    ("domains/de_overrides.md",),
 )
 
 

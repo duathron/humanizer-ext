@@ -1,0 +1,44 @@
+{
+  "pattern_id": 7,
+  "pattern_name": "Übernutzte KI-Vokabeln",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_007_de_001",
+      "input": "Darüber hinaus bietet die ganzheitliche Lösung eine nachhaltige und umfassende Grundlage für die kontinuierliche Weiterentwicklung der vielfältigen Stakeholder-Interessen.",
+      "expected_changes": [
+        "Darüber hinaus",
+        "ganzheitliche"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_007_de_002",
+      "input": "Die innovative Plattform ermöglicht eine nahtlose und nachhaltige Zusammenarbeit, die es Teams erlaubt, transformative Ergebnisse zu erzielen und vielfältige Synergien zu nutzen.",
+      "expected_changes": [
+        "nahtlose",
+        "nachhaltige",
+        "transformative",
+        "vielfältige Synergien"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_007_de_003",
+      "input": "Vor diesem Hintergrund ist es wichtig zu betonen, dass unsere umfassende und ganzheitliche Herangehensweise in der heutigen Zeit maßgeblich zum Erfolg beiträgt.",
+      "expected_changes": [
+        "Vor diesem Hintergrund",
+        "ganzheitliche",
+        "in der heutigen Zeit",
+        "maßgeblich"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

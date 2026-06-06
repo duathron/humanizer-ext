@@ -270,9 +270,161 @@ PATTERNS_EN = {
     ),
 }
 
+PATTERNS_DE = {
+    # --- Directness ---------------------------------------------------------
+    "de_significance_inflation": (
+        re.compile(
+            r"\b(steht für|dient als|ist ein Zeugnis|ist eine Erinnerung|"
+            r"eine (?:zentrale|bedeutende|entscheidende|wichtige|bedeutsame) Rolle|"
+            r"unterstreicht (?:seine|ihre|dessen) Bedeutung|"
+            r"spiegelt einen breiteren Trend wider|"
+            r"symbolisiert (?:sein|ihr) (?:anhaltendes|bleibendes) Vermächtnis|"
+            r"bereitet den Boden für|markiert einen Wendepunkt|"
+            r"sich wandelnde Landschaft|tief verwurzelt|"
+            r"spielt eine (?:zentrale|entscheidende|wichtige|bedeutende|bedeutsame) Rolle)\b",
+            re.I,
+        ),
+        "DE significance inflation",
+    ),
+    "de_vague_attribution": (
+        re.compile(
+            r"\b(laut Experten|Branchenberichten? zufolge|wie Beobachter "
+            r"(?:festgestellt haben|zitiert haben)|Einige Kritiker argumentieren|"
+            r"mehrere (?:Quellen|Publikationen)|Quellen zufolge|"
+            r"wertvolle Erkenntnisse)\b",
+            re.I,
+        ),
+        "DE vague attribution / weasel words",
+    ),
+    # --- Authenticity -------------------------------------------------------
+    "de_puffery": (
+        re.compile(
+            r"\b(verfügt über|lebendig|nahtlos(?:e[rnsm]?)?|robust(?:e[rnsm]?)?|"
+            r"hochmodern(?:e[rnsm]?)?|bahnbrechend(?:e[rnsm]?)?|"
+            r"renommiert(?:e[rnsm]?)?|atemberaubend(?:e[rnsm]?)?|"
+            r"beeindruckend(?:e[rnsm]?)?|beispielhaft(?:e[rnsm]?)?|"
+            r"unbedingt besuchen|zukunftsorientiert(?:e[rnsm]?)?|"
+            r"wegweisend(?:e[rnsm]?)?)\b",
+            re.I,
+        ),
+        "DE puffery vocabulary",
+    ),
+    "de_ai_vocab": (
+        re.compile(
+            r"\b(darüber hinaus|ganzheitlich(?:e[rnsm]?)?|"
+            r"umfassend(?:e[rnsm]?)?|facettenreich(?:e[rnsm]?)?|"
+            r"transformativ(?:e[rnsm]?)?|zukunftsweisend(?:e[rnsm]?)?|"
+            r"maßgeblich(?:e[rnsm]?)?|prägend(?:e[rnsm]?)?|"
+            r"es ist wichtig zu betonen|in der heutigen Zeit|"
+            r"vor diesem Hintergrund)\b",
+            re.I,
+        ),
+        "DE overused AI vocabulary",
+    ),
+    "de_copula_avoidance": (
+        re.compile(
+            r"\b(gilt als|fungiert als|stellt\s+\S+\s+dar|"
+            r"erweist sich als|verkörpert|repräsentiert)\b",
+            re.I,
+        ),
+        "DE copula avoidance (gilt als / fungiert als / stellt … dar)",
+    ),
+    # --- Trust / sycophancy -------------------------------------------------
+    "de_sycophancy": (
+        re.compile(
+            r"(?:^|\.\s+|\!\s+)(Natürlich!|Gerne!|Selbstverständlich!|"
+            r"Super Frage!|Das ist eine (?:sehr )?gute Frage|"
+            r"Sie haben absolut Recht|Das ist ein ausgezeichneter Punkt|"
+            r"Vielen Dank für Ihre Frage)[!]?",
+            re.I,
+        ),
+        "DE sycophantic opener",
+    ),
+    "de_filler": (
+        re.compile(
+            r"\b(Ich hoffe,? das hilft|Lassen Sie mich wissen|"
+            r"Lass mich wissen(?:,? ob)?|"
+            r"Es ist wichtig (?:zu beachten|zu betonen|festzuhalten),? dass|"
+            r"Es sei darauf hingewiesen,? dass|"
+            r"Es versteht sich von selbst,? dass|"
+            r"wie bereits erwähnt|es bleibt festzuhalten|"
+            r"an dieser Stelle)\b",
+            re.I,
+        ),
+        "DE filler phrases",
+    ),
+    # --- Rhythm / signposting -----------------------------------------------
+    "de_signposting": (
+        re.compile(
+            r"\b(Lassen (?:Sie|wir) (?:uns )?(?:eintauchen|das aufschlüsseln)|"
+            r"schauen wir uns (?:das|nun|einmal) an|"
+            r"sehen wir uns (?:nun|an)|"
+            r"ohne weitere Umschweife|"
+            r"Im Folgenden (?:wird|werden|erläutern|behandeln)|"
+            r"lassen Sie uns nun|"
+            r"hier ist,? was Sie wissen müssen)\b",
+            re.I,
+        ),
+        "DE signposting / announcement phrase",
+    ),
+    "de_sentence_opener_intensifier": (
+        re.compile(
+            r"(?m)^[ \t>*\-]*"
+            r"(Letztendlich|Letztlich|Tatsächlich|Im Wesentlichen|"
+            r"Offensichtlich|Bemerkenswert|Bedeutsam|Fundamental)\s*[,.]",
+            re.I,
+        ),
+        "DE sentence-opener intensifier",
+    ),
+    # --- Density / Restraint ------------------------------------------------
+    "de_quantity_vagueness": (
+        re.compile(
+            r"\b(eine breite Palette von|eine Vielzahl von|"
+            r"zahlreich(?:e[rnsm]?)?|unzählig(?:e[rnsm]?)?|"
+            r"eine Anzahl von|mehrere verschiedene|"
+            r"viele verschiedene)\b",
+            re.I,
+        ),
+        "DE quantity vagueness",
+    ),
+    # --- DE-only patterns ---------------------------------------------------
+    "de_academic_frame": (
+        re.compile(
+            r"\bim Rahmen der (?:vorliegenden|durchgeführten) "
+            r"(?:Arbeit|Studie|Untersuchung|Analyse|Recherche|Untersuchungen|Berichts?)\b",
+            re.I,
+        ),
+        "DE academic frame filler (im Rahmen der vorliegenden …)",
+    ),
+    "de_impersonal_reflexive": (
+        re.compile(
+            r"\b(es lässt sich (?:feststellen|sagen|festhalten|zeigen|zusammenfassen)|"
+            r"zusammenfassend lässt sich (?:sagen|feststellen|festhalten))\b",
+            re.I,
+        ),
+        "DE impersonal reflexive (es lässt sich …)",
+    ),
+    "de_denglisch": (
+        re.compile(
+            r"\b(alignen|scalen|leveragen|performen|highlighten|"
+            r"committen|challengen|tracken|briefen|pitchen|featuren|"
+            r"Pain Points?|Stakeholder[- ]Buy-in|"
+            r"Customer Journey|Value Proposition|User Mindset|"
+            r"ein nahtloses? Onboarding)\b",
+            re.I,
+        ),
+        "DE Denglisch / anglicism leakage",
+    ),
+    # --- Universal mechanics (reuse EN compiled objects by reference) --------
+    "em_dash_overuse": PATTERNS_EN["em_dash_overuse"],
+    "boldface_overuse": PATTERNS_EN["boldface_overuse"],
+    "emoji_bullet": PATTERNS_EN["emoji_bullet"],
+}
+
 # Language registry. Add new packs here (e.g., "de": PATTERNS_DE).
 PATTERNS_BY_LANG: dict[str, dict] = {
     "en": PATTERNS_EN,
+    "de": PATTERNS_DE,
 }
 
 # Threshold-based patterns: a single occurrence is fine, density is the tell.

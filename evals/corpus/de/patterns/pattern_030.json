@@ -1,0 +1,43 @@
+{
+  "pattern_id": 30,
+  "pattern_name": "Satzanfang-Intensivierer",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_030_de_001",
+      "input": "Letztendlich zählt vor allem die Umsetzung. Tatsächlich bestätigen die Daten das. Offensichtlich war der alte Ansatz fehlerhaft.",
+      "expected_changes": [
+        "Letztendlich",
+        "Tatsächlich",
+        "Offensichtlich"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_030_de_002",
+      "input": "Natürlich ist das Ergebnis nicht überraschend. Offensichtlich fehlte es von Anfang an an einer klaren Strategie. Tatsächlich hätte man das früher erkennen können.",
+      "expected_changes": [
+        "Natürlich",
+        "Offensichtlich",
+        "Tatsächlich"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_030_de_003",
+      "input": "Letztlich ist die Entscheidung gefallen. Wichtig ist dabei vor allem die Umsetzungsgeschwindigkeit. Bemerkenswert bleibt, wie schnell sich die Lage verändert hat.",
+      "expected_changes": [
+        "Letztlich",
+        "Wichtig",
+        "Bemerkenswert"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

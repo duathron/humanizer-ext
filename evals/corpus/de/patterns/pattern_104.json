@@ -1,0 +1,42 @@
+{
+  "pattern_id": 104,
+  "pattern_name": "Nominalstil-Inflation",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_104_de_001",
+      "input": "Die Durchführung einer ganzheitlichen Evaluierung im Rahmen der Berücksichtigung sämtlicher relevanter Faktoren erfordert eine umfassende Vorbereitung.",
+      "expected_changes": [
+        "Die Durchführung einer ganzheitlichen Evaluierung",
+        "im Rahmen der Berücksichtigung sämtlicher relevanter Faktoren"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_104_de_002",
+      "input": "Die Gewährleistung einer reibungslosen Durchführung erfordert die Sicherstellung ausreichender Ressourcen und die Berücksichtigung aller relevanten Risikofaktoren.",
+      "expected_changes": [
+        "Die Gewährleistung einer reibungslosen Durchführung",
+        "die Sicherstellung ausreichender Ressourcen",
+        "die Berücksichtigung aller relevanten Risikofaktoren"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_104_de_003",
+      "input": "Die Ermöglichung einer effektiven Zusammenarbeit setzt die Schaffung geeigneter Rahmenbedingungen sowie die Etablierung klarer Kommunikationsstrukturen voraus.",
+      "expected_changes": [
+        "Die Ermöglichung einer effektiven Zusammenarbeit",
+        "die Schaffung geeigneter Rahmenbedingungen",
+        "die Etablierung klarer Kommunikationsstrukturen"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

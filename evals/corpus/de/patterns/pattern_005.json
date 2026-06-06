@@ -1,0 +1,40 @@
+{
+  "pattern_id": 5,
+  "pattern_name": "Vage Autoritäten und Weasel Words",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_005_de_001",
+      "input": "Laut Experten und Branchenberichten hat die Entwicklung weitreichende Folgen. Einige Kritiker argumentieren, dass der Ansatz grundlegende Mängel aufweist.",
+      "expected_changes": [
+        "Laut Experten und Branchenberichten",
+        "Einige Kritiker argumentieren"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_005_de_002",
+      "input": "Wie Fachleute betonen, birgt die neue Technologie erhebliche Risiken. Beobachter haben zudem festgestellt, dass die Implementierung kostspielig ist.",
+      "expected_changes": [
+        "Wie Fachleute betonen",
+        "Beobachter haben zudem festgestellt"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_005_de_003",
+      "input": "Experten sind sich einig, dass der Klimawandel dringendes Handeln erfordert. Mehrere Quellen zufolge zeigt die aktuelle Datenlage alarmierende Tendenzen.",
+      "expected_changes": [
+        "Experten sind sich einig",
+        "Mehrere Quellen zufolge"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

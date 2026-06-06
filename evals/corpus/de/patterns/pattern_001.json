@@ -1,0 +1,40 @@
+{
+  "pattern_id": 1,
+  "pattern_name": "Übertriebene Betonung von Bedeutung, Vermächtnis und allgemeinen Trends",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_001_de_001",
+      "input": "Das Statistische Institut Kataloniens wurde 1989 offiziell gegründet und markiert damit einen Wendepunkt in der Entwicklung der Regionalstatistik in Spanien. Diese Initiative war Teil einer breiteren Bewegung zur Dezentralisierung von Verwaltungsfunktionen in ganz Spanien.",
+      "expected_changes": [
+        "markiert damit einen Wendepunkt",
+        "Teil einer breiteren Bewegung"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_001_de_002",
+      "input": "Die Entscheidung, das Stadtmuseum umzustrukturieren, spiegelt einen breiteren kulturellen Wandel wider und trägt zu einer zunehmend selbstreflexiven Museumslandschaft bei.",
+      "expected_changes": [
+        "spiegelt einen breiteren kulturellen Wandel wider",
+        "trägt zu einer zunehmend selbstreflexiven Museumslandschaft bei"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_001_de_003",
+      "input": "Die Einführung des neuen Bildungsplans 2022 markiert einen Wendepunkt in der deutschen Schulgeschichte und steht für den Wandel zu kompetenzorientiertem Lernen.",
+      "expected_changes": [
+        "markiert einen Wendepunkt",
+        "steht für den Wandel"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

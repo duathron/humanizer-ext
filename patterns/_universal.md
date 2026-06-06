@@ -63,6 +63,12 @@ A specific sub-pattern is **paired em dash bracketing**: wrapping an elaboration
 **Before (paired bracketing):**
 > The report—which covered three continents and twelve case studies—concluded that demand had shifted.
 
+**Vorher (DE — gepaarte em-dash-Klammerung):**
+> Der Bericht—der drei Kontinente umfasste—kam zu dem Schluss, dass sich die Nachfrage verschoben hatte.
+
+**Nachher (DE):**
+> Der Bericht, der drei Kontinente umfasste, kam zu dem Schluss, dass sich die Nachfrage verschoben hatte.
+
 **After (pick the option that fits the insertion):**
 - **If a list:** break into a separate sentence — "The report covered three continents and twelve case studies. It concluded that demand had shifted."
 - **If an appositive:** use a comma — "The report, covering three continents and twelve case studies, concluded that demand had shifted."
@@ -108,6 +114,23 @@ Report the final em dash count in the audit summary (e.g., "0 em dashes remainin
 
 **After:**
 > ## Strategic negotiations and global partnerships
+
+**German note:** German normally capitalizes all nouns, so AI title case
+is harder to spot. The tell in German is **capitalized non-nouns** in
+a heading — conjunctions (und, oder, aber), prepositions (in, für, mit,
+von), articles (der, die, das, ein), and adjectives that would be
+lower-case mid-sentence. Lower-case those; keep the nouns capitalized
+(that is correct German orthography, not a tell).
+
+**Vorher (DE):**
+> ## Strategische Verhandlungen Und Globale Partnerschaften
+
+**Nachher (DE):**
+> ## Strategische Verhandlungen und globale Partnerschaften
+
+("Und" → "und", "Globale" → "globale"; the nouns "Verhandlungen" and
+"Partnerschaften" stay capitalized — that is normal German, not title
+case.)
 
 ### 18. Emojis
 

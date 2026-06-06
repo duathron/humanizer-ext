@@ -1,0 +1,42 @@
+{
+  "pattern_id": 20,
+  "pattern_name": "Artefakte aus kollaborativer Kommunikation / Brief-Stil",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_020_de_001",
+      "input": "Natürlich! Hier ist eine Übersicht der Französischen Revolution. Ich hoffe, das hilft! Lassen Sie mich wissen, wenn Sie mehr möchten.",
+      "expected_changes": [
+        "Natürlich!",
+        "Ich hoffe, das hilft!",
+        "Lassen Sie mich wissen, wenn Sie mehr möchten"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_020_de_002",
+      "input": "Gerne! Hier ist eine kurze Zusammenfassung des Zweiten Weltkriegs. Lassen Sie mich wissen, wenn Sie noch weitere Details benötigen.",
+      "expected_changes": [
+        "Gerne!",
+        "Lassen Sie mich wissen, wenn Sie noch weitere Details benötigen"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_020_de_003",
+      "input": "Selbstverständlich! Ich habe die gewünschten Änderungen vorgenommen. Ich hoffe, das hilft! Gibt es noch etwas, womit ich Ihnen behilflich sein kann?",
+      "expected_changes": [
+        "Selbstverständlich!",
+        "Ich hoffe, das hilft!",
+        "Gibt es noch etwas, womit ich Ihnen behilflich sein kann"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

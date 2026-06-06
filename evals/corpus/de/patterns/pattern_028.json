@@ -1,0 +1,40 @@
+{
+  "pattern_id": 28,
+  "pattern_name": "Ankündigungen und Wegweiser",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_028_de_001",
+      "input": "Lassen Sie uns eintauchen, wie Caching in Next.js funktioniert. Hier ist, was Sie wissen müssen.",
+      "expected_changes": [
+        "Lassen Sie uns eintauchen",
+        "Hier ist, was Sie wissen müssen"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_028_de_002",
+      "input": "Sehen wir uns nun an, wie dieses Modell funktioniert. Im Folgenden wird erläutert, was Sie über die Architektur wissen müssen.",
+      "expected_changes": [
+        "Sehen wir uns nun an",
+        "Im Folgenden wird erläutert"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_028_de_003",
+      "input": "Ohne weitere Umschweife, lassen Sie uns das Thema aufschlüsseln. In diesem Abschnitt werden wir die wichtigsten Aspekte behandeln.",
+      "expected_changes": [
+        "Ohne weitere Umschweife",
+        "In diesem Abschnitt werden wir die wichtigsten Aspekte behandeln"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

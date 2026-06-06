@@ -1,0 +1,40 @@
+{
+  "pattern_id": 3,
+  "pattern_name": "Oberflächliche Analysen mit Partizip-I-Endungen",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_003_de_001",
+      "input": "Die Farbpalette des Tempels in Blau, Grün und Gold resoniert mit der natürlichen Schönheit der Region, die Verbundenheit der Gemeinschaft widerspiegelnd und gleichzeitig ihr reiches kulturelles Erbe betonend.",
+      "expected_changes": [
+        "widerspiegelnd",
+        "betonend"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_003_de_002",
+      "input": "Die Architektur des neuen Bahnhofs verbindet Tradition und Moderne, die Geschichte der Stadt widerspiegelnd und gleichzeitig ihre Zukunftsorientierung betonend.",
+      "expected_changes": [
+        "widerspiegelnd",
+        "betonend"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_003_de_003",
+      "input": "Das Programm stärkt die Gemeinschaft, lokale Identitäten unterstützend und dabei interkulturelle Brücken bauend.",
+      "expected_changes": [
+        "unterstützend",
+        "bauend"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

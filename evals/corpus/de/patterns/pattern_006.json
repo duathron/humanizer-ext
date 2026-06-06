@@ -1,0 +1,40 @@
+{
+  "pattern_id": 6,
+  "pattern_name": "Outline-like \"Challenges and Future Prospects\" Sections",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_006_de_001",
+      "input": "Trotz seiner industriellen Stärke steht Köln vor typischen städtischen Herausforderungen wie Wohnungsmangel und Verkehrsstaus. Trotz dieser Herausforderungen bleibt die Stadt ein wichtiger Wirtschaftsstandort mit guten Zukunftsaussichten.",
+      "expected_changes": [
+        "Trotz dieser Herausforderungen",
+        "bleibt die Stadt ein wichtiger Wirtschaftsstandort mit guten Zukunftsaussichten"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "denoise+brittle-fix"
+    },
+    {
+      "id": "pattern_006_de_002",
+      "input": "Trotz der wirtschaftlichen Stärke Hamburgs stehen die Hafenwirtschaft und das Bildungssystem vor erheblichen Herausforderungen. Trotz dieser Herausforderungen bleibt die Stadt auf gutem Kurs und verfügt über hervorragende Zukunftsaussichten.",
+      "expected_changes": [
+        "Trotz dieser Herausforderungen",
+        "verfügt über hervorragende Zukunftsaussichten"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "denoise+brittle-fix"
+    },
+    {
+      "id": "pattern_006_de_003",
+      "input": "Die Forschungseinrichtung kämpft mit Finanzierungslücken und dem Verlust erfahrener Wissenschaftler. Dennoch bleibt die Zukunft vielversprechend, da neue Kooperationen entstehen und spannende Perspektiven auf uns warten.",
+      "expected_changes": [
+        "bleibt die Zukunft vielversprechend",
+        "spannende Perspektiven"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

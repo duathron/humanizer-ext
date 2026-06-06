@@ -1,0 +1,37 @@
+{
+  "pattern_id": 32,
+  "pattern_name": "Gestapelte Intensivierer-Adjektive",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_032_de_001",
+      "input": "Diese innovative, umfassende und zukunftsorientierte Lösung erfüllt die Anforderungen moderner Organisationen.",
+      "expected_changes": [
+        "innovative, umfassende und zukunftsorientierte"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_032_de_002",
+      "input": "Der bahnbrechende, wegweisende und transformative Ansatz hat das Potenzial, die gesamte Branche nachhaltig zu verändern.",
+      "expected_changes": [
+        "bahnbrechende, wegweisende und transformative"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_032_de_003",
+      "input": "Ein robustes, intuitives und nachhaltiges Werkzeug ermöglicht auch weniger erfahrenen Nutzern einen reibungslosen Einstieg.",
+      "expected_changes": [
+        "robustes, intuitives und nachhaltiges"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

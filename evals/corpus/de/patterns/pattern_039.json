@@ -1,0 +1,44 @@
+{
+  "pattern_id": 39,
+  "pattern_name": "Phrasal Templates and Placeholder Text",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_039_de_001",
+      "input": "Gegründet im Jahr [JAHR], ist [UNTERNEHMENSNAME] ein führender Anbieter von [BRANCHE]-Lösungen. Abgerufen am 2025-xx-xx.",
+      "expected_changes": [
+        "[JAHR]",
+        "[UNTERNEHMENSNAME]",
+        "2025-xx-xx"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_039_de_002",
+      "input": "[VORNAME] [NACHNAME] ist seit [JAHR] bei [FIRMA] tätig. Die Präsentation findet am 2026-xx-xx statt.",
+      "expected_changes": [
+        "[VORNAME]",
+        "[NACHNAME]",
+        "2026-xx-xx"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_039_de_003",
+      "input": "Kontaktieren Sie [ANSPRECHPARTNER] unter [E-MAIL-ADRESSE] oder besuchen Sie uns am [DATUM] in [VERANSTALTUNGSORT].",
+      "expected_changes": [
+        "[ANSPRECHPARTNER]",
+        "[E-MAIL-ADRESSE]",
+        "[DATUM]",
+        "[VERANSTALTUNGSORT]"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

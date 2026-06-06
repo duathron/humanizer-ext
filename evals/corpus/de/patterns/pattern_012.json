@@ -1,0 +1,39 @@
+{
+  "pattern_id": 12,
+  "pattern_name": "Falsche Bereiche / False Ranges",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_012_de_001",
+      "input": "Unsere Reise durch das Universum hat uns von der Singularität des Urknalls bis hin zum kosmischen Netz geführt, von der Geburt und dem Tod der Sterne bis zum enigmatischen Tanz der dunklen Materie.",
+      "expected_changes": [
+        "von der Singularität des Urknalls bis hin zum kosmischen Netz",
+        "von der Geburt und dem Tod der Sterne bis zum enigmatischen Tanz der dunklen Materie"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_012_de_002",
+      "input": "Das Buch führt den Leser von den Anfängen der Demokratie im antiken Griechenland bis hin zu den digitalen Populismus-Bewegungen des 21. Jahrhunderts.",
+      "expected_changes": [
+        "von den Anfängen der Demokratie im antiken Griechenland bis hin zu den digitalen Populismus-Bewegungen des 21. Jahrhunderts"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_012_de_003",
+      "input": "Die Ausstellung zeigt Werke von der Frührenaissance bis zur zeitgenössischen Streetart, von lokalen Künstlern bis zu globalen Ikonen.",
+      "expected_changes": [
+        "von der Frührenaissance bis zur zeitgenössischen Streetart",
+        "von lokalen Künstlern bis zu globalen Ikonen"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

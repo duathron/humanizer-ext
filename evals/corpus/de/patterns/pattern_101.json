@@ -1,0 +1,38 @@
+{
+  "pattern_id": 101,
+  "pattern_name": "Impersonales Reflexiv (\"Es lässt sich ...\")",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_101_de_001",
+      "input": "Zusammenfassend lässt sich feststellen, dass die Implementierung moderner Lösungen eine zentrale Rolle spielt.",
+      "expected_changes": [
+        "Zusammenfassend lässt sich feststellen"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_101_de_002",
+      "input": "Es lässt sich feststellen, dass die gewählte Methode in allen drei Testszenarien zu stabilen Ergebnissen führte.",
+      "expected_changes": [
+        "Es lässt sich feststellen"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_101_de_003",
+      "input": "Aus den Daten lässt sich schlussfolgern, dass der Ansatz im urbanen Raum effektiver wirkt. Zusammenfassend lässt sich sagen, dass weiterer Forschungsbedarf besteht.",
+      "expected_changes": [
+        "lässt sich schlussfolgern",
+        "Zusammenfassend lässt sich sagen"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

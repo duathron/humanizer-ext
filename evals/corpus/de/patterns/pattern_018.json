@@ -1,0 +1,43 @@
+{
+  "pattern_id": 18,
+  "pattern_name": "Emojis",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_018_de_001",
+      "input": "🚀 **Startphase:** Das Produkt wird in Q3 veröffentlicht 💡 **Wichtige Erkenntnis:** Nutzer bevorzugen Einfachheit ✅ **Nächste Schritte:** Folgetermin planen",
+      "expected_changes": [
+        "🚀",
+        "💡",
+        "✅"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_018_de_002",
+      "input": "🎯 Das Ziel ist klar definiert. 📊 Die Zahlen sprechen für sich. 🔑 Drei Schlüsselfaktoren bestimmen den Erfolg.",
+      "expected_changes": [
+        "🎯",
+        "📊",
+        "🔑"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_018_de_003",
+      "input": "⚡ Schnelle Ladezeiten garantiert. 🛡️ Maximale Sicherheit inklusive. 💬 Support rund um die Uhr verfügbar.",
+      "expected_changes": [
+        "⚡",
+        "🛡️",
+        "💬"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

@@ -1,14 +1,18 @@
 ---
 name: humanizer
-version: 3.4.2
+version: 3.5.0
 description: |
   Use when editing or reviewing text to remove signs of AI-generated writing
-  and make it sound more natural and human. Detects 41 patterns from Wikipedia's
-  "Signs of AI writing" guide with domain-aware overrides for casual, academic,
-  legal, technical, marketing, and career (cover letter / CV / LinkedIn) — so
-  passive voice in a legal brief is preserved while it's flagged in a blog post
-  and cover-letter metrics are kept verbatim. Runs a Tier-1 density pre-flight
-  before any Full pass so human-first drafts aren't over-edited.
+  and make it sound more natural and human. Works in English and German
+  (auto-detected) — the German pack adds DE-only tells (Nominalstil,
+  Konjunktiv-II stacking, Denglisch, academic Rahmen-Floskeln) and a DACH
+  career register for Anschreiben / Lebenslauf (formal-modest, understated).
+  Detects 41 patterns from Wikipedia's "Signs of AI writing" guide with
+  domain-aware overrides for casual, academic, legal, technical, marketing, and
+  career (cover letter / CV / LinkedIn) — so passive voice in a legal brief is
+  preserved while it's flagged in a blog post and cover-letter metrics are kept
+  verbatim. Runs a Tier-1 density pre-flight before any Full pass so human-first
+  drafts aren't over-edited.
 license: MIT
 compatibility: claude-code opencode
 allowed-tools:
@@ -30,7 +34,7 @@ Choose a mode based on the task. If the user doesn't specify, default to **Full*
 
 | Mode | What it does | When to use |
 |------|-------------|-------------|
-| **Quick** | Strip AI vocabulary, chatbot artifacts, sycophancy, and filler only (patterns 7, 20, 22, 23) | Short texts, minor cleanup |
+| **Quick** | Strip AI vocabulary, chatbot artifacts, sycophancy, filler, plus the unconditional mechanical tells (em-dash, Title Case, emojis, curly quotes) and copy-paste artifacts (patterns 7, 14, 17, 18, 19, 20, 22, 23, 38, 39, 40) | Short texts, minor cleanup |
 | **Full** | All 41 patterns + Tier-1 density pre-flight + length audit + final AI audit | Default — thorough rewrites |
 | **Voice** | Full pass + mandatory voice matching from a writing sample | When user provides their own writing as reference |
 
@@ -143,7 +147,7 @@ If the user provides a writing sample (their own previous writing), **analyze it
 3. If Voice or a sample is provided: analyze the writing sample first
 4. Read the input text carefully
 5. **Pre-flight: AI-iness density check.** Count **Tier 1 dead-giveaway** tells per 100 words. Tier 1 = patterns #1, #4, #7, #20, #21, #22, #25 — these almost never appear in genuine human writing.
-    - **0 tells / 100 words:** Announce: *"This reads as human-authored. Switching to a Quick-mode pass (patterns 7, 20, 22, 23 only) to avoid over-editing voice."* Then run Quick mode. User can override with an explicit instruction.
+    - **0 tells / 100 words:** Announce: *"This reads as human-authored. Switching to a Quick-mode pass (universal tells only — AI vocab, artifacts, sycophancy, filler, plus em-dash / Title Case / emojis / curly quotes / placeholders) to avoid over-editing voice."* Then run Quick mode. User can override with an explicit instruction.
     - **1–2 tells / 100 words:** Mixed input. Proceed with the Full pass but preserve voice quirks aggressively (apply the Detection Guidance "Signs of human writing" list).
     - **3+ tells / 100 words:** AI-heavy input. Proceed with the full Full pass.
     - Announce the result before the draft, e.g.: *"Pre-flight: 4 Tier-1 tells per 100 words → AI-heavy. Full pass."*
@@ -176,11 +180,15 @@ If the user provides a writing sample (their own previous writing), **analyze it
 
 ### Quick mode
 
+Quick mode strips only tells that are unconditional — wrong regardless of domain, register, or density. This is also the pass the Full-mode pre-flight drops to on human-authored input, so it must still catch the mechanical and copy-paste tells that genuine writing never contains.
+
 1. Strip AI vocabulary (pattern #7)
 2. Remove chatbot artifacts (pattern #20)
 3. Remove sycophantic tone (pattern #22)
 4. Remove filler phrases (pattern #23)
-5. Present the cleaned text. No audit pass. (Quick mode ignores domain — these four patterns are universal.)
+5. **Mechanical tells (always, any domain, any density):** reduce em-dash overuse (#14 — replace paired / `X — Y — Z` dashes with commas, periods, or parentheses); lowercase Title-Case headings (#17 — in German, lowercase capitalized non-nouns such as conjunctions, prepositions, and adjectives, keeping nouns capitalized); strip emojis (#18); normalize curly quotes to straight quotes (#19).
+6. **Copy-paste artifacts (always strip, regardless of domain):** chat-UI reference markup (#38); phrasal-template / placeholder text such as `[INSERT]`, `[JAHR]`, `[COMPANY NAME]`, `2025-xx-xx` (#39); Markdown / wikitext contamination (#40).
+7. Present the cleaned text. No audit pass, no domain reasoning — every pattern in this list is universal. Do **not** touch boldface (#15), structure, voice, or any judgment-based pattern; those need a Full pass.
 
 ## Output Format
 

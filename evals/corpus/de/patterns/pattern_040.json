@@ -1,0 +1,40 @@
+{
+  "pattern_id": 40,
+  "pattern_name": "Markdown / Wikitext Contamination",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_040_de_001",
+      "input": "```markdown ## Hintergrund --- Das Unternehmen wurde 1994 gegründet. ``` Möchten Sie, dass ich den Abschnitt Hintergrund erweitere, Quellen hinzufüge oder dies in Wikitext umwandle?",
+      "expected_changes": [
+        "```markdown",
+        "Möchten Sie, dass ich den Abschnitt Hintergrund erweitere"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_040_de_002",
+      "input": "```python\n# Beispielcode\nprint('Hallo Welt')\n``` Möchten Sie, dass ich den Code erweitere oder in eine andere Sprache übersetze?",
+      "expected_changes": [
+        "```python",
+        "Möchten Sie, dass ich den Code erweitere"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_040_de_003",
+      "input": "== Geschichte == Das Unternehmen wurde 1987 gegründet. [[Kategorie:Unternehmen]] Soll ich weitere Abschnitte hinzufügen oder das Format anpassen?",
+      "expected_changes": [
+        "[[Kategorie:Unternehmen]]",
+        "Soll ich weitere Abschnitte hinzufügen"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "pattern_id": 21,
+  "pattern_name": "Wissens-Cutoff-Hinweise und spekulative Lückenfüllung",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_021_de_001",
+      "input": "Basierend auf verfügbaren Informationen und bis zu meinem letzten Update war die Situation wie folgt. Obwohl spezifische Details nicht allgemein dokumentiert sind, wurde das Unternehmen scheinbar irgendwann in den 1990ern gegründet.",
+      "expected_changes": [
+        "bis zu meinem letzten Update",
+        "nicht allgemein dokumentiert sind"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_021_de_002",
+      "input": "Informationen über ihre frühe Kindheit sind nicht öffentlich verfügbar, was darauf hindeutet, dass sie ein zurückgezogenes Leben führt und persönliche Details privat hält. Sie dürfte in einem Mittelschicht- Haushalt aufgewachsen sein, was ihr späteres Interesse an der Bildungsreform geprägt haben dürfte.",
+      "expected_changes": [
+        "nicht öffentlich verfügbar",
+        "ein zurückgezogenes Leben führt",
+        "persönliche Details privat hält"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_021_de_003",
+      "input": "Stand meiner Trainingsdaten ist unklar, ob das Projekt abgeschlossen wurde. Basierend auf verfügbaren Informationen dürfte die Fertigstellung für 2024 geplant gewesen sein.",
+      "expected_changes": [
+        "Stand meiner Trainingsdaten",
+        "Basierend auf verfügbaren Informationen",
+        "dürfte die Fertigstellung für 2024 geplant gewesen sein"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "denoise+brittle-fix"
+    }
+  ]
+}

@@ -79,17 +79,18 @@ python evals/scripts/run_e2e_eval.py --lang en --aggregate-only
 
 `--force` re-scores a case even if a partial exists (use when corpus changes). Partials are gitignored — they are user-session artifacts, not canonical records. The aggregated `summary_latest_en.{json,md}` is the committed baseline.
 
-## Adding a new language pack (per the v3.5.0 spec)
+## Adding a new language pack (validated against the DE pack, v3.5.0)
 
 1. **Phase A — Wiki seed (if available)** — check whether the target Wikipedia community maintains an "Anzeichen für KI-generierte Inhalte" / "Identifier l'usage d'une IA générative" equivalent.
-2. **Phase B — Empirical mining** — generate an AI corpus + human corpus, run `mine_patterns.py` (Phase 2 deliverable) to extract candidate AI tells via log-likelihood divergence.
-3. **Phase C — Manual curation** — review candidates, write `patterns/<lang>.md` and `domains/<lang>_overrides.md`.
-4. **Phase D — Cross-reference** — public NLP papers, AI-detection tool indicator lists, community PRs after first release.
-5. **Build eval corpus** — `evals/corpus/<lang>/{patterns,human,e2e}/` parallel to the EN structure.
-6. **Iterate** — run all three evals against the new pack until thresholds pass:
-   - Pattern detection: ≥ 0.85 per pattern
-   - False-positive rate: ≤ 0.10 mean edit ratio on human samples
-   - E2E quality: human-ness mean ≥ 7.5, meaning ≥ 9, length within ±15%
+2. **Phase B — Empirical mining** — assemble an AI corpus + human corpus (per-domain real sources beat synthesis; pre-2022 / clear-license for AI-contamination safety), run `mine_patterns.py` to extract candidate tells via log-likelihood divergence.
+3. **Phase C — Manual curation** — write `patterns/<lang>.md` and `domains/<lang>_overrides.md`. Translate the universal/EN patterns with native examples; put **language-only tells at IDs #100+** (DE used #100–104; FR would use #200+, ES #300+, … — keep this convention so packs never collide). Adapt every domain override to the target register (e.g. DE academic is more passive-heavy; DACH career rewards understatement, the opposite of US/UK).
+4. **Register the deterministic scorer** — add `regex_scorer.PATTERNS_<LANG>` and register it in `PATTERNS_BY_LANG`. Reuse the universal-mechanics keys (`em_dash_overuse`, `boldface_overuse`, `emoji_bullet`) **by reference** so they can't drift from EN.
+5. **Build eval corpus** — `evals/corpus/<lang>/{patterns,human,e2e}/` parallel to EN. Pattern cases: aim for **≥3 cases/pattern** (single-case-per-pattern is too noisy — a stable rate needs the redundancy); every `expected_changes` entry MUST be a verbatim substring of its `input`; keep inputs at realistic fluff density (a ~50%-fluff input is an unwinnable strawman for the length-anchored E2E judge). The FP human corpus reader walks nested source dirs and reads `metadata.domain` frontmatter; trim human samples to ~200–350 words so the skill stays under the CLI timeout.
+6. **Install the packs so `claude -p` can load them** — the runtime reads `patterns/<lang>.md` + `domains/<lang>_overrides.md` from the *installed* skill dir. Symlink (or copy) the new packs into `~/.claude/skills/humanizer/{patterns,domains}/`, and add them to `_PACK_FILES` in `evals/scripts/_shared.py` so `verify_skill_install` fails on a stale/missing pack instead of silently running zero patterns.
+7. **Run + iterate** — `--lang <lang>` on each runner (`run_pattern_eval`, `run_false_positive_eval`, `run_e2e_eval`); runs are resumable across session limits via per-case partials. Targets (relaxed for a first language vs EN's mature 0.85):
+   - Pattern detection: **≥ 0.70** overall (force-full method measures detection, not pre-flight routing)
+   - False-positive: **≤ 0.15** mean edit ratio on human samples
+   - E2E: per-case **meaning ≥ 8.0** (+ human-ness ≥ 7.5, length ≥ 7.0); run ≥5 and report the **median** — judge scores are noisy at n=3.
 
 ## Personal-mode false-positive testing
 

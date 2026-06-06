@@ -1,0 +1,14 @@
+---
+id: wiki_technical_beos
+source_url: "https://de.wikipedia.org/wiki/BeOS"
+license: "CC-BY-SA-3.0"
+license_class: redistributable
+fetch_date: "2026-05-27"
+metadata:
+  title: BeOS
+  wiki: de.wikipedia
+  domain: technical
+  pre_date_cutoff: "2022-11-30T00:00:00Z"
+---
+
+BeOS ist ein Betriebssystem der ehemaligen Be Incorporated. Aufgrund seiner Multimedia-Fähigkeiten wurde es von Be auch als „Media OS“ bezeichnet. Am Markt konnte es sich jedoch nicht behaupten und wurde 2001 eingestellt. In der Folge entstand unter anderem Haiku (Betriebssystem) Haiku, eine freie Re-Implementierung von BeOS. Bei BeOS handelt es sich um ein Einbenutzersystem mit einem modularen Hybridkernel für 32-Bit-x86-Prozessor x86- (ab Pentium) und PowerPC-Prozessoren (PowerPC 603 und 604, PowerPC G3 G3 nur auf Upgradekarten). Es unterstützt Mehrprozessorsysteme mit bis zu acht Prozessoren und ist multitasking- und multithreadingfähig. BeOS verwendet ein eigenes Be File System BeFS genanntes 64-Bit-Journaling-Dateisystem. BeOS liest und beschreibt auch Partitionen, die mit den Windows-Dateisystemen FAT16, FAT32 oder dem Mac-OS-Dateisystem HFS (Dateisystem) HFS formatiert sind. Auf Partitionen, die mit dem Windows-Dateisystem NTFS oder dem Linux-Dateisystem ext2 formatiert sind, kann lesend zugegriffen werden. Zudem verfügt BeOS über einen Speicherschutz, so dass ein abgestürztes Programm nicht das gesamte System beschädigt. Dies war bei Erscheinen von BeOS eine echte Neuerung im Heimanwenderbereich, verfügten doch die damals populärsten Betriebssysteme Microsoft Windows 95 Windows&nbsp;95 und Mac OS (Classic) klassisches Mac&nbsp;OS nicht über diese Technik. BeOS brachte mit bootman seinen eigenen Bootmanager mit, der komplett in den Master Boot Record passt. Er kann keine Dateisysteme lesen und lädt daher ein Betriebssystem so, als ob es direkt gestartet würde, dadurch kann bootman nahezu jedes Betriebssystem starten. BeOS verzichtete auf die Trennung von Kernel und grafischer Oberfläche. class="wikitable" - Version Erscheinungsdatum Plattform - Developer Release 5 1995 rowspan="4"|BeBox - Developer Release 6 Januar 1996 - Developer Release 7 April 1996 - Developer Release 8 September 1996 - Developer Release 8.2 Januar 1997 rowspan="5"|BeBox und Power Macintosh Power Mac - Developer Release 8.3 März 1997 - Developer Release 9 Mai 1997 - Preview Release 1 Juli 1997 - Preview Release 2 Oktober 1997 - Release 3 März 1998 rowspan="3"|IA-32 (32-Bit-x86-Prozessor x86), Power Mac und BeBox* - &nbsp;Release 3.1 Juni 1998 - &nbsp;Release 3.2 Juli 1998 - Release 4 Dezember 1998 rowspan="2"|IA-32, Power Mac und BeBox* - &nbsp;Release 4.5 Juni 1999 - Release 5 März 2000 IA-32, Power Mac und BeBox* } * nur BeBoxen ab Revision 6 Software-Entwickler erhielten Developer Releases (DR) zusammen mit der BeBox und bekamen dann das jeweils neueste Developer Release zugesandt.

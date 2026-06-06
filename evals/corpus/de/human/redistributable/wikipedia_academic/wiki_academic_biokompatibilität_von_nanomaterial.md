@@ -1,0 +1,14 @@
+---
+id: wiki_academic_biokompatibilität_von_nanomaterial
+source_url: "https://de.wikipedia.org/wiki/Biokompatibilit%C3%A4t_von_Nanomaterial"
+license: "CC-BY-SA-3.0"
+license_class: redistributable
+fetch_date: "2026-05-27"
+metadata:
+  title: Biokompatibilität von Nanomaterial
+  wiki: de.wikipedia
+  domain: academic
+  pre_date_cutoff: "2022-11-30T00:00:00Z"
+---
+
+Die Biokompatibilität von Nanomaterial bezeichnet den Einfluss von Nanomaterial auf Lebewesen und Umwelt. Die Biokompatibilität und Zytotoxizität von Nanotubes (Nanoröhren) mit einem Durchmesser von 10–15 Nanometer nm und einer Länge von 1000 nm wurden in Tierversuchen erforscht. Nanoröhren sind meistens Kohlenstoffnanoröhren (engl. carbon nanotubes, CNT), Derivatisierung funktionalisierte Kohlenstoffnanoröhren (siehe Kohlenstoff-Nanoröhren-Chemie), Silikatnanoröhren oder funktionalisierte Silikatnanoröhren. Nanopartikel von wenigen Nanometern Durchmesser können unter anderem aus Kohlenstoff, Silikat, Gold, Silber, Zinkoxid oder Titandioxid bestehen. Die Anwendungsmöglichkeiten von Nanomaterial sind beispielsweise im medizinischen und pharmakologischen Bereich, wie in der Forschung zur Krebstherapie. Sie werden in der Tumorforschung eingesetzt, aber außerhalb des Labors kann Nanomaterial in Gebrauchsgegenständen eventuell schädlich sein. Die Nanopartikel können eventuell die Blut-Hirn-Schranke passieren, was für manche pharmakologischen Anwendungen erwünscht ist – sie können sich aber auch in der Lunge festsetzen. Kolloidales Silber Silbernanopartikel werden als Zusatzstoffe in Sonnencremes verwendet. Silbernanopartikel dringen nicht tiefer in die Haut ein, wenn sie mit Aluminiumchlorid, Methylparaben oder Dibutylphthalat Di-n-butylphthalat als Sonnencreme auf die Haut aufgetragen werden. Die größte Menge Silber, die die Haut durchdringt, war 0,45 ng/cm 2 (0,365–0,974 ng/cm 2 ) für PEG-stabilisierte Silbernanopartikel mit Methylparaben. Goldnanopartikel haben eine Größe von 0,8 bis 1,8 nm. Sie haben antimikrobielle Wirkung und können als Pharmazeutika Anwendung finden. Aloysia triphylla-Extrakte machen eine Synthese von Goldnanopartikeln möglich, und die erhaltenen Nanopartikel können wegen ihrer antibakteriellen und katalytischen Wirkung zur Wasseraufbereitung verwendet werden. Es gibt unterschiedliche Forschungsergebnisse verschiedener Studien: Kohlenstoffnanotubes (CNTs) zeigen Toxizität. CNTs waren nach Injektion embryolethal und teratogen bei Mäusen, und Hühnerembryos zeigten eine Wachstumsverzögerung. Man nimmt an, dass CNTs karzinogen sind und Lungentumore verursachen können. Nach Erkenntnissen einer anderen Studie zeigt die Injektion von Kohlenstoffnanoröhren bei Mäusen keine Symptome. Die Forschungen haben ergeben, dass reine Nanotubes mehr Zellen abtöten als die funktionalisierten multiwall-CNTs, dass diese aber dafür gentoxischer sind. Die Toxizität wurde an Glioblastomazellen von Ratten erforscht.

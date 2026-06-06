@@ -1,0 +1,42 @@
+{
+  "pattern_id": 22,
+  "pattern_name": "Schmeichelhafte / unterwürfige Sprache",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_022_de_001",
+      "input": "Super Frage! Sie haben absolut Recht, dass das ein komplexes Thema ist. Das ist ein ausgezeichneter Punkt bezüglich der wirtschaftlichen Faktoren.",
+      "expected_changes": [
+        "Super Frage!",
+        "Sie haben absolut Recht",
+        "Das ist ein ausgezeichneter Punkt"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_022_de_002",
+      "input": "Vielen Dank für Ihre Frage! Das ist ein ausgezeichneter Punkt. Sie haben völlig Recht, dass dieses Thema besonderer Aufmerksamkeit bedarf.",
+      "expected_changes": [
+        "Vielen Dank für Ihre Frage!",
+        "Das ist ein ausgezeichneter Punkt",
+        "Sie haben völlig Recht"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_022_de_003",
+      "input": "Das ist eine sehr gute Frage! Gerne erkläre ich das. Ich hoffe, meine Antwort ist hilfreich.",
+      "expected_changes": [
+        "Das ist eine sehr gute Frage!",
+        "Ich hoffe, meine Antwort ist hilfreich"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

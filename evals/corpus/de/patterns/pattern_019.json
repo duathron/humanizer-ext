@@ -1,0 +1,40 @@
+{
+  "pattern_id": 19,
+  "pattern_name": "Curly Quotation Marks",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_019_de_001",
+      "input": "Sie sagte “das Projekt liegt im Zeitplan”, aber andere sahen das anders.",
+      "expected_changes": [
+        "“",
+        "”"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_019_de_002",
+      "input": "Der Minister erklärte “wir sind auf dem richtigen Weg”, obwohl die Opposition das bezweifelt.",
+      "expected_changes": [
+        "“",
+        "”"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_019_de_003",
+      "input": "Das Unternehmen bezeichnet sein Produkt als “revolutionär” und “zukunftsweisend”.",
+      "expected_changes": [
+        "“",
+        "”"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

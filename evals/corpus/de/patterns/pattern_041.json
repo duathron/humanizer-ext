@@ -1,0 +1,39 @@
+{
+  "pattern_id": 41,
+  "pattern_name": "Diff-Anchored Writing",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_041_de_001",
+      "input": "Diese Funktion wurde hinzugefügt, um den bisherigen Ansatz zu ersetzen, der alle Elemente durchlief und dabei O(n²)-Leistungsprobleme verursachte.",
+      "expected_changes": [
+        "wurde hinzugefügt, um den bisherigen Ansatz zu ersetzen"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_041_de_002",
+      "input": "Die CLI verwendet nun YAML für die Konfiguration. Zuvor nutzte sie ein benutzerdefiniertes Format, das schwer zu parsen war.",
+      "expected_changes": [
+        "verwendet nun YAML",
+        "Zuvor nutzte sie"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_041_de_003",
+      "input": "Der Authentifizierungsfluss wurde überarbeitet, um die alte Sitzungsverwaltung zu ersetzen, die keine Token-Erneuerung unterstützte. Neu hinzugekommen ist außerdem ein Rate-Limiter.",
+      "expected_changes": [
+        "wurde überarbeitet, um die alte Sitzungsverwaltung zu ersetzen",
+        "Neu hinzugekommen ist"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}

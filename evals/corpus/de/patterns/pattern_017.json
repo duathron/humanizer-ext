@@ -1,0 +1,37 @@
+{
+  "pattern_id": 17,
+  "pattern_name": "Title Case in Headings",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_017_de_001",
+      "input": "## Strategische Verhandlungen Und Globale Partnerschaften",
+      "expected_changes": [
+        "Verhandlungen Und Globale Partnerschaften"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_fill"
+    },
+    {
+      "id": "pattern_017_de_002",
+      "input": "## Digitale Transformation Und Nachhaltige Entwicklung Im 21. Jahrhundert",
+      "expected_changes": [
+        "Transformation Und Nachhaltige Entwicklung"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_017_de_003",
+      "input": "## Künstliche Intelligenz Im Gesundheitswesen Und Ihre Ethischen Implikationen",
+      "expected_changes": [
+        "Intelligenz Im Gesundheitswesen Und Ihre Ethischen Implikationen"
+      ],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "manual_de_denoise"
+    }
+  ]
+}
