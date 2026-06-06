@@ -102,7 +102,7 @@ These are tendencies, not rules. All four families produce all the patterns in t
 When given text to humanize:
 
 1. **Check mode** — Quick, Full (default), or Voice?
-2. **Detect input language** from the text. Supported languages have a pack at `patterns/{lang}.md` — currently `en`. If the detected language has no pack, fall back to `en` and warn inline.
+2. **Detect input language** from the text. Supported languages have a pack at `patterns/{lang}.md` — currently `en` and `de` (auto-detected; no flag needed). If the detected language has no pack, fall back to `en` and warn inline.
 3. **Load the relevant pattern packs.** Always Read `patterns/_universal.md`. Then Read `patterns/{lang}.md` for the detected language.
 4. **Check domain** — Casual (default), academic, legal, technical, or marketing? If not specified, infer from the text and state the detected domain at the start of your response.
 5. **Load the per-language domain overrides** by Reading `domains/{lang}_overrides.md`.
