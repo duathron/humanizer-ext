@@ -2,7 +2,7 @@
 
 A skill for Claude Code and OpenCode that removes signs of AI-generated writing from text, making it sound more natural and human.
 
-**Extended fork of [blader/humanizer](https://github.com/blader/humanizer), actively maintained.** Adds domain-aware overrides, 11 new patterns (40 total), a Quick/Full/Voice mode selector, a Tier-1 AI-iness density pre-flight, a Detection Guidance section (false positives + signs of human writing + LLM idiolects), a length audit, and an extended 13-point final AI audit checklist.
+**Extended fork of [blader/humanizer](https://github.com/blader/humanizer), actively maintained.** Adds English + German (auto-detected) language packs, domain-aware overrides, 12 new patterns (41 total), a Quick/Full/Voice mode selector, a Tier-1 AI-iness density pre-flight, a Detection Guidance section (false positives + signs of human writing + LLM idiolects), a length audit, and an extended final AI audit checklist.
 
 ## What's different from upstream
 
@@ -16,7 +16,7 @@ A skill for Claude Code and OpenCode that removes signs of AI-generated writing 
 | Detection guidance | none | **dedicated section** — what NOT to flag (false positives), signs of human writing to preserve, per-model LLM idiolects (ChatGPT / Grok / Gemini / Claude) |
 | Density pre-flight | none | **Tier-1 dead-giveaway density check** before any Full pass; auto-drops to Quick when density = 0 so human-first drafts aren't over-edited |
 | Length audit | none | explicit step to cut 20–30% padding |
-| Final AI audit | vague self-prompt | **specific 13-point checklist** annotated with per-domain exceptions |
+| Final AI audit | vague self-prompt | **specific multi-point checklist** annotated with per-domain exceptions |
 | Pattern #9 ("not just X") | base | extended to "rather than" dismissals + on-the-table test |
 | Pattern #14 (em dash) | base | extended to paired bracketing with 4 fix options by insertion type |
 | Pattern #16 (inline-header lists) | convert all | convert only fake bullets; preserve genuine lists |
@@ -103,7 +103,7 @@ The skill runs in one of three modes. If you don't specify, it defaults to **Ful
 | Mode | What it does |
 |------|-------------|
 | **Quick** | Strips AI vocabulary, chatbot artifacts, sycophancy, and filler only. Fast cleanup for short texts. |
-| **Full** | All 40 patterns, a Tier-1 AI-iness density pre-flight, a length audit (cut 20–30% padding), and a 13-point final AI audit checklist. Default. |
+| **Full** | All 41 patterns, a Tier-1 AI-iness density pre-flight, a length audit (cut 20–30% padding), and an extended final AI audit checklist. Default. |
 | **Voice** | Full pass plus mandatory voice matching from a writing sample you provide. |
 
 Specify a mode by including it in your prompt:
@@ -132,11 +132,12 @@ The skill detects (or accepts) a domain and adjusts which patterns are enforced.
 
 | Domain | What changes |
 |--------|-------------|
-| **casual** (default) | All 40 patterns strict; personal voice encouraged |
+| **casual** (default) | All 41 patterns strict; personal voice encouraged |
 | **academic** | Passive voice and hedging preserved; first-person discouraged; "soul" section disabled |
 | **legal** | Passive voice, hedging, and formal connectors preserved; precise impersonal register |
 | **technical** | Lists, bold, and inline-header lists preserved for scannability; direct active voice |
 | **marketing** | Promotional register preserved; only AI buzzwords, chatbot artifacts, and sycophancy removed |
+| **career** | Cover letter / CV / LinkedIn / Anschreiben; metrics, proper nouns, tech stack, JD keywords, and concrete achievements preserved verbatim; career-AI clichés ("results-driven", "passionate about") stripped |
 
 If you don't specify, the skill infers the domain from the text and tells you which one it picked. To set it explicitly, name it alongside the mode:
 
@@ -152,11 +153,33 @@ If you don't specify, the skill infers the domain from the text and tells you wh
 [paste your text here]
 ```
 
+### Languages
+
+The skill works in **English and German**, auto-detected — just paste text in either language; no flag needed. It detects the input language, then loads `patterns/{lang}.md` + `domains/{lang}_overrides.md` for that language (English behaviour is byte-unchanged from earlier versions).
+
+```
+/humanizer
+
+Sehr geehrte Damen und Herren, mit großem Interesse habe ich Ihre
+Stellenausschreibung gelesen ...
+```
+
+The German pack adds **DE-only tells** on top of the translated universal patterns:
+
+- **Nominalstil-Inflation** — bureaucratic noun-stacking (`#104`)
+- **Konjunktiv-II-Stacking** — piled-up `würde / wäre / hätte` hedging (`#102`)
+- **Denglisch / Anglizismen-Leakage** — `leveragen`, `scalen`, `Pain Points`, `Stakeholder-Buy-in` (`#103`)
+- **Akademische Rahmen-Floskeln** — `im Rahmen der vorliegenden Arbeit`, `es lässt sich festhalten` (`#100`, `#101`)
+
+…and a **DACH career register** for Anschreiben / Lebenslauf: where US/UK cover letters reward assertive self-promotion, German Bewerbung culture rewards formal-modest understatement — so the career overrides strip the puffery (`ausgeprägte Teamfähigkeit`, `ich sehe mich als idealen Kandidaten`) while preserving the substantive facts, achievements, and motivation.
+
+A language with no pack falls back to English with an inline warning. Adding a new language (FR, ES, …) follows the recipe in [`evals/README.md`](evals/README.md); language-only patterns get IDs starting at #100 (DE), #200 (FR), #300 (ES), and so on.
+
 ## Overview
 
 Based on [Wikipedia's "Signs of AI writing"](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) guide, maintained by WikiProject AI Cleanup. This comprehensive guide comes from observations of thousands of instances of AI-generated text.
 
-The skill runs a length audit to cut 20–30% of padding, then a specific 9-point final AI audit checklist to catch lingering AI-isms before presenting the final version.
+The skill runs a length audit to cut 20–30% of padding, then a specific final AI audit checklist to catch lingering AI-isms before presenting the final version.
 
 ### Key Insight from Wikipedia
 
