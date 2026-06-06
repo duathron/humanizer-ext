@@ -1,5 +1,5 @@
 {
   "name": "humanizer-ext",
-  "version": "3.5.0",
+  "version": "3.5.1",
   "description": "Remove AI writing patterns in English and German (auto-detected). 41 patterns + DE-only tells + domain-aware overrides for casual, academic, legal, technical, marketing, and career (cover letter / CV / Anschreiben)."
 }

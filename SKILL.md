@@ -1,6 +1,6 @@
 ---
 name: humanizer
-version: 3.5.0
+version: 3.5.1
 description: |
   Use when editing or reviewing text to remove signs of AI-generated writing
   and make it sound more natural and human. Works in English and German
