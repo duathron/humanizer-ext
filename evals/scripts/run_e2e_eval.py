@@ -197,6 +197,7 @@ def score_case(
     run_results = []
     for run_idx in range(runs):
         rewrite = ""
+        first_attempt_changelog = None
         for _ in range(_MAX_REWRITE_ATTEMPTS):
             skill_out = run_skill(
                 case["input"],
@@ -207,7 +208,10 @@ def score_case(
                 timeout=420,  # E2E inputs (esp. career Anschreiben) run longer than the 180s default
             )
             candidate = skill_out.get("final") or skill_out.get("draft") or ""
-            if not _looks_like_failed_rewrite(candidate):
+            is_changelog = _looks_like_failed_rewrite(candidate)
+            if first_attempt_changelog is None:
+                first_attempt_changelog = is_changelog
+            if not is_changelog:
                 rewrite = candidate
                 break
         else:
@@ -230,6 +234,7 @@ def score_case(
         scores["rewrite_length_words"] = len(rewrite.split())
         # Persist rewrite text (truncated) so humans can audit guard misses.
         scores["rewrite"] = rewrite[:1500]
+        scores["first_attempt_changelog"] = bool(first_attempt_changelog)
         run_results.append(scores)
 
     if not run_results:
@@ -339,6 +344,10 @@ def run(
                 statistics.fmean(c["mean"][k] for c in per_case), 3
             )
 
+    all_runs = [r for c in per_case for r in c.get("runs", [])]
+    cl = [r for r in all_runs if "first_attempt_changelog" in r]
+    changelog_rate = round(sum(1 for r in cl if r["first_attempt_changelog"]) / len(cl), 3) if cl else 0.0
+
     return {
         "eval_type": "e2e",
         "lang": lang,
@@ -370,6 +379,7 @@ def run(
                 )
                 for k in ("human_ness", "meaning", "length")
             },
+            "changelog_first_attempt_rate": changelog_rate,
         },
         "per_case": per_case,
     }

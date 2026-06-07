@@ -1,5 +1,14 @@
 # DE Baseline Eval Summary
 
+## SP1 (2026-06-07) — closed metric-only, no behavior change
+
+Two anecdotal skill defects were measured from outside before building anything; both premises failed, so SP1 ships only the new sentinel metric.
+
+- **Change-log defect:** shipped `changelog_first_attempt_rate` metric (e2e harness), then measured **1/51** runs (DE+EN e2e). 95% CI [0.35%, 10.3%] — refutes the "~1/3" premise; true rate ≤~10%. **Lever 1 (rewrite-first restructure) dropped.**
+- **True-negative over-editing:** re-baselined 9 EN cases × 5 runs → **5/9 majority, 23/45 (51%) per-run, bimodal/noise-dominated.** Zero stable behavior defects: the 2 always-fail cases (`pattern_008`, `pattern_029`) are **corpus disputes** (each is the skill's own documented AI-tell Before-example). **Lever 2 dropped → SP3** (needs multi-run-median harness).
+- **Shipped:** `changelog_first_attempt_rate` sentinel (306 pytest green, Skeptic-cleared) + two probe scripts. **SKILL.md byte-identical to main.**
+- **SP3 hand-off:** true-neg restraint + multi-run harness + career FP + the `pattern_008`/`pattern_029` corpus disputes.
+
 **Status: v3.5.0 Task 11 baseline + Task 12 round 1. Pattern (force-full, 140 cases, post-fix): **0.864** all-or-nothing / 0.907 per-term — ABOVE ≥0.70 target. The earlier 0.557 was a measurement artifact (parser leak + preflight routing + brittle substrings), now fixed. FP (clean): **0.1376** (41/46) — UNDER ≤0.15 target. BOTH acceptance metrics now pass on trustworthy measurement. EN FP regression guard 0.2039→0.1433 (safe). FP mean edit ratio 0.204 (target ≤0.15). E2E deferred (paid judge). Both still below target. Task-12 round 1 revealed the dominant blocker is the density preflight quick-dropping short inputs into Quick mode — the same mechanism behind the FP failure — so preflight calibration (not more pattern-prose) is the next lever.**
 
 ## Task 12 round 4 — TRUSTWORTHY re-measurement after fixing the measurement (this is the real number)

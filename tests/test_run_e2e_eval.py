@@ -361,3 +361,78 @@ def test_run_summary_includes_below_threshold_by_dimension_median(
     # Mean is below threshold (5.667 < 7.5), but median is fine (8.0 >= 7.5)
     assert summary["below_threshold_by_dimension"]["human_ness"] == 1  # mean fails
     assert summary["below_threshold_by_dimension_median"]["human_ness"] == 0  # median passes
+
+
+# ---------------------------------------------------------------------------
+# SP1 Task 1 — changelog_first_attempt_rate metric
+# ---------------------------------------------------------------------------
+
+
+def test_first_attempt_changelog_recorded(monkeypatch):
+    """score_case records whether the FIRST skill attempt was a change-log."""
+    import evals.scripts.run_e2e_eval as e2e
+    outs = iter([
+        {"final": "**Wesentliche Änderungen:** #7 entfernt"},  # changelog -> retried
+        {"final": "Eine saubere, menschliche Umschreibung des Textes."},  # clean
+    ])
+    monkeypatch.setattr(e2e, "run_skill", lambda *a, **k: next(outs))
+    monkeypatch.setattr(e2e, "_call_judge",
+                        lambda **k: {"human_ness": 8, "meaning": 8, "length": 8})
+    res = e2e.score_case({"id": "t", "input": "x", "domain": "casual"}, runs=1)
+    assert res["runs"][0]["first_attempt_changelog"] is True
+
+
+def test_first_attempt_clean_not_flagged(monkeypatch):
+    import evals.scripts.run_e2e_eval as e2e
+    monkeypatch.setattr(e2e, "run_skill",
+                        lambda *a, **k: {"final": "Sauberer menschlicher Text."})
+    monkeypatch.setattr(e2e, "_call_judge",
+                        lambda **k: {"human_ness": 8, "meaning": 8, "length": 8})
+    res = e2e.score_case({"id": "t", "input": "x", "domain": "casual"}, runs=1)
+    assert res["runs"][0]["first_attempt_changelog"] is False
+
+
+def test_changelog_rate_aggregated_in_run(monkeypatch, tmp_path):
+    """run() reports changelog_first_attempt_rate across all scored runs.
+    run() globs REPO_ROOT/evals/corpus/<lang>/e2e/*.json and returns the report
+    dict directly (no corpus-loader, no write_report)."""
+    import json
+    import evals.scripts.run_e2e_eval as e2e
+    corpus_dir = tmp_path / "evals" / "corpus" / "de" / "e2e"
+    corpus_dir.mkdir(parents=True)
+    (corpus_dir / "a.json").write_text(json.dumps(
+        {"id": "a", "input": "x", "domain": "casual", "lang": "de"}), encoding="utf-8")
+    (corpus_dir / "b.json").write_text(json.dumps(
+        {"id": "b", "input": "y", "domain": "casual", "lang": "de"}), encoding="utf-8")
+    outs = iter([
+        {"final": "**Changes:** x"},             # a, attempt 1 -> flagged, retried
+        {"final": "saubere Umschreibung"},        # a, attempt 2 -> clean
+        {"final": "zweite saubere Umschreibung"}, # b, attempt 1 -> clean
+    ])
+    monkeypatch.setattr(e2e, "run_skill", lambda *a, **k: next(outs))
+    monkeypatch.setattr(e2e, "_call_judge",
+                        lambda **k: {"human_ness": 8, "meaning": 8, "length": 8})
+    monkeypatch.setattr(e2e, "verify_skill_install", lambda: None)
+    monkeypatch.setattr(e2e, "REPO_ROOT", tmp_path)
+    report = e2e.run(lang="de", runs=1)
+    assert report["summary"]["changelog_first_attempt_rate"] == 0.5
+
+
+def test_partial_persists_first_attempt_changelog(monkeypatch, tmp_path):
+    """The per-case partial written to disk must carry first_attempt_changelog."""
+    import json
+    import evals.scripts.run_e2e_eval as e2e
+    corpus_dir = tmp_path / "evals" / "corpus" / "de" / "e2e"
+    corpus_dir.mkdir(parents=True)
+    (corpus_dir / "a.json").write_text(json.dumps(
+        {"id": "a", "input": "x", "domain": "casual", "lang": "de"}), encoding="utf-8")
+    monkeypatch.setattr(e2e, "run_skill",
+                        lambda *a, **k: {"final": "saubere Umschreibung"})
+    monkeypatch.setattr(e2e, "_call_judge",
+                        lambda **k: {"human_ness": 8, "meaning": 8, "length": 8})
+    monkeypatch.setattr(e2e, "verify_skill_install", lambda: None)
+    monkeypatch.setattr(e2e, "REPO_ROOT", tmp_path)
+    e2e.run(lang="de", runs=1)
+    partial = json.loads((tmp_path / "evals" / "reports" / "_partial"
+                          / "e2e_de_a.json").read_text(encoding="utf-8"))
+    assert partial["runs"][0]["first_attempt_changelog"] is False

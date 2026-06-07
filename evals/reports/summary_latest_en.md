@@ -1,5 +1,12 @@
 # EN Baseline Eval Summary
 
+## SP1 (2026-06-07) — closed metric-only, no behavior change
+
+- **Detection smoke (force-full, 40 EN cases):** `overall_detection_rate` **0.905** — healthy (non-gating crater baseline; rigorous noise-budgeted guard → SP3).
+- **True-negative (9 EN cases × 5 runs):** **5/9 majority, 51% per-run, noise-dominated.** Zero stable behavior defects — `pattern_008` (#8 "serves as"/"boasts") and `pattern_029` (#29 fragmented header) are corpus disputes (the skill's own documented Before-examples placed in the leave-alone set). → SP3 corpus review + multi-run harness.
+- **Change-log defect:** 1/51 pooled (DE+EN), premise refuted; lever 1 dropped.
+- **Shipped:** `changelog_first_attempt_rate` sentinel; **SKILL.md unchanged vs main**; 306 pytest green.
+
 **Status: v3.4.1 sign-off baseline. Pattern 0.619 (post-parser-fix). FP 0.2039 + density preflight 1.00 unchanged. E2E 6/6 cases pass per-case ≥8.0 on all 3 dims after meaning-preservation rule iteration + upstream v2.6.0 port. New `career` domain shipped with first-shot E2E pass.**
 
 **Pattern run date:** 2026-05-27 07:20 (resume of 2026-05-26 22:04 run after Pro session reset)
