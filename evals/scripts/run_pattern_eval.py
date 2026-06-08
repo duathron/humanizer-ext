@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import statistics
 import subprocess
 import sys
 from collections import defaultdict
@@ -17,6 +18,7 @@ from pathlib import Path
 from evals.scripts._shared import (
     Case,
     SkillRunError,
+    aggregate_runs,
     load_pattern_corpus,
     run_skill,
     verify_skill_install,
@@ -28,7 +30,7 @@ DEFAULT_THRESHOLD = 0.85
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
-def score_case(case: Case, *, model: str = "sonnet", force_full: bool = False) -> dict:
+def _score_case_once(case: Case, *, model: str = "sonnet", force_full: bool = False) -> dict:
     """Run one case through the skill and report which expected_changes survived.
 
     Three case categories:
@@ -136,6 +138,69 @@ def score_case(case: Case, *, model: str = "sonnet", force_full: bool = False) -
     }
 
 
+def score_case(case: Case, *, model: str = "sonnet", force_full: bool = False, runs: int = 5) -> dict:
+    """Multi-run wrapper: run the per-case scoring `runs` times and aggregate.
+
+    Unscorable categories (no run_skill call) are decided once. Scored + true-neg
+    categories run N times; each run's run_skill exception is caught EXCEPT a
+    session-limit error, which re-raises so run()'s case-level break still fires.
+    """
+    # Unscorable categories don't call the skill — decide once, no multi-run.
+    if not case.true_negative and not case.expected_changes:
+        return _score_case_once(case, model=model, force_full=force_full)
+    if not case.true_negative:
+        input_lower = case.input.lower()
+        if not [t for t in case.expected_changes if t.lower() in input_lower]:
+            return _score_case_once(case, model=model, force_full=force_full)
+
+    run_dicts: list[dict | None] = []
+    for _ in range(runs):
+        try:
+            run_dicts.append(_score_case_once(case, model=model, force_full=force_full))
+        except SkillRunError as exc:
+            if _is_session_limit_error(exc):
+                raise  # quota guard: propagate so run()'s break fires
+            run_dicts.append(None)
+        except subprocess.TimeoutExpired:
+            run_dicts.append(None)
+
+    if case.true_negative:
+        values = [r["edit_ratio"] if r is not None else None for r in run_dicts]
+        agg = aggregate_runs(values, kind="continuous", n_target=runs, threshold=0.10)
+        present_vals = [r for r in run_dicts if r is not None]
+        return {
+            "case_id": case.id,
+            "pattern_id": case.metadata.get("pattern_id"),
+            "status": "true_negative",
+            "detected": bool(agg["verdict"]),            # for true-neg, "left it alone"
+            "passes_true_negative": bool(agg["verdict"]),
+            "edit_ratio": agg["median"],
+            "runs": [None if r is None else r["edit_ratio"] for r in run_dicts],
+            "aggregate": agg,
+            "rewrite_preview": (present_vals[0]["rewrite_preview"] if present_vals else ""),
+        }
+
+    # scored detection case
+    values = [1.0 if (r is not None and r["detected"]) else (0.0 if r is not None else None)
+              for r in run_dicts]
+    agg = aggregate_runs(values, kind="binary", n_target=runs)
+    present = [r for r in run_dicts if r is not None]
+    med_present = round(statistics.median([r["terms_present"] for r in present])) if present else 0
+    med_removed = round(statistics.median([r["terms_removed"] for r in present])) if present else 0
+    return {
+        "case_id": case.id,
+        "pattern_id": case.metadata.get("pattern_id"),
+        "status": "scored",
+        "detected": bool(agg["verdict"]) if agg["verdict"] is not None else False,
+        "runs": [None if r is None else r["detected"] for r in run_dicts],
+        "aggregate": agg,
+        "terms_present": med_present,
+        "terms_removed": med_removed,
+        "rewrite_preview": (present[0]["rewrite_preview"] if present else ""),
+        "preflight": (present[0]["preflight"] if present else ""),  # back-compat: test_score_case_scorable_returns_extra_keys asserts this key
+    }
+
+
 PARTIALS_SUBDIR = "_partial"
 
 
@@ -161,6 +226,7 @@ def run(
     threshold: float = DEFAULT_THRESHOLD,
     force: bool = False,
     aggregate_only: bool = False,
+    runs: int = 5,
     *,
     _corpus_dir_override: Path | None = None,
     _partial_dir_override: Path | None = None,
@@ -178,6 +244,8 @@ def run(
     ``summary['session_limit_hit'] = True``.  Both failure kinds leave
     ``summary['is_complete'] = False`` so the run is resumable.
     """
+    if runs < 1:
+        raise ValueError(f"runs must be >= 1, got {runs}")
     if not aggregate_only:
         verify_skill_install()
     if _corpus_dir_override is not None:
@@ -210,7 +278,7 @@ def run(
             continue
 
         try:
-            score = score_case(case, model=model, force_full=True)
+            score = score_case(case, model=model, force_full=True, runs=runs)
         except SkillRunError as exc:
             if _is_session_limit_error(exc):
                 print(
@@ -231,9 +299,11 @@ def run(
     per_pattern_summary = []
     for pid in sorted(by_pattern.keys()):
         scores = by_pattern[pid]
-        scorable = [s for s in scores if s.get("status") == "scored"]
+        scorable = [s for s in scores if s.get("status") == "scored"
+                    and not s.get("aggregate", {}).get("inconclusive")]
         unscorable = [s for s in scores if s.get("status", "").startswith("unscorable")]
-        true_negatives = [s for s in scores if s.get("status") == "true_negative"]
+        true_negatives = [s for s in scores if s.get("status") == "true_negative"
+                          and not s.get("aggregate", {}).get("inconclusive")]
         detected = sum(1 for s in scorable if s["detected"])
         total = len(scorable)
         rate = detected / total if total else 0.0
@@ -254,14 +324,25 @@ def run(
         )
 
     all_scorable = [
-        s for ps in by_pattern.values() for s in ps if s.get("status") == "scored"
+        s for ps in by_pattern.values() for s in ps
+        if s.get("status") == "scored" and not s.get("aggregate", {}).get("inconclusive")
     ]
     overall = (
         sum(s["detected"] for s in all_scorable) / len(all_scorable)
     ) if all_scorable else 0.0
     total_unscorable = sum(p["unscorable"] for p in per_pattern_summary)
+
+    inconclusive_cases = [
+        s["case_id"] for ps in by_pattern.values() for s in ps
+        if s.get("aggregate", {}).get("inconclusive")
+    ]
+    flaky_cases = [
+        s["case_id"] for ps in by_pattern.values() for s in ps
+        if s.get("aggregate", {}).get("flaky")
+    ]
     is_complete = (
         not skipped_no_partial and not failed and not session_limit_hit
+        and not inconclusive_cases
     )
 
     # Per-term removal rate: de-deflated companion to the all-or-nothing
@@ -282,6 +363,12 @@ def run(
         else 0.0
     )
 
+    overall_fraction = (
+        sum(s["aggregate"]["fraction"] for s in all_scorable
+            if s.get("aggregate", {}).get("fraction") is not None)
+        / len([s for s in all_scorable if s.get("aggregate", {}).get("fraction") is not None])
+    ) if any(s.get("aggregate", {}).get("fraction") is not None for s in all_scorable) else 0.0
+
     return {
         "eval_type": "pattern",
         "lang": lang,
@@ -289,6 +376,7 @@ def run(
         "threshold": threshold,
         "summary": {
             "overall_detection_rate": round(overall, 3),
+            "overall_detection_fraction": round(overall_fraction, 3),
             "per_term_removal_rate": per_term_removal_rate,
             "forced_full": True,
             "patterns_below_threshold": sum(
@@ -301,6 +389,9 @@ def run(
             "failed": failed,
             "session_limit_hit": session_limit_hit,
             "is_complete": is_complete,
+            "flaky_cases": flaky_cases,
+            "inconclusive_cases": inconclusive_cases,
+            "runs_per_case": runs,
         },
         "per_pattern": per_pattern_summary,
     }
@@ -325,6 +416,10 @@ def main() -> None:
         "--aggregate-only", action="store_true",
         help="No API calls; just aggregate existing partials into a summary.",
     )
+    parser.add_argument(
+        "--runs", type=int, default=5,
+        help="Skill invocations per case; verdict = majority/median over runs.",
+    )
     args = parser.parse_args()
 
     report = run(
@@ -334,6 +429,7 @@ def main() -> None:
         threshold=args.threshold,
         force=args.force,
         aggregate_only=args.aggregate_only,
+        runs=args.runs,
     )
     json_path, md_path = write_report(f"pattern_{args.lang}", report)
     print(f"Wrote {json_path.name} and {md_path.name}")
@@ -359,6 +455,15 @@ def main() -> None:
         print(
             "Session limit hit — stopping; re-run after reset to resume from partials."
         )
+    if report["summary"].get("inconclusive_cases"):
+        print(
+            f"Inconclusive ({len(report['summary']['inconclusive_cases'])} cases — "
+            "too few successful runs; NOT resumable, needs --force or a corpus/skill fix): "
+            + ", ".join(report["summary"]["inconclusive_cases"])
+        )
+    if report["summary"].get("flaky_cases"):
+        print(f"Flaky ({len(report['summary']['flaky_cases'])} cases disagreed run-to-run): "
+              + ", ".join(report["summary"]["flaky_cases"]))
     is_complete = report["summary"].get("is_complete", True)
     # Non-zero exit when: run is incomplete (any failures / session limit) OR
     # run is complete but patterns fell below the detection threshold.

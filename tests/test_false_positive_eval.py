@@ -309,8 +309,15 @@ FP_MODULE = "evals.scripts.run_false_positive_eval"
 
 
 def test_fp_run_per_item_timeout_continues_and_records_failure(tmp_path, monkeypatch):
-    """TimeoutExpired on one file → loop continues; remaining files processed;
-    failing file appears in summary['failed']; run is marked incomplete (is_complete=False)."""
+    """Case-level fallback: score_human_text itself raises TimeoutExpired → loop continues;
+    failing file in summary['failed']; run marked is_complete=False.
+
+    Under SP3a a realistic per-run timeout becomes a None run inside score_human_text's
+    multi-run loop, so this test covers the case-level except that remains for defensive
+    coverage (e.g. a monkeypatched score function that propagates, or a regression).
+    The realistic per-run path is covered by test_fp_score_runs_n_times_median_verdict
+    and test_fp_run_inconclusive_file_own_bucket.
+    """
     corpus_dir = tmp_path / "corpus"
     corpus_dir.mkdir()
     _make_corpus(corpus_dir, ["file_a.md", "file_b.md", "file_c.md"])
@@ -322,7 +329,7 @@ def test_fp_run_per_item_timeout_continues_and_records_failure(tmp_path, monkeyp
 
     call_count = {"n": 0}
 
-    def fake_score(text, *, lang, model, domain):
+    def fake_score(text, *, lang, model, domain, **_):
         call_count["n"] += 1
         # file_b.md is the second call — raise timeout
         if call_count["n"] == 2:
@@ -373,7 +380,7 @@ def test_fp_run_non_session_skill_error_continues_and_records_failure(tmp_path, 
 
     call_count = {"n": 0}
 
-    def fake_score(text, *, lang, model, domain):
+    def fake_score(text, *, lang, model, domain, **_):
         call_count["n"] += 1
         if call_count["n"] == 1:
             raise SkillRunError("claude CLI exited 1\n  stderr: rate limit\n  stdout: (empty)")
@@ -419,7 +426,7 @@ def test_fp_run_session_limit_stops_loop_and_marks_incomplete(tmp_path, monkeypa
 
     call_count = {"n": 0}
 
-    def fake_score(text, *, lang, model, domain):
+    def fake_score(text, *, lang, model, domain, **_):
         call_count["n"] += 1
         if call_count["n"] == 2:
             raise SkillRunError(
@@ -469,7 +476,7 @@ def test_fp_run_success_path_unaffected(tmp_path, monkeypatch):
 
     monkeypatch.setattr(f"{FP_MODULE}.REPO_ROOT", tmp_path)
 
-    def fake_score(text, *, lang, model, domain):
+    def fake_score(text, *, lang, model, domain, **_):
         return {
             "edit_distance": 2,
             "edit_ratio": 0.02,
@@ -497,3 +504,104 @@ def test_fp_run_success_path_unaffected(tmp_path, monkeypatch):
     assert summary.get("failed", []) == []
     assert summary.get("is_complete") is True
     assert summary.get("session_limit_hit") is False
+
+
+# ---------------------------------------------------------------------------
+# Task 3: multi-run tests
+# ---------------------------------------------------------------------------
+
+
+def test_fp_score_runs_n_times_median_verdict(monkeypatch):
+    import evals.scripts.run_false_positive_eval as fp
+    inp = "A clean human paragraph that the skill should leave essentially intact here."
+    # 3 near-verbatim (low ratio) + 2 heavy edits -> median low -> NOT over-threshold
+    outs = iter([
+        {"final": inp}, {"final": inp}, {"final": inp},
+        {"final": "completely different text entirely"},
+        {"final": "completely different text entirely"},
+    ])
+    monkeypatch.setattr(fp, "run_skill", lambda *a, **k: next(outs))
+    score = fp.score_human_text(inp, lang="en", model="sonnet", domain="casual", runs=5)
+    assert len(score["runs"]) == 5
+    assert score["above_threshold"] is False          # median edit_ratio <= 0.10
+    assert score["aggregate"]["flaky"] is True
+
+
+def test_fp_score_session_limit_propagates(monkeypatch):
+    import evals.scripts.run_false_positive_eval as fp
+    from evals.scripts._shared import SkillRunError
+    def boom(*a, **k):
+        raise SkillRunError("session limit reached")
+    monkeypatch.setattr(fp, "run_skill", boom)
+    with pytest.raises(SkillRunError):
+        fp.score_human_text("clean text", lang="en", model="sonnet", domain="casual", runs=5)
+
+
+def test_fp_run_inconclusive_file_own_bucket(monkeypatch, tmp_path):
+    import evals.scripts.run_false_positive_eval as fp
+    from evals.scripts._shared import SkillRunError
+    corpus_dir = tmp_path / "human" / "synthetic"; corpus_dir.mkdir(parents=True)
+    (corpus_dir / "f1.md").write_text("A clean human sentence left alone.", encoding="utf-8")
+    partial_dir = tmp_path / "partial"; partial_dir.mkdir()
+    seq = iter([
+        {"final": "A clean human sentence left alone."},
+        SkillRunError("x"), SkillRunError("x"), SkillRunError("x"), SkillRunError("x"),
+    ])
+    def maybe(*a, **k):
+        x = next(seq)
+        if isinstance(x, Exception): raise x
+        return x
+    monkeypatch.setattr(fp, "run_skill", maybe)
+    monkeypatch.setattr(fp, "verify_skill_install", lambda: None)
+    monkeypatch.setattr("evals.scripts.run_false_positive_eval.REPO_ROOT", tmp_path)
+    report = fp.run(lang="en", corpus="synthetic", runs=5,
+                    _corpus_dir_override=corpus_dir, _partial_dir_override=partial_dir)
+    s = report["summary"]
+    assert "f1.md" in s["inconclusive_files"]
+    assert not s["failed"]
+    assert s["is_complete"] is False
+
+
+def test_fp_score_uses_configured_threshold(monkeypatch):
+    """flaky/verdict computed at the passed threshold, not hardcoded DEFAULT_THRESHOLD."""
+    import evals.scripts.run_false_positive_eval as fp
+    # 5 runs with fixed edit_ratios via monkeypatched _score_human_text_once
+    ratios = iter([0.05, 0.06, 0.20, 0.30, 0.40])
+    monkeypatch.setattr(fp, "_score_human_text_once",
+                        lambda *a, **k: {"edit_ratio": next(ratios),
+                                         "density_preflight_quick_drop": False,
+                                         "rewrite_length_chars": 10, "preflight_message": ""})
+    # threshold 0.25: successes straddle (0.05,0.06,0.20 below; 0.30,0.40 above) -> flaky;
+    # median 0.20 <= 0.25 -> NOT above_threshold
+    score = fp.score_human_text("x", lang="en", model="sonnet", domain="casual",
+                                runs=5, threshold=0.25)
+    assert score["aggregate"]["flaky"] is True
+    assert score["above_threshold"] is False
+    assert score["edit_ratio"] == 0.20
+
+
+def test_fp_run_rejects_runs_below_one():
+    import evals.scripts.run_false_positive_eval as fp
+    with pytest.raises(ValueError, match="runs must be >= 1"):
+        fp.run(lang="en", corpus="synthetic", runs=0)
+
+
+def test_fp_run_all_failed_file_no_crash_none_median(monkeypatch, tmp_path):
+    """All N runs fail -> median None. run() must NOT crash on `None > threshold`."""
+    import evals.scripts.run_false_positive_eval as fp
+    from evals.scripts._shared import SkillRunError
+    corpus_dir = tmp_path / "human" / "synthetic"; corpus_dir.mkdir(parents=True)
+    (corpus_dir / "f1.md").write_text("A clean human sentence.", encoding="utf-8")
+    partial_dir = tmp_path / "partial"; partial_dir.mkdir()
+    monkeypatch.setattr(fp, "run_skill",
+                        lambda *a, **k: (_ for _ in ()).throw(SkillRunError("transient")))
+    monkeypatch.setattr(fp, "verify_skill_install", lambda: None)
+    monkeypatch.setattr("evals.scripts.run_false_positive_eval.REPO_ROOT", tmp_path)
+    report = fp.run(lang="en", corpus="synthetic", runs=5,
+                    _corpus_dir_override=corpus_dir, _partial_dir_override=partial_dir)
+    s = report["summary"]
+    assert "f1.md" in s["inconclusive_files"]      # 0 successes -> inconclusive
+    # the per-file record exists with above_threshold False (None-median guarded), no crash
+    rec = next(r for r in report["per_file"] if r["file"] == "f1.md")
+    assert rec["above_threshold"] is False
+    assert rec["edit_ratio"] is None

@@ -6,6 +6,8 @@ the claude CLI or write reports.
 from __future__ import annotations
 
 import json
+import math
+import statistics
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -390,6 +392,58 @@ def verify_skill_install(
                 f"installed pack bytes differ from repo: {rel} — "
                 f"the eval would test a stale pack version"
             )
+
+
+def aggregate_runs(
+    values: list,
+    *,
+    kind: str,
+    n_target: int,
+    threshold: float | None = None,
+) -> dict:
+    """Aggregate per-run outcomes for ONE case/file into a stable verdict.
+
+    `values`: per-run outcomes; `None` = a failed/timed-out run (excluded).
+    `kind="continuous"`: values are floats (e.g. edit_ratio). verdict = median <= threshold.
+    `kind="binary"`:     values are 1.0/0.0 (e.g. detected). verdict = majority of successes.
+    Inconclusive when fewer than ceil(n_target/2) runs succeed -> verdict None.
+    """
+    successes = [v for v in values if v is not None]
+    n_success = len(successes)
+    n_fail = len(values) - n_success
+    inconclusive = n_success < math.ceil(n_target / 2)
+
+    if kind == "continuous":
+        if threshold is None:
+            raise ValueError("continuous kind requires a threshold")
+        median = round(statistics.median(successes), 4) if n_success else None
+        k = sum(1 for v in successes if v <= threshold)
+        fraction = None
+        verdict = None if inconclusive else (median is not None and median <= threshold)
+        flaky = (
+            not inconclusive and n_success > 0
+            and min(successes) <= threshold < max(successes)
+        )
+    elif kind == "binary":
+        k = sum(1 for v in successes if v == 1.0)
+        fraction = round(k / n_success, 4) if n_success else None
+        median = None
+        majority = (k >= math.ceil(n_success / 2)) if n_success else False
+        verdict = None if inconclusive else majority
+        flaky = not inconclusive and 0 < k < n_success
+    else:
+        raise ValueError(f"unknown kind: {kind!r}")
+
+    return {
+        "verdict": verdict,
+        "median": median,
+        "fraction": fraction,
+        "passed_fraction": f"{k}/{n_success}",
+        "n_success": n_success,
+        "n_fail": n_fail,
+        "inconclusive": inconclusive,
+        "flaky": flaky,
+    }
 
 
 def _render_report_md(name: str, data: dict[str, Any]) -> str:

@@ -54,8 +54,12 @@ def _case(case_id: str, *, pattern_id: int = 1) -> dict:
 
 
 def test_pattern_run_per_item_timeout_continues_and_records_failure(tmp_path, monkeypatch):
-    """TimeoutExpired on case_b → loop continues; case_a and case_c processed;
-    case_b appears in summary['failed']; is_complete is False."""
+    """Case-level fallback: a score_case() that itself raises TimeoutExpired (e.g. a bug or
+    a monkeypatched test) still lets the loop continue and lands in summary['failed'].
+    Under SP3a the realistic per-run timeout path is covered by
+    test_pattern_score_case_nonsession_failure_becomes_none_run; this test covers the
+    defensive case-level except that remains in run() for propagated session-limit and
+    other unexpected raises from score_case itself."""
     corpus_dir = tmp_path / "patterns"
     _write_pattern_file(
         corpus_dir,
@@ -70,7 +74,7 @@ def test_pattern_run_per_item_timeout_continues_and_records_failure(tmp_path, mo
 
     call_count = {"n": 0}
 
-    def fake_score_case(case: Case, *, model: str = "sonnet", force_full: bool = False) -> dict:
+    def fake_score_case(case: Case, *, model: str = "sonnet", force_full: bool = False, **_) -> dict:
         call_count["n"] += 1
         if case.id == "case_b":
             raise subprocess.TimeoutExpired(cmd="claude", timeout=180)
@@ -126,7 +130,7 @@ def test_pattern_run_non_session_skill_error_continues(tmp_path, monkeypatch):
 
     monkeypatch.setattr(f"{PATTERN_MODULE}.REPO_ROOT", tmp_path)
 
-    def fake_score_case(case: Case, *, model: str = "sonnet", force_full: bool = False) -> dict:
+    def fake_score_case(case: Case, *, model: str = "sonnet", force_full: bool = False, **_) -> dict:
         if case.id == "case_a":
             raise SkillRunError("claude CLI exited 1\n  stderr: some transient error\n  stdout: (empty)")
         return {
@@ -182,7 +186,7 @@ def test_pattern_run_session_limit_breaks_loop(tmp_path, monkeypatch):
 
     call_count = {"n": 0}
 
-    def fake_score_case(case: Case, *, model: str = "sonnet", force_full: bool = False) -> dict:
+    def fake_score_case(case: Case, *, model: str = "sonnet", force_full: bool = False, **_) -> dict:
         call_count["n"] += 1
         if case.id == "case_b":
             raise SkillRunError(
@@ -242,7 +246,7 @@ def test_pattern_run_success_path_unaffected(tmp_path, monkeypatch):
 
     monkeypatch.setattr(f"{PATTERN_MODULE}.REPO_ROOT", tmp_path)
 
-    def fake_score_case(case: Case, *, model: str = "sonnet", force_full: bool = False) -> dict:
+    def fake_score_case(case: Case, *, model: str = "sonnet", force_full: bool = False, **_) -> dict:
         return {
             "case_id": case.id,
             "pattern_id": case.metadata.get("pattern_id"),
@@ -429,7 +433,7 @@ def test_run_aggregates_per_term_removal_rate(tmp_path, monkeypatch):
 
     monkeypatch.setattr(f"{PATTERN_MODULE}.REPO_ROOT", tmp_path)
 
-    def fake_score_case(case: Case, *, model: str = "sonnet", force_full: bool = False) -> dict:
+    def fake_score_case(case: Case, *, model: str = "sonnet", force_full: bool = False, **_) -> dict:
         if case.id == "case_a":
             # 1 of 2 terms removed
             return {
@@ -566,7 +570,7 @@ def test_run_per_term_removal_rate_divide_by_zero_guard(tmp_path, monkeypatch):
 
     monkeypatch.setattr(f"{PATTERN_MODULE}.REPO_ROOT", tmp_path)
 
-    def fake_score_case(case: Case, *, model: str = "sonnet", force_full: bool = False) -> dict:
+    def fake_score_case(case: Case, *, model: str = "sonnet", force_full: bool = False, **_) -> dict:
         return {
             "case_id": case.id,
             "pattern_id": 6,
@@ -596,3 +600,149 @@ def test_run_per_term_removal_rate_divide_by_zero_guard(tmp_path, monkeypatch):
     summary = result["summary"]
     assert "per_term_removal_rate" in summary
     assert summary["per_term_removal_rate"] == 0.0
+
+
+# ---------------------------------------------------------------------------
+# Task 2: multi-run score_case + run() aggregation (SP3a)
+# ---------------------------------------------------------------------------
+
+
+def test_pattern_run_rejects_runs_below_one():
+    import evals.scripts.run_pattern_eval as pat
+    with pytest.raises(ValueError, match="runs must be >= 1"):
+        pat.run(lang="en", runs=0)
+
+
+def test_pattern_score_case_runs_n_times_and_aggregates_detection(monkeypatch):
+    """score_case runs the skill N times; detected = majority; partial carries runs[]."""
+    import evals.scripts.run_pattern_eval as pat
+    from evals.scripts._shared import Case
+    # 3 of 5 runs remove the tell -> majority detected True, fraction 0.6
+    outs = iter([
+        {"final": "clean"},            # removed -> detected
+        {"final": "clean"},            # removed
+        {"final": "clean"},            # removed
+        {"final": "still aiword here"},# retained -> not detected
+        {"final": "still aiword here"},# retained
+    ])
+    monkeypatch.setattr(pat, "run_skill", lambda *a, **k: next(outs))
+    case = Case(id="p1_en_001", input="aiword here", expected_changes=["aiword"],
+                domain="casual", true_negative=False, expected_unchanged=[], metadata={"pattern_id": 1, "lang": "en"})
+    score = pat.score_case(case, model="sonnet", force_full=True, runs=5)
+    assert len(score["runs"]) == 5
+    assert score["detected"] is True                  # majority verdict
+    assert score["aggregate"]["fraction"] == 0.6      # stability signal
+    assert score["status"] == "scored"
+
+
+def test_pattern_score_case_true_negative_uses_median_edit_ratio(monkeypatch):
+    import evals.scripts.run_pattern_eval as pat
+    from evals.scripts._shared import Case
+    inp = "This is a clean human sentence that should be left alone entirely."
+    # 3 runs ~unchanged (low ratio), 2 heavily edited -> median low -> passes
+    outs = iter([
+        {"final": inp}, {"final": inp}, {"final": inp},
+        {"final": "totally different rewritten text"},
+        {"final": "totally different rewritten text"},
+    ])
+    monkeypatch.setattr(pat, "run_skill", lambda *a, **k: next(outs))
+    case = Case(id="p8_en_001", input=inp, expected_changes=[], expected_unchanged=[],
+                domain="casual", true_negative=True, metadata={"pattern_id": 8, "lang": "en"})
+    score = pat.score_case(case, model="sonnet", force_full=False, runs=5)
+    assert score["status"] == "true_negative"
+    assert score["passes_true_negative"] is True      # median edit_ratio <= 0.10
+    assert score["aggregate"]["flaky"] is True         # runs straddled the threshold
+
+
+def test_pattern_score_case_session_limit_propagates(monkeypatch):
+    """A session-limit error mid-case must propagate (quota guard), not become a None run."""
+    import evals.scripts.run_pattern_eval as pat
+    from evals.scripts._shared import Case, SkillRunError
+    def boom(*a, **k):
+        raise SkillRunError("Claude usage limit reached — session limit")
+    monkeypatch.setattr(pat, "run_skill", boom)
+    case = Case(id="p1_en_001", input="aiword here", expected_changes=["aiword"],
+                domain="casual", true_negative=False, expected_unchanged=[], metadata={"pattern_id": 1, "lang": "en"})
+    with pytest.raises(SkillRunError):
+        pat.score_case(case, model="sonnet", force_full=True, runs=5)
+
+
+def test_pattern_score_case_nonsession_failure_becomes_none_run(monkeypatch):
+    """A non-session failure on one run becomes a None run; the case is NOT aborted."""
+    import evals.scripts.run_pattern_eval as pat
+    from evals.scripts._shared import Case, SkillRunError
+    seq = iter([
+        {"final": "clean"},                      # detected
+        SkillRunError("transient CLI exit 1"),   # non-session -> None run
+        {"final": "clean"},                      # detected
+        {"final": "clean"},                      # detected
+        {"final": "clean"},                      # detected
+    ])
+    def maybe(*a, **k):
+        x = next(seq)
+        if isinstance(x, Exception):
+            raise x
+        return x
+    monkeypatch.setattr(pat, "run_skill", maybe)
+    case = Case(id="p1_en_001", input="aiword here", expected_changes=["aiword"],
+                domain="casual", true_negative=False, expected_unchanged=[], metadata={"pattern_id": 1, "lang": "en"})
+    score = pat.score_case(case, model="sonnet", force_full=True, runs=5)
+    assert score["runs"].count(None) == 1
+    assert score["aggregate"]["n_fail"] == 1
+    assert score["detected"] is True             # 4/4 successful detected
+
+
+def test_pattern_run_inconclusive_case_own_bucket_not_failed(monkeypatch, tmp_path):
+    """A case with <ceil(N/2) successful runs lands in inconclusive_cases, not failed."""
+    import evals.scripts.run_pattern_eval as pat
+    corpus_dir = tmp_path / "corpus"; corpus_dir.mkdir()
+    partial_dir = tmp_path / "partial"; partial_dir.mkdir()
+    _write_pattern_file(corpus_dir, 1, [
+        {"id": "p1_en_001", "input": "aiword here", "expected_changes": ["aiword"],
+         "domain": "casual", "metadata": {"pattern_id": 1, "lang": "en"}},
+    ])
+    from evals.scripts._shared import SkillRunError
+    # 4 of 5 runs fail (non-session) -> only 1 success < ceil(5/2)=3 -> inconclusive
+    seq = iter([
+        {"final": "clean"},
+        SkillRunError("x"), SkillRunError("x"), SkillRunError("x"), SkillRunError("x"),
+    ])
+    def maybe(*a, **k):
+        x = next(seq)
+        if isinstance(x, Exception):
+            raise x
+        return x
+    monkeypatch.setattr(pat, "run_skill", maybe)
+    monkeypatch.setattr(pat, "verify_skill_install", lambda: None)
+    monkeypatch.setattr(f"{PATTERN_MODULE}.REPO_ROOT", tmp_path)
+    report = pat.run(lang="en", runs=5, _corpus_dir_override=corpus_dir,
+                     _partial_dir_override=partial_dir)
+    s = report["summary"]
+    assert "p1_en_001" in s["inconclusive_cases"]
+    assert not s["failed"]                        # NOT laundered into failed
+    assert s["is_complete"] is False              # terminal-unstable, exit 1
+
+
+def test_pattern_multirun_partial_reused_wholesale(monkeypatch, tmp_path):
+    """A cached multi-run partial (with runs[]) is reused without re-scoring; --force redoes."""
+    import evals.scripts.run_pattern_eval as pat
+    corpus_dir = tmp_path / "corpus"; corpus_dir.mkdir()
+    partial_dir = tmp_path / "partial"; partial_dir.mkdir()
+    _write_pattern_file(corpus_dir, 1, [
+        {"id": "p1_en_001", "input": "aiword here", "expected_changes": ["aiword"],
+         "domain": "casual", "metadata": {"pattern_id": 1, "lang": "en"}},
+    ])
+    calls = {"n": 0}
+    def counting(*a, **k):
+        calls["n"] += 1
+        return {"final": "clean"}
+    monkeypatch.setattr(pat, "run_skill", counting)
+    monkeypatch.setattr(pat, "verify_skill_install", lambda: None)
+    monkeypatch.setattr(f"{PATTERN_MODULE}.REPO_ROOT", tmp_path)
+    pat.run(lang="en", runs=5, _corpus_dir_override=corpus_dir, _partial_dir_override=partial_dir)
+    first = calls["n"]
+    assert first == 5                       # 5 runs for the one case
+    pat.run(lang="en", runs=5, _corpus_dir_override=corpus_dir, _partial_dir_override=partial_dir)
+    assert calls["n"] == first              # second run reused the partial, no new skill calls
+    pat.run(lang="en", runs=5, force=True, _corpus_dir_override=corpus_dir, _partial_dir_override=partial_dir)
+    assert calls["n"] == first + 5          # --force re-scored

@@ -426,7 +426,7 @@ def test_pattern_eval_scores_detection(mock_run_skill, tmp_path, monkeypatch):
         domain="casual",
         metadata={"pattern_id": 7, "pattern_name": "AI vocabulary", "lang": "en"},
     )
-    # Simulate a rewrite that removed all three expected_changes
+    # Simulate a rewrite that removed all three expected_changes (all 5 runs identical)
     mock_run_skill.return_value = {
         "domain": "casual",
         "preflight": "",
@@ -434,10 +434,11 @@ def test_pattern_eval_scores_detection(mock_run_skill, tmp_path, monkeypatch):
         "final": "The report flags an important shift.",
     }
 
-    score = score_case(case, model="sonnet")
+    score = score_case(case, model="sonnet", runs=5)
     assert score["detected"] is True
-    assert score["removed_terms"] == ["Additionally", "underscores", "pivotal moment"]
-    assert score["retained_terms"] == []
+    # multi-run: terms_present/terms_removed are now medians across runs
+    assert score["terms_present"] == 3
+    assert score["terms_removed"] == 3
 
 
 @patch("evals.scripts.run_pattern_eval.run_skill")
@@ -459,10 +460,10 @@ def test_pattern_eval_partial_removal(mock_run_skill):
         "draft": "This is a pivotal moment.",
         "final": "This is a pivotal moment.",
     }
-    score = score_case(case, model="sonnet")
-    assert score["detected"] is False  # only 1 of 2 removed
-    assert score["removed_terms"] == ["Additionally"]
-    assert score["retained_terms"] == ["pivotal moment"]
+    score = score_case(case, model="sonnet", runs=5)
+    assert score["detected"] is False  # only 1 of 2 removed (majority across runs)
+    assert score["terms_present"] == 2
+    assert score["terms_removed"] == 1
 
 
 @patch("evals.scripts.run_e2e_eval._call_judge")
@@ -574,3 +575,99 @@ def test_run_skill_force_full_false_no_directive(mock_run):
     cmd = mock_run.call_args[0][0]
     full_prompt = cmd[cmd.index("-p") + 1]
     assert "do NOT switch to Quick mode" not in full_prompt
+
+
+def test_aggregate_runs_continuous_median_verdict():
+    from evals.scripts._shared import aggregate_runs
+    r = aggregate_runs([0.02, 0.05, 0.08, 0.40, 0.50], threshold=0.10,
+                       kind="continuous", n_target=5)
+    assert r["verdict"] is True
+    assert r["median"] == 0.08
+    assert r["fraction"] is None
+    assert r["passed_fraction"] == "3/5"
+    assert r["inconclusive"] is False
+    assert r["flaky"] is True
+
+
+def test_aggregate_runs_continuous_passed_fraction_can_disagree_with_verdict():
+    from evals.scripts._shared import aggregate_runs
+    r = aggregate_runs([0.05, 0.06, 0.11, 0.12, 0.13], threshold=0.10,
+                       kind="continuous", n_target=5)
+    assert r["verdict"] is False
+    assert r["median"] == 0.11
+    assert r["passed_fraction"] == "2/5"
+
+
+def test_aggregate_runs_continuous_not_flaky_when_all_one_side():
+    from evals.scripts._shared import aggregate_runs
+    r = aggregate_runs([0.02, 0.03, 0.04, 0.05, 0.06], threshold=0.10,
+                       kind="continuous", n_target=5)
+    assert r["flaky"] is False
+    assert r["verdict"] is True
+
+
+def test_aggregate_runs_binary_majority_and_fraction():
+    from evals.scripts._shared import aggregate_runs
+    r = aggregate_runs([1.0, 1.0, 1.0, 0.0, 0.0], kind="binary", n_target=5)
+    assert r["verdict"] is True
+    assert r["fraction"] == 0.6
+    assert r["median"] is None
+    assert r["passed_fraction"] == "3/5"
+    assert r["flaky"] is True
+
+
+def test_aggregate_runs_binary_even_split_is_majority_not_fraction_mean():
+    """2/4 detected: majority (k>=ceil(4/2)=2) is True even though fraction is 0.5.
+    Pins that verdict is majority, not fraction>0.5 (which would be False)."""
+    from evals.scripts._shared import aggregate_runs
+    r = aggregate_runs([1.0, 1.0, 0.0, 0.0], kind="binary", n_target=4)
+    assert r["verdict"] is True
+    assert r["fraction"] == 0.5
+    assert r["flaky"] is True
+
+
+def test_aggregate_runs_binary_unanimous_not_flaky():
+    from evals.scripts._shared import aggregate_runs
+    r = aggregate_runs([1.0, 1.0, 1.0, 1.0, 1.0], kind="binary", n_target=5)
+    assert r["verdict"] is True
+    assert r["fraction"] == 1.0
+    assert r["flaky"] is False
+
+
+def test_aggregate_runs_inconclusive_when_too_few_succeed():
+    from evals.scripts._shared import aggregate_runs
+    r = aggregate_runs([0.02, 0.05, None, None, None], threshold=0.10,
+                       kind="continuous", n_target=5)
+    assert r["inconclusive"] is True
+    assert r["verdict"] is None
+    assert r["flaky"] is False
+    assert r["n_success"] == 2
+    assert r["n_fail"] == 3
+
+
+def test_aggregate_runs_all_failed_is_inconclusive():
+    from evals.scripts._shared import aggregate_runs
+    r = aggregate_runs([None, None, None, None, None], threshold=0.10,
+                       kind="continuous", n_target=5)
+    assert r["inconclusive"] is True
+    assert r["verdict"] is None
+    assert r["median"] is None
+    assert r["passed_fraction"] == "0/0"
+
+
+def test_aggregate_runs_verdict_boundary_median_equals_threshold():
+    """median == threshold must PASS (verdict uses <=, not <)."""
+    from evals.scripts._shared import aggregate_runs
+    r = aggregate_runs([0.10, 0.10, 0.10], threshold=0.10, kind="continuous", n_target=5)
+    assert r["verdict"] is True       # 0.10 <= 0.10
+    assert r["flaky"] is False        # all equal -> no straddle
+
+
+def test_aggregate_runs_inconclusive_boundary_exactly_half():
+    """n_success == ceil(n_target/2) is NOT inconclusive (uses <, not <=)."""
+    from evals.scripts._shared import aggregate_runs
+    r = aggregate_runs([0.02, 0.03, 0.04, None, None], threshold=0.10,
+                       kind="continuous", n_target=5)
+    assert r["n_success"] == 3        # ceil(5/2) == 3
+    assert r["inconclusive"] is False
+    assert r["verdict"] is True

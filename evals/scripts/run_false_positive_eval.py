@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import subprocess
 import sys
 from pathlib import Path
@@ -22,6 +23,7 @@ from rapidfuzz.distance import Levenshtein
 
 from evals.scripts._shared import (
     SkillRunError,
+    aggregate_runs,
     run_skill,
     verify_skill_install,
     write_report,
@@ -32,7 +34,7 @@ DEFAULT_THRESHOLD = 0.10  # edit ratio above this = over-editing
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
-def score_human_text(
+def _score_human_text_once(
     text: str, *, lang: str = "en", model: str = "sonnet", domain: str = "casual"
 ) -> dict:
     result = run_skill(text, lang=lang, mode="full", domain=domain, model=model)
@@ -47,6 +49,45 @@ def score_human_text(
         "preflight_message": result.get("preflight", ""),
         "density_preflight_quick_drop": quick_drop,
         "rewrite_length_chars": len(rewritten),
+    }
+
+
+def score_human_text(
+    text: str, *, lang: str = "en", model: str = "sonnet", domain: str = "casual",
+    runs: int = 5, threshold: float = DEFAULT_THRESHOLD
+) -> dict:
+    """Multi-run: run N times, verdict = median(edit_ratio) > threshold (over-edit).
+
+    `threshold` flows into aggregate_runs so the median verdict AND the flaky
+    straddle-marker are computed at the SAME threshold run() gates on (defaults to
+    DEFAULT_THRESHOLD for direct callers). run() passes the configured --threshold.
+    """
+    run_dicts: list[dict | None] = []
+    for _ in range(runs):
+        try:
+            run_dicts.append(_score_human_text_once(text, lang=lang, model=model, domain=domain))
+        except SkillRunError as exc:
+            if _is_session_limit_error(exc):
+                raise
+            run_dicts.append(None)
+        except subprocess.TimeoutExpired:
+            run_dicts.append(None)
+
+    values = [r["edit_ratio"] if r is not None else None for r in run_dicts]
+    agg = aggregate_runs(values, kind="continuous", n_target=runs, threshold=threshold)
+    present = [r for r in run_dicts if r is not None]
+    quick_drops = sum(1 for r in present if r["density_preflight_quick_drop"])
+    return {
+        "edit_ratio": agg["median"],
+        "median_edit_ratio": agg["median"],
+        "runs": values,
+        "aggregate": agg,
+        # over-threshold when the MEDIAN exceeds threshold (None when inconclusive),
+        # computed at the same `threshold` aggregate_runs used (flaky list stays consistent).
+        "above_threshold": (agg["median"] is not None and agg["median"] > threshold),
+        "density_preflight_quick_drop": (quick_drops >= math.ceil(len(present) / 2)) if present else False,
+        "rewrite_length_chars": (present[0]["rewrite_length_chars"] if present else 0),
+        "preflight_message": (present[0]["preflight_message"] if present else ""),
     }
 
 
@@ -147,6 +188,7 @@ def run(
     threshold: float = DEFAULT_THRESHOLD,
     force: bool = False,
     aggregate_only: bool = False,
+    runs: int = 5,
     *,
     _corpus_dir_override: Path | None = None,
     _partial_dir_override: Path | None = None,
@@ -163,6 +205,8 @@ def run(
     ``summary['session_limit_hit'] = True``.  Both failure kinds leave
     ``summary['is_complete'] = False`` so the run is resumable.
     """
+    if runs < 1:
+        raise ValueError(f"runs must be >= 1, got {runs}")
     if not aggregate_only:
         verify_skill_install()
     if _corpus_dir_override is not None:
@@ -195,7 +239,8 @@ def run(
 
         domain, body = _read_sample(path)
         try:
-            score = score_human_text(body, lang=lang, model=model, domain=domain)
+            score = score_human_text(body, lang=lang, model=model, domain=domain,
+                                      runs=runs, threshold=threshold)
         except SkillRunError as exc:
             if _is_session_limit_error(exc):
                 print(
@@ -212,16 +257,22 @@ def run(
 
         score["file"] = path.name
         score["domain"] = domain
-        score["above_threshold"] = score["edit_ratio"] > threshold
+        # run() is the authority for the configured --threshold.
+        # Guard against None median (all-failed inconclusive file): None > threshold raises TypeError.
+        score["above_threshold"] = (score["edit_ratio"] is not None and score["edit_ratio"] > threshold)
         partial.write_text(json.dumps(score, indent=2, ensure_ascii=False) + "\n")
         per_file.append(score)
 
-    total = len(per_file)
-    over_edited = sum(1 for s in per_file if s["above_threshold"])
-    quick_drops = sum(1 for s in per_file if s["density_preflight_quick_drop"])
-    mean_ratio = sum(s["edit_ratio"] for s in per_file) / total if total else 0.0
+    inconclusive_files = [s["file"] for s in per_file if s.get("aggregate", {}).get("inconclusive")]
+    flaky_files = [s["file"] for s in per_file if s.get("aggregate", {}).get("flaky")]
+    scorable_files = [s for s in per_file if not s.get("aggregate", {}).get("inconclusive")]
+    total = len(scorable_files)
+    over_edited = sum(1 for s in scorable_files if s["above_threshold"])
+    quick_drops = sum(1 for s in scorable_files if s["density_preflight_quick_drop"])
+    mean_ratio = sum(s["edit_ratio"] for s in scorable_files) / total if total else 0.0
     is_complete = (
         not skipped_no_partial and not failed and not session_limit_hit
+        and not inconclusive_files
     )
 
     return {
@@ -237,6 +288,9 @@ def run(
             "density_preflight_quick_drop_rate": (
                 round(quick_drops / total, 2) if total else 0.0
             ),
+            "flaky_files": flaky_files,
+            "inconclusive_files": inconclusive_files,
+            "runs_per_file": runs,
             "skipped_no_partial": skipped_no_partial,
             "failed": failed,
             "session_limit_hit": session_limit_hit,
@@ -269,6 +323,10 @@ def main() -> None:
         "--aggregate-only", action="store_true",
         help="No API calls; just aggregate existing partials into a summary.",
     )
+    parser.add_argument(
+        "--runs", type=int, default=5,
+        help="Skill invocations per file; verdict = median edit_ratio over runs.",
+    )
     args = parser.parse_args()
 
     report = run(
@@ -278,6 +336,7 @@ def main() -> None:
         threshold=args.threshold,
         force=args.force,
         aggregate_only=args.aggregate_only,
+        runs=args.runs,
     )
     name = f"false_positive_{args.lang}_{args.corpus}"
     json_path, md_path = write_report(name, report)
@@ -286,6 +345,15 @@ def main() -> None:
         f"Mean edit ratio: {report['summary']['mean_edit_ratio']} "
         f"({report['summary']['files_over_threshold']}/{report['summary']['total_files']} over {args.threshold})"
     )
+    if report["summary"].get("inconclusive_files"):
+        print(
+            f"Inconclusive ({len(report['summary']['inconclusive_files'])} files — "
+            "too few successful runs; NOT resumable, needs --force or a corpus/skill fix): "
+            + ", ".join(report["summary"]["inconclusive_files"])
+        )
+    if report["summary"].get("flaky_files"):
+        print(f"Flaky ({len(report['summary']['flaky_files'])} files disagreed run-to-run): "
+              + ", ".join(report["summary"]["flaky_files"]))
     if report["summary"].get("skipped_no_partial"):
         print(
             f"Skipped (no partial yet): {report['summary']['skipped_no_partial']} — "
