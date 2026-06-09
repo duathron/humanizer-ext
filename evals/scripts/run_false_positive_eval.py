@@ -24,6 +24,7 @@ from rapidfuzz.distance import Levenshtein
 from evals.scripts._shared import (
     SkillRunError,
     aggregate_runs,
+    is_refusal,
     run_skill,
     verify_skill_install,
     write_report,
@@ -39,6 +40,8 @@ def _score_human_text_once(
 ) -> dict:
     result = run_skill(text, lang=lang, mode="full", domain=domain, model=model)
     rewritten = result.get("final") or result.get("draft") or ""
+    if is_refusal(rewritten):
+        return None
     edit_distance = Levenshtein.distance(text, rewritten)
     edit_ratio = edit_distance / max(1, len(text))
     preflight = (result.get("preflight") or "").lower()

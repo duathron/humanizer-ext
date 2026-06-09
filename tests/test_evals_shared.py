@@ -671,3 +671,42 @@ def test_aggregate_runs_inconclusive_boundary_exactly_half():
     assert r["n_success"] == 3        # ceil(5/2) == 3
     assert r["inconclusive"] is False
     assert r["verdict"] is True
+
+
+def test_is_refusal_flags_real_refusal_stubs():
+    from evals.scripts._shared import is_refusal
+    assert is_refusal("no text provided. what should I humanize?") is True
+    assert is_refusal("Paste the text to humanize and I'll run a full casual pass.") is True
+    assert is_refusal("No text to humanize was provided.") is True
+    assert is_refusal("") is True
+    assert is_refusal("   \n  ") is True
+
+
+def test_is_refusal_does_not_flag_aggressive_rewrite():
+    """Load-bearing (round-1 BLOCKER): a legit heavy rewrite has NO refusal phrase."""
+    from evals.scripts._shared import is_refusal
+    assert is_refusal("It works better.") is False
+    assert is_refusal("This approach simply works better than before.") is False
+    # "can't help" appears in legit prose and is NOT a refusal phrase
+    assert is_refusal("You can't help noticing the difference.") is False
+
+
+def test_is_refusal_passes_real_short_rewrites():
+    from evals.scripts._shared import is_refusal
+    # real SP3b conversion rewrites (skill actually rewrote)
+    assert is_refusal("Gallery 825 is LAAA's exhibition space; it has four rooms.") is False
+    assert is_refusal("The goal is to write clearly.") is False
+    assert is_refusal("The report, which covered three continents, concluded demand had shifted.") is False
+
+
+def test_is_refusal_phrases_are_refusal_anchored_not_bare():
+    """Anchored phrases ('no text provided', not bare 'no text') so a legit rewrite
+    that merely mentions text/forms is NOT mis-flagged (Skeptic round-3)."""
+    from evals.scripts._shared import is_refusal
+    assert is_refusal("There's no text-message etiquette anymore.") is False
+    assert is_refusal("Paste the text into the box and hit submit.") is False
+    assert is_refusal("What text editor do you use?") is False
+    assert is_refusal("We provide the text editor for free.") is False
+    # but the full refusal stubs still match
+    assert is_refusal("No text to humanize was provided. Paste the text you want processed.") is True
+    assert is_refusal("What text do you want humanized?") is True

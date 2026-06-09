@@ -746,3 +746,83 @@ def test_pattern_multirun_partial_reused_wholesale(monkeypatch, tmp_path):
     assert calls["n"] == first              # second run reused the partial, no new skill calls
     pat.run(lang="en", runs=5, force=True, _corpus_dir_override=corpus_dir, _partial_dir_override=partial_dir)
     assert calls["n"] == first + 5          # --force re-scored
+
+
+# ---------------------------------------------------------------------------
+# Task 2: refusal guard — both branches return None on refusal
+# ---------------------------------------------------------------------------
+
+
+def test_score_case_refusal_run_becomes_none_scored(monkeypatch):
+    """A refusal output on a DETECTION case → None run → excluded; all-refuse → inconclusive."""
+    import evals.scripts.run_pattern_eval as pat
+    from evals.scripts._shared import Case
+    monkeypatch.setattr(pat, "run_skill",
+                        lambda *a, **k: {"final": "No text provided. What should I humanize?"})
+    case = Case(id="p1_en_001", input="aiword here", expected_changes=["aiword"],
+                expected_unchanged=[], domain="casual", true_negative=False,
+                metadata={"pattern_id": 1, "lang": "en"})
+    score = pat.score_case(case, model="sonnet", force_full=True, runs=5)
+    assert score["runs"] == [None, None, None, None, None]   # every refusal → None
+    assert score["aggregate"]["inconclusive"] is True         # 0 successes < ceil(5/2)
+    assert score["detected"] is False                         # NEVER a false detection
+
+
+def test_score_case_refusal_run_becomes_none_true_negative(monkeypatch):
+    """A refusal on a TRUE-NEG case → None run → excluded from median (not a false over-edit fail)."""
+    import evals.scripts.run_pattern_eval as pat
+    from evals.scripts._shared import Case
+    monkeypatch.setattr(pat, "run_skill",
+                        lambda *a, **k: {"final": "no text to humanize was provided. paste the text."})
+    case = Case(id="p8_en_001", input="A clean human sentence left alone.",
+                expected_changes=[], expected_unchanged=[], domain="casual",
+                true_negative=True, metadata={"pattern_id": 8, "lang": "en"})
+    score = pat.score_case(case, model="sonnet", runs=5)
+    assert score["runs"] == [None, None, None, None, None]
+    assert score["aggregate"]["inconclusive"] is True
+    assert score["passes_true_negative"] is False  # bool(None); harmless because run() excludes inconclusive
+
+
+def test_run_all_refuse_true_negative_is_inconclusive_not_failure(monkeypatch, tmp_path):
+    """run()-level proof (load-bearing): an all-refuse TRUE-NEG case lands in
+    inconclusive_cases and is NOT counted as a true_neg failure."""
+    import evals.scripts.run_pattern_eval as pat
+    corpus_dir = tmp_path / "corpus"; corpus_dir.mkdir()
+    partial_dir = tmp_path / "partial"; partial_dir.mkdir()
+    _write_pattern_file(corpus_dir, 8, [
+        {"id": "p8_en_001", "input": "A clean human sentence left alone.",
+         "expected_changes": [], "expected_unchanged": [], "domain": "casual",
+         "true_negative": True, "metadata": {"pattern_id": 8, "lang": "en"}},
+    ])
+    monkeypatch.setattr(pat, "run_skill",
+                        lambda *a, **k: {"final": "No text provided. What should I humanize?"})
+    monkeypatch.setattr(pat, "verify_skill_install", lambda: None)
+    monkeypatch.setattr(f"{PATTERN_MODULE}.REPO_ROOT", tmp_path)
+    report = pat.run(lang="en", runs=5, _corpus_dir_override=corpus_dir,
+                     _partial_dir_override=partial_dir)
+    s = report["summary"]
+    assert "p8_en_001" in s["inconclusive_cases"]
+    # not counted as a true-neg failure anywhere in per_pattern
+    for p in report["per_pattern"]:
+        assert "p8_en_001" not in p.get("true_neg_failures", [])
+
+
+def test_score_case_mixed_refusal_and_real_detection(monkeypatch):
+    """3 real rewrites that detect + 2 refusals → refusals→None, reals→detected."""
+    import evals.scripts.run_pattern_eval as pat
+    from evals.scripts._shared import Case
+    outs = iter([
+        {"final": "clean"},                                   # detected (aiword gone)
+        {"final": "No text provided."},                       # refusal → None
+        {"final": "clean"},                                   # detected
+        {"final": "clean"},                                   # detected
+        {"final": "What text do you want humanized?"},        # refusal → None
+    ])
+    monkeypatch.setattr(pat, "run_skill", lambda *a, **k: next(outs))
+    case = Case(id="p1_en_001", input="aiword here", expected_changes=["aiword"],
+                expected_unchanged=[], domain="casual", true_negative=False,
+                metadata={"pattern_id": 1, "lang": "en"})
+    score = pat.score_case(case, model="sonnet", force_full=True, runs=5)
+    assert score["runs"].count(None) == 2                     # 2 refusals excluded
+    assert score["aggregate"]["n_success"] == 3               # 3 real runs
+    assert score["detected"] is True                          # 3/3 real detected → majority

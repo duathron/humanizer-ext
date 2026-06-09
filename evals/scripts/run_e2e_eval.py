@@ -350,6 +350,7 @@ def run(
 
     return {
         "eval_type": "e2e",
+        "measures": "shipped-routing fidelity (real pre-flight, realistic multi-pattern inputs); the pattern eval measures detection-logic capability under a forced full pass",
         "lang": lang,
         "model": model,
         "judge_model": judge_model,

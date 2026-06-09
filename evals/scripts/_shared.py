@@ -446,6 +446,39 @@ def aggregate_runs(
     }
 
 
+# Observed skill-refusal stubs (the skill asks for input instead of rewriting).
+# Phrase-only by design, anchored to the REFUSAL context (e.g. "no text provided",
+# not bare "no text") so a legitimate rewrite that merely mentions text/forms
+# ("There's no text-message etiquette anymore.") is NOT mis-flagged. Trade-offs:
+#  - false NEGATIVE (a novel/DE refusal wording not listed) → scored as detected/miss:
+#    one bad data point; the SAFE direction.
+#  - false POSITIVE (a rewrite containing a stub substring) → that run becomes a None
+#    run → the case goes `inconclusive` (surfaced, NOT a silent false detection).
+#    Rare with anchored phrases; if it ever fires on a real rewrite, tighten further.
+_REFUSAL_PHRASES = (
+    "no text provided",
+    "no text to humanize",
+    "what should i humanize",
+    "what text do you want",
+    "paste the text to humanize",
+    "paste the text you want",
+    "provide the text to humanize",
+    "provide the text you want",
+    "what do you want me to humanize",
+    "text to humanize?",
+)
+
+
+def is_refusal(text: str) -> bool:
+    """True if `text` is a skill refusal / non-rewrite (empty, or an input-request
+    meta-message), so eval scorers can treat it as a None run instead of scoring
+    the trivially-absent tell as a detection (or the huge edit_ratio as over-edit)."""
+    if not text or not text.strip():
+        return True
+    low = text.lower()
+    return any(p in low for p in _REFUSAL_PHRASES)
+
+
 def _render_report_md(name: str, data: dict[str, Any]) -> str:
     """Render a minimal Markdown summary of a report payload."""
     lines = [f"# Eval report: {name}", ""]

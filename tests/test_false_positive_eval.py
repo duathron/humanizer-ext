@@ -605,3 +605,22 @@ def test_fp_run_all_failed_file_no_crash_none_median(monkeypatch, tmp_path):
     rec = next(r for r in report["per_file"] if r["file"] == "f1.md")
     assert rec["above_threshold"] is False
     assert rec["edit_ratio"] is None
+
+
+# ---------------------------------------------------------------------------
+# Task 3: refusal guard in _score_human_text_once (defensive)
+# ---------------------------------------------------------------------------
+
+
+def test_fp_score_refusal_run_becomes_none(monkeypatch):
+    """A refusal on an FP file → None run → excluded from median; all-refuse → inconclusive
+    (FP uses force_full=False and shouldn't refuse, but this closes the inverse bug:
+    a refusal = huge edit_ratio = false 'over-edit')."""
+    import evals.scripts.run_false_positive_eval as fp
+    monkeypatch.setattr(fp, "run_skill",
+                        lambda *a, **k: {"final": "No text provided. Paste the text to humanize."})
+    score = fp.score_human_text("A clean human paragraph left alone.", lang="en",
+                                model="sonnet", domain="casual", runs=5)
+    assert score["runs"] == [None, None, None, None, None]
+    assert score["aggregate"]["inconclusive"] is True
+    assert score["above_threshold"] is False                  # NOT a false over-edit

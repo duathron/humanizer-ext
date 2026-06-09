@@ -19,6 +19,7 @@ from evals.scripts._shared import (
     Case,
     SkillRunError,
     aggregate_runs,
+    is_refusal,
     load_pattern_corpus,
     run_skill,
     verify_skill_install,
@@ -65,6 +66,8 @@ def _score_case_once(case: Case, *, model: str = "sonnet", force_full: bool = Fa
             force_full=False,
         )
         rewritten = result.get("final") or result.get("draft") or ""
+        if is_refusal(rewritten):
+            return None
         edit_distance = Levenshtein.distance(case.input, rewritten)
         edit_ratio = edit_distance / max(1, len(case.input))
         passes = edit_ratio <= 0.10
@@ -113,7 +116,10 @@ def _score_case_once(case: Case, *, model: str = "sonnet", force_full: bool = Fa
         model=model,
         force_full=force_full,
     )
-    rewritten = (result.get("final") or result.get("draft") or "").lower()
+    rewritten_raw = result.get("final") or result.get("draft") or ""
+    if is_refusal(rewritten_raw):
+        return None
+    rewritten = rewritten_raw.lower()
 
     removed: list[str] = []
     retained: list[str] = []
@@ -371,6 +377,7 @@ def run(
 
     return {
         "eval_type": "pattern",
+        "measures": "detection-logic capability under a forced full pass (force_full=True bypasses the product's real pre-flight routing); NOT shipped-routing fidelity — see run_e2e_eval",
         "lang": lang,
         "model": model,
         "threshold": threshold,
