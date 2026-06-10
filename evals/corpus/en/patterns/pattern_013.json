@@ -6,12 +6,12 @@
     {
       "id": "pattern_013_en_001",
       "input": "No configuration file needed. The results are preserved automatically.",
-      "expected_changes": [],
+      "expected_changes": ["are preserved automatically"],
       "expected_unchanged": [],
       "domain": "casual",
       "source": "manual_refinement_meetup_consensus_true_negative",
-      "true_negative": true,
-      "notes": "Meetup 2026-05-26 (7/2/0 endorse true-neg). Technical-domain norm per skill doc (#13 SKIP for tech). System-actor passive is correct register."
+      "true_negative": false,
+      "notes": "Meetup 2026-05-26 (7/2/0 endorse true-neg). Technical-domain norm per skill doc (#13 SKIP for tech). System-actor passive is correct register. | SP3b 2026-06-08: speculative true_negative→detection — #13 passive-voice Before-example (en.md:208). Passive is a weak term; Task 5 validates — if it does not majority-detect, delete as a recorded EN gap (#13 not cleanly term-scorable)."
     }
   ]
 }

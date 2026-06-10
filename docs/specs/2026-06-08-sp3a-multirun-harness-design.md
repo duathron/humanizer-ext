@@ -13,6 +13,8 @@ This is **eval-infrastructure only — no skill behavior change**, no CI wiring 
 - **`run_e2e_eval` changes** — it already has `--runs` + median (the partial template); SP3a does not touch it.
 - **CI wiring** → SP2 (shipwright onboarding) consumes this harness later.
 - **Behavior/corpus fixes** — true-neg restraint (SP3b), career FP (SP3c), `pattern_008`/`pattern_029` corpus disputes (SP3d) come after, *using* this harness.
+
+> SP3b (2026-06-08) subsumes the planned "SP3d pattern_008/029 corpus disputes" — 008/029 are now detection cases; the over-edit slice is the FP eval, not the 9 true-neg cases.
 - **Per-run resume / top-up** — explicitly NOT built (see Components §resume). Resume stays at **case granularity**: a case writes its partial only after all N runs finish, so an interruption mid-case (session limit on run 3 of 5) loses that case's prior runs and redoes all N next session. **This is a real resumability regression vs the current single-run-per-case partial** — bounded (≤N−1 runs lost per interruption, ~one interruption per session window), accepted as the cost of not building per-run partials. Routine runs should slice to keep a session within budget.
 - **Parallelism** — sequential, quota-safe.
 - **min/max spread reporting** — redundant with per-case passed-fraction; not built.

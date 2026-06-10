@@ -42,6 +42,8 @@ Only hit: DE-legal (probe, 1 of 3). e2e-judge set = academic/career/technical on
 
 **Mechanism conflict (superseded by re-baseline below):** initial single-run read suggested an em-dash carve-out. A fresh probe + 5-run re-baseline overturned it.
 
+> **Superseded by SP3b (2026-06-08):** 8/9 of these rows were the skill's own documented Before-examples (a corpus-construction bug), not "2 disputes + noise" and not a "5/9 or 6/9 skill defect". Reclassified to detection/deleted — see docs/plans/sp3b-notes.md.
+
 ### True-neg 5-run re-baseline (2026-06-07) — the single-run 6/9 was NOISE
 
 Probe `/tmp/sp1_tn_multirun.py 5` (mode=full, force_full=False, edit_ratio≤0.10 = pass):

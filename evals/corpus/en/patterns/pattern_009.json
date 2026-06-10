@@ -29,12 +29,12 @@
     {
       "id": "pattern_009_en_003",
       "input": "The goal is to write clearly rather than to impress the reader with complexity.",
-      "expected_changes": [],
+      "expected_changes": ["rather than to impress"],
       "expected_unchanged": [],
       "domain": "casual",
       "source": "manual_refinement_meetup_consensus_true_negative",
-      "true_negative": true,
-      "notes": "Meetup 2026-05-26 (6/1/2 endorse true-neg). 'rather than' is basic English contrast; on-the-table test fails (complexity is real alternative)."
+      "true_negative": false,
+      "notes": "Meetup 2026-05-26 (6/1/2 endorse true-neg). 'rather than' is basic English contrast; on-the-table test fails (complexity is real alternative). | SP3b 2026-06-08: speculative true_negative→detection — #9 'rather than' dismissal (en.md:162; on-the-table test: 'impress with complexity' is a strawman, After = 'write clearly'). SP1 TN 4/5 (skill mostly leaves it) → Task 5 validates; non-detect → delete as recorded gap."
     }
   ]
 }

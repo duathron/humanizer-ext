@@ -2,16 +2,6 @@
   "pattern_id": 17,
   "pattern_name": "Title Case in Headings",
   "lang": "en",
-  "cases": [
-    {
-      "id": "pattern_017_en_001",
-      "input": "## Strategic Negotiations And Global Partnerships",
-      "expected_changes": [],
-      "expected_unchanged": [],
-      "domain": "casual",
-      "source": "manual_refinement_meetup_consensus_true_negative",
-      "true_negative": true,
-      "notes": "Meetup 2026-05-26 (3/5/1). Title-case 'And' is capitalization style (MOS:HEAD), not AI-writing pattern per W. Multiple voices reject."
-    }
-  ]
+  "note": "SP3b 2026-06-08: the sole case (pattern_017_en_001) was deleted. Its input was the skill's own #17 Title-Case Before-example (_universal.md:113), but #17's tell is a capitalization-only edit — the term-absence detection scorer lowercases both sides, so any rewrite retains the lowercased term → permanently unscorable. #17 detection is exercised by the regex scorer / DE corpus, not this term-based pattern eval.",
+  "cases": []
 }

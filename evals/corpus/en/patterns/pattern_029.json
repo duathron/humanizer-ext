@@ -2,16 +2,6 @@
   "pattern_id": 29,
   "pattern_name": "Fragmented Headers",
   "lang": "en",
-  "cases": [
-    {
-      "id": "pattern_029_en_001",
-      "input": "## Performance\n>\n> Speed matters.\n>\n> When users hit a slow page, they leave.",
-      "expected_changes": [],
-      "expected_unchanged": [],
-      "domain": "casual",
-      "source": "manual_refinement_meetup_consensus_true_negative",
-      "true_negative": true,
-      "notes": "Meetup 2026-05-26 (2/2/5 strong dissent). 'Speed matters.' defended as legitimate one-sentence-paragraph craft by 5/9 voices (Nielsen Norman, Paul Graham style)."
-    }
-  ]
+  "cases": [],
+  "note": "SP3b 2026-06-09: the sole case (pattern_029_en_001, '## Performance / Speed matters. / ...') was deleted after the Task-5 validation run. As a detection case it majority-MISSED: the skill removed 'Speed matters' only 1/5 at --runs 5 (FTFFF). CONTESTED, not a clean gap: the doc (_universal.md:40) lists it as a #29 Before-example, but the meetup 2/2/5-dissent (5/9) defended the one-sentence-paragraph warm-up as legitimate craft, AND the skill's actual behavior (1/5 removal) agrees with the meetup, not the doc. So it is neither a valid true-negative (it IS a doc Before-example) nor a reliable detection case (skill disputes it's a tell). Deleted pending a SKILL-DESIGN/doc decision: is a one-sentence-paragraph warm-up a #29 tell? (NB SP1 TN 0/5 was edit-ratio noise/commentary-leak, NOT 'Speed matters' deletion.) See docs/plans/sp3b-notes.md."
 }

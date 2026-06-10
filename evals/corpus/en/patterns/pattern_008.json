@@ -6,12 +6,12 @@
     {
       "id": "pattern_008_en_001",
       "input": "Gallery 825 serves as LAAA's exhibition space for contemporary art. The gallery features four separate spaces and boasts over 3,000 square feet.",
-      "expected_changes": [],
+      "expected_changes": ["serves as", "boasts"],
       "expected_unchanged": [],
       "domain": "casual",
       "source": "manual_refinement_meetup_consensus_true_negative",
-      "true_negative": true,
-      "notes": "Meetup 2026-05-26 (3/3/3 SPLIT). Single-word triggers ('boasts', 'features', 'serves as') fail across all registers — pattern needs structural context, not vocabulary."
+      "true_negative": false,
+      "notes": "Meetup 2026-05-26 (3/3/3 SPLIT). Single-word triggers ('boasts', 'features', 'serves as') fail across all registers — pattern needs structural context, not vocabulary. | SP3b 2026-06-08: reclassified true_negative→detection — input is the skill's own #8 Before-example (en.md:139, After :142 drops 'serves as'/'boasts'). The meetup true_negative flag contradicted the skill doc."
     }
   ]
 }

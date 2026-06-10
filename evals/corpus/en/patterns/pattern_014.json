@@ -6,22 +6,22 @@
     {
       "id": "pattern_014_en_001",
       "input": "The term is primarily promoted by Dutch institutions—not by the people themselves. You don't say \"Netherlands, Europe\" as an address—yet this mislabeling continues—even in official documents.",
-      "expected_changes": [],
+      "expected_changes": ["—"],
       "expected_unchanged": [],
       "domain": "casual",
       "source": "manual_refinement_meetup_consensus_true_negative",
-      "true_negative": true,
-      "notes": "Meetup 2026-05-26 (1/6/2). Em-dash density needs count-based regex not substring match; substring-flagging would punish legitimate punctuation."
+      "true_negative": false,
+      "notes": "Meetup 2026-05-26 (1/6/2). Em-dash density needs count-based regex not substring match; substring-flagging would punish legitimate punctuation. | SP3b 2026-06-08: reclassified true_negative→detection — input is the skill's own #14 em-dash Before-example (_universal.md:58/64, After replaces — with commas)."
     },
     {
       "id": "pattern_014_en_002",
       "input": "The report—which covered three continents and twelve case studies—concluded that demand had shifted.",
-      "expected_changes": [],
+      "expected_changes": ["—"],
       "expected_unchanged": [],
       "domain": "casual",
       "source": "manual_refinement_meetup_consensus_true_negative",
-      "true_negative": true,
-      "notes": "Meetup 2026-05-26 (8/1/0 endorse true-neg). Single paired em-dash = skill doc's explicit 'earned bracket' exception."
+      "true_negative": false,
+      "notes": "Meetup 2026-05-26 (8/1/0 endorse true-neg). Single paired em-dash = skill doc's explicit 'earned bracket' exception. | SP3b 2026-06-08: reclassified true_negative→detection — input is the skill's own #14 em-dash Before-example (_universal.md:58/64, After replaces — with commas)."
     }
   ]
 }

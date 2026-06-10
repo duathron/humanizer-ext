@@ -3,7 +3,7 @@
 ## SP1 (2026-06-07) — closed metric-only, no behavior change
 
 - **Detection smoke (force-full, 40 EN cases):** `overall_detection_rate` **0.905** — healthy (non-gating crater baseline; rigorous noise-budgeted guard → SP3).
-- **True-negative (9 EN cases × 5 runs):** **5/9 majority, 51% per-run, noise-dominated.** Zero stable behavior defects — `pattern_008` (#8 "serves as"/"boasts") and `pattern_029` (#29 fragmented header) are corpus disputes (the skill's own documented Before-examples placed in the leave-alone set). → SP3 corpus review + multi-run harness.
+- **True-negative (9 EN cases × 5 runs):** **5/9 majority, 51% per-run, noise-dominated.** Zero stable behavior defects — `pattern_008` (#8 "serves as"/"boasts") and `pattern_029` (#29 fragmented header) are corpus disputes (the skill's own documented Before-examples placed in the leave-alone set). → SP3 corpus review + multi-run harness. **[Superseded by SP3b 2026-06-08: 8/9 were the skill's own Before-examples; converted to detection / deleted; 1 genuine true-neg (pattern_019). See docs/plans/sp3b-notes.md.]**
 - **Change-log defect:** 1/51 pooled (DE+EN), premise refuted; lever 1 dropped.
 - **Shipped:** `changelog_first_attempt_rate` sentinel; **SKILL.md unchanged vs main**; 306 pytest green.
 

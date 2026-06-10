@@ -6,12 +6,12 @@
     {
       "id": "pattern_015_en_001",
       "input": "It blends **OKRs (Objectives and Key Results)**, **KPIs (Key Performance Indicators)**, and visual strategy tools such as the **Business Model Canvas (BMC)** and **Balanced Scorecard (BSC)**.",
-      "expected_changes": [],
+      "expected_changes": ["(Objectives and Key Results)"],
       "expected_unchanged": [],
       "domain": "casual",
       "source": "manual_refinement_meetup_consensus_true_negative",
-      "true_negative": true,
-      "notes": "Meetup 2026-05-26 (6/2/1 endorse true-neg). Bold on acronyms at first definition = standard tech writing + MOS:BOLD convention."
+      "true_negative": false,
+      "notes": "Meetup 2026-05-26 (6/2/1 endorse true-neg). Bold on acronyms at first definition = standard tech writing + MOS:BOLD convention. | SP3b 2026-06-08: reclassified true_negative→detection — skill's own #15 bold-acronym Before-example (_universal.md:103, After drops the parenthetical)."
     }
   ]
 }
