@@ -211,7 +211,7 @@ def _build_humanizer_prompt(
             "(Run a full pass — do NOT switch to Quick mode regardless of pre-flight density. "
             "This is an explicit user override.)"
         )
-        return f"{header}\n{override}\n\n{text}"
+        return f"{header}\n{override}\n\nText to humanize:\n\n{text}"
     return f"{header}\n\n{text}"
 
 

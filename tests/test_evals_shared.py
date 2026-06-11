@@ -523,17 +523,20 @@ def test_build_humanizer_prompt_force_full_contains_override_directive():
 
 
 def test_build_humanizer_prompt_force_full_directive_before_text():
-    """The override directive appears between the command header and the text body."""
+    """The override directive and 'Text to humanize:' label appear between header and body (V1)."""
     from evals.scripts._shared import _build_humanizer_prompt
 
     text = "Some AI-generated prose here."
     result = _build_humanizer_prompt(text, lang="en", mode="full", domain=None, samples_dir=None, force_full=True)
     directive_pos = result.index("do NOT switch to Quick mode")
+    label_pos = result.index("Text to humanize:")
     text_pos = result.index(text)
     header_pos = result.index("/humanizer")
-    assert header_pos < directive_pos < text_pos, (
-        "Expected: header ... directive ... text body"
+    assert header_pos < directive_pos < label_pos < text_pos, (
+        "Expected: header ... directive ... 'Text to humanize:' label ... text body"
     )
+    # V1: the label must be present in force_full=True prompts
+    assert "Text to humanize:" in result
 
 
 def test_build_humanizer_prompt_force_full_false_has_no_directive():
