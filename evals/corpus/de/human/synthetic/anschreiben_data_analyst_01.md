@@ -12,7 +12,7 @@ während meiner Promotion in Volkswirtschaftslehre habe ich drei Jahre lang Pane
 
 Konkret: Für ein Kapitel meiner Arbeit habe ich einen Datensatz mit 240.000 Mietinseraten bereinigt, geokodiert und mit Zensusdaten verknüpft. Die Pipeline lief in Python (pandas, später Polars, weil die Laufzeit von elf auf knapp zwei Minuten fiel), die Auswertung in R. Was ich daraus mitnehme: Die meiste Arbeit steckt nicht im Modell, sondern darin, sauber zu verstehen, wie die Daten zustande kamen.
 
-Nebenher habe ich zwei Semester die Statistik-Übung betreut und etwa 60 Studierenden erklärt, warum ein signifikantes Ergebnis noch keine relevante Aussage ist. Diese Übersetzungsarbeit — vom Befund zur Entscheidung — ist genau das, was Ihre Stelle im Team Customer Insights verlangt.
+Nebenher habe ich zwei Semester die Statistik-Übung betreut und etwa 60 Studierenden erklärt, warum ein signifikantes Ergebnis noch keine relevante Aussage ist. Diese Übersetzungsarbeit, vom Befund zur Entscheidung, ist genau das, was Ihre Stelle im Team Customer Insights verlangt.
 
 Mit SQL arbeite ich sicher, Dashboards habe ich bisher in Streamlit gebaut; Power BI müsste ich mir aneignen, was ich für überschaubar halte.
 
