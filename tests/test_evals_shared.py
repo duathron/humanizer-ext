@@ -179,6 +179,54 @@ def test_run_skill_passes_model_flag(mock_run):
     assert cmd[cmd.index("--model") + 1] == "claude-opus-4-7"
 
 
+# ---------------------------------------------------------------------------
+# Phase 1 — commentary-fence tests (eval-only, no skill change)
+# ---------------------------------------------------------------------------
+from evals.scripts._shared import _strip_trailing_commentary, _AUDIT_SENTINEL
+
+
+def test_audit_sentinel_value():
+    assert _AUDIT_SENTINEL == "<!--HUMANIZER-AUDIT-->"
+
+
+def test_strip_fence_cuts_trailing_note():
+    s = (
+        "Sehr geehrte Frau Reichert,\n\n"
+        "ich bringe X mit.\n\n"
+        "Mit freundlichen Grüßen\n"
+        "Daniel\n\n"
+        "<!--HUMANIZER-AUDIT-->\n"
+        "Text unverändert. kein KI-Signal gefunden. DACH-register passt."
+    )
+    expected = (
+        "Sehr geehrte Frau Reichert,\n\n"
+        "ich bringe X mit.\n\n"
+        "Mit freundlichen Grüßen\n"
+        "Daniel"
+    )
+    assert _strip_trailing_commentary(s) == expected
+
+
+def test_strip_fence_no_marker_unchanged():
+    s = "A clean rewrite with no marker at all.\n\nSecond paragraph stays."
+    assert _strip_trailing_commentary(s) == s
+
+
+def test_strip_fence_no_false_cut_on_audit_word():
+    s = "We reviewed the audit findings and left a comment in the thread.\n\nThe report ships Friday."
+    assert _strip_trailing_commentary(s) == s
+
+
+def test_strip_fence_no_false_cut_on_other_html_comment():
+    s = "See the diagram <!-- figure 1 --> below for the flow.\n\nDetails follow."
+    assert _strip_trailing_commentary(s) == s
+
+
+def test_strip_fence_then_existing_header_still_works():
+    s = "The rewrite text.\n\n**Changes:** removed two em dashes."
+    assert _strip_trailing_commentary(s) == "The rewrite text."
+
+
 @patch("subprocess.run")
 def test_run_skill_returncode_nonzero_raises(mock_run):
     from evals.scripts._shared import run_skill, SkillRunError

@@ -95,15 +95,25 @@ _COMMENTARY_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Collision-proof fence the skill is instructed (later phase) to put before any
+# trailing commentary. Never occurs in legit rewrite prose, so cutting at it
+# cannot truncate real output. Applied to the already-extracted rewrite region.
+_AUDIT_SENTINEL = "<!--HUMANIZER-AUDIT-->"
+
 
 def _strip_trailing_commentary(s: str) -> str:
     """Cut a trailing skill-commentary block off a rewrite.
 
-    Matches patterns like ``**changes:** …``, ``**Summary:** …``,
-    ``concept-noun check: …`` that the skill appends after the rewrite text.
-    The regex is anchored to a leading newline so ordinary prose containing
-    the word "changes" mid-sentence is never truncated.
+    Two cutters, applied to the already-extracted rewrite region:
+    1. The explicit `<!--HUMANIZER-AUDIT-->` fence — everything from the literal
+       sentinel onward is commentary. Exact-literal match only, so ordinary prose
+       (or a different HTML comment) is never truncated.
+    2. The legacy English bold-header block (`**Changes:**` etc.), newline-anchored.
+    The earliest cut wins.
     """
+    idx = s.find(_AUDIT_SENTINEL)
+    if idx != -1:
+        s = s[:idx].rstrip()
     m = _COMMENTARY_RE.search(s)
     return s[: m.start()].rstrip() if m else s
 
