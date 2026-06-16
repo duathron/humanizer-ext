@@ -761,3 +761,25 @@ def test_is_refusal_phrases_are_refusal_anchored_not_bare():
     # but the full refusal stubs still match
     assert is_refusal("No text to humanize was provided. Paste the text you want processed.") is True
     assert is_refusal("What text do you want humanized?") is True
+
+
+# ---------------------------------------------------------------------------
+# Phase 1, Task 2 — integration: fence cut composes correctly with extraction
+# ---------------------------------------------------------------------------
+
+def test_parse_fullmode_pre_rewrite_audit_not_truncated_trailing_fence_cut():
+    resp = (
+        "**Final AI audit findings:**\n- em dash count: 0\n- concept coverage: 7/8\n\n"
+        "**Final rewrite:**\n"
+        "Der Brief ist fertig und sachlich.\n\n"
+        "<!--HUMANIZER-AUDIT-->\nText unverändert. Authentisches DACH-Anschreiben."
+    )
+    assert parse_skill_output(resp)["final"] == "Der Brief ist fertig und sachlich."
+
+def test_parse_quick_direct_trailing_fence_cut():
+    resp = "Just the clean rewrite.\n\n<!--HUMANIZER-AUDIT-->\nNo edits made. human-authored."
+    assert parse_skill_output(resp)["final"] == "Just the clean rewrite."
+
+def test_parse_no_fence_unchanged():
+    resp = "**Final rewrite:**\nA rewrite with no fence and no commentary."
+    assert parse_skill_output(resp)["final"] == "A rewrite with no fence and no commentary."
