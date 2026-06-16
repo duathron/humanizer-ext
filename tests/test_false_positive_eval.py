@@ -624,3 +624,156 @@ def test_fp_score_refusal_run_becomes_none(monkeypatch):
     assert score["runs"] == [None, None, None, None, None]
     assert score["aggregate"]["inconclusive"] is True
     assert score["above_threshold"] is False                  # NOT a false over-edit
+
+
+# ---------------------------------------------------------------------------
+# --save-rewrites flag: sidecar capture (new feature)
+# ---------------------------------------------------------------------------
+
+
+def test_fp_save_rewrites_writes_sidecar(monkeypatch, tmp_path):
+    """When save_rewrites=True, run() writes a JSON sidecar next to the partial
+    containing the original text and per-run (index, edit_ratio, rewrite) entries.
+    The scored partial itself must NOT gain a 'rewrite' key.
+    """
+    import json as _json
+    import evals.scripts.run_false_positive_eval as fp
+
+    corpus_dir = tmp_path / "corpus"
+    corpus_dir.mkdir()
+    # One sample file with known content
+    sample_text = "A perfectly clean human-written paragraph about coffee."
+    (corpus_dir / "sample_01.md").write_text(
+        f"---\ndomain: casual\n---\n\n{sample_text}\n",
+        encoding="utf-8",
+    )
+    partial_dir = tmp_path / "partials"
+    partial_dir.mkdir()
+
+    # Stub _score_human_text_once to return a fixed rewrite + ratio
+    call_idx = {"n": 0}
+
+    def fake_once(text, *, lang, model, domain):
+        call_idx["n"] += 1
+        rewrite = f"A clean human-written paragraph about coffee (run {call_idx['n']})."
+        edit_distance = abs(len(rewrite) - len(text))
+        ratio = round(edit_distance / max(1, len(text)), 4)
+        return {
+            "edit_ratio": ratio,
+            "edit_distance": edit_distance,
+            "density_preflight_quick_drop": True,
+            "preflight_message": "Pre-flight: 0 Tier-1 patterns",
+            "rewrite_length_chars": len(rewrite),
+            "rewrite": rewrite,
+        }
+
+    monkeypatch.setattr(fp, "_score_human_text_once", fake_once)
+    monkeypatch.setattr(fp, "verify_skill_install", lambda: None)
+    monkeypatch.setattr("evals.scripts.run_false_positive_eval.REPO_ROOT", tmp_path)
+
+    report = fp.run(
+        lang="en",
+        corpus="synthetic",
+        model="sonnet",
+        threshold=0.10,
+        force=False,
+        aggregate_only=False,
+        runs=3,
+        save_rewrites=True,
+        _corpus_dir_override=corpus_dir,
+        _partial_dir_override=partial_dir,
+    )
+
+    # --- sidecar must exist ---
+    sidecar_files = list(partial_dir.glob("*__rewrites.json"))
+    assert len(sidecar_files) == 1, f"Expected 1 sidecar, got: {sidecar_files}"
+    sidecar = _json.loads(sidecar_files[0].read_text(encoding="utf-8"))
+
+    # original text captured once at top level
+    assert sidecar["original"] == sample_text
+
+    # per-run entries: index, edit_ratio, rewrite
+    assert len(sidecar["runs"]) == 3
+    for i, entry in enumerate(sidecar["runs"]):
+        assert "run_index" in entry
+        assert entry["run_index"] == i
+        assert "edit_ratio" in entry
+        assert "rewrite" in entry
+        assert len(entry["rewrite"]) > 0
+
+    # --- scored partial must NOT contain 'rewrite' key ---
+    partial_files = [p for p in partial_dir.glob("*.json") if "__rewrites" not in p.name]
+    assert len(partial_files) == 1
+    scored = _json.loads(partial_files[0].read_text(encoding="utf-8"))
+    assert "rewrite" not in scored, f"Scored partial must not contain 'rewrite', got keys: {list(scored.keys())}"
+
+    # --- sidecar path follows naming convention ---
+    # fp_<lang>_<corpus>_<rel_key>__rewrites.json
+    assert sidecar_files[0].name.startswith("fp_en_synthetic_")
+    assert sidecar_files[0].name.endswith("__rewrites.json")
+
+
+def test_fp_save_rewrites_false_no_sidecar_and_partial_unchanged(monkeypatch, tmp_path):
+    """When save_rewrites=False (default), no sidecar is written and the scored
+    partial dict is byte-identical in schema to pre-feature behaviour.
+    """
+    import json as _json
+    import evals.scripts.run_false_positive_eval as fp
+
+    corpus_dir = tmp_path / "corpus"
+    corpus_dir.mkdir()
+    sample_text = "Another clean human paragraph about tea."
+    (corpus_dir / "sample_02.md").write_text(
+        f"---\ndomain: casual\n---\n\n{sample_text}\n",
+        encoding="utf-8",
+    )
+    partial_dir = tmp_path / "partials"
+    partial_dir.mkdir()
+
+    EXPECTED_SCORED_PARTIAL_KEYS = {
+        "edit_ratio", "median_edit_ratio", "runs", "aggregate",
+        "above_threshold", "density_preflight_quick_drop",
+        "rewrite_length_chars", "preflight_message", "file", "domain",
+    }
+
+    def fake_once(text, *, lang, model, domain):
+        rewrite = text  # identity — zero edit
+        return {
+            "edit_ratio": 0.0,
+            "edit_distance": 0,
+            "density_preflight_quick_drop": True,
+            "preflight_message": "Pre-flight: 0 Tier-1 patterns",
+            "rewrite_length_chars": len(rewrite),
+            "rewrite": rewrite,   # key present in once-return; must NOT bleed into partial
+        }
+
+    monkeypatch.setattr(fp, "_score_human_text_once", fake_once)
+    monkeypatch.setattr(fp, "verify_skill_install", lambda: None)
+    monkeypatch.setattr("evals.scripts.run_false_positive_eval.REPO_ROOT", tmp_path)
+
+    report = fp.run(
+        lang="en",
+        corpus="synthetic",
+        model="sonnet",
+        threshold=0.10,
+        force=False,
+        aggregate_only=False,
+        runs=3,
+        # save_rewrites defaults to False — not passed
+        _corpus_dir_override=corpus_dir,
+        _partial_dir_override=partial_dir,
+    )
+
+    # No sidecar files
+    sidecar_files = list(partial_dir.glob("*__rewrites.json"))
+    assert sidecar_files == [], f"Expected no sidecars, got: {sidecar_files}"
+
+    # Scored partial has exactly the expected keys
+    partial_files = list(partial_dir.glob("*.json"))
+    assert len(partial_files) == 1
+    scored = _json.loads(partial_files[0].read_text(encoding="utf-8"))
+    assert set(scored.keys()) == EXPECTED_SCORED_PARTIAL_KEYS, (
+        f"Scored partial key drift.\n"
+        f"  Expected: {sorted(EXPECTED_SCORED_PARTIAL_KEYS)}\n"
+        f"  Got:      {sorted(scored.keys())}"
+    )

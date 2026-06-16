@@ -52,6 +52,10 @@ def _score_human_text_once(
         "preflight_message": result.get("preflight", ""),
         "density_preflight_quick_drop": quick_drop,
         "rewrite_length_chars": len(rewritten),
+        # Rewrite text included for opt-in sidecar capture (--save-rewrites).
+        # Never written to the scored partial — only consumed by score_human_text
+        # when the caller requests rewrite collection.
+        "rewrite": rewritten,
     }
 
 
@@ -64,6 +68,10 @@ def score_human_text(
     `threshold` flows into aggregate_runs so the median verdict AND the flaky
     straddle-marker are computed at the SAME threshold run() gates on (defaults to
     DEFAULT_THRESHOLD for direct callers). run() passes the configured --threshold.
+
+    Return dict keys are the scored-partial schema (stable). The extra ``_rewrites``
+    key carries per-run rewrite text for opt-in sidecar capture by run() when
+    ``save_rewrites=True``; it is never written to the scored partial JSON.
     """
     run_dicts: list[dict | None] = []
     for _ in range(runs):
@@ -80,6 +88,17 @@ def score_human_text(
     agg = aggregate_runs(values, kind="continuous", n_target=runs, threshold=threshold)
     present = [r for r in run_dicts if r is not None]
     quick_drops = sum(1 for r in present if r["density_preflight_quick_drop"])
+
+    # Collect per-run rewrite snapshots for opt-in sidecar. Stored under a
+    # private ``_rewrites`` key so it is available to run() but is explicitly
+    # stripped before the scored partial is written (schema stays unchanged).
+    per_run_rewrites = [
+        {"run_index": i, "edit_ratio": r["edit_ratio"], "rewrite": r.get("rewrite", "")}
+        if r is not None else
+        {"run_index": i, "edit_ratio": None, "rewrite": None}
+        for i, r in enumerate(run_dicts)
+    ]
+
     return {
         "edit_ratio": agg["median"],
         "median_edit_ratio": agg["median"],
@@ -91,6 +110,8 @@ def score_human_text(
         "density_preflight_quick_drop": (quick_drops >= math.ceil(len(present) / 2)) if present else False,
         "rewrite_length_chars": (present[0]["rewrite_length_chars"] if present else 0),
         "preflight_message": (present[0]["preflight_message"] if present else ""),
+        # Private key — stripped before writing to scored partial.
+        "_rewrites": per_run_rewrites,
     }
 
 
@@ -179,6 +200,15 @@ def _partial_path(
     return base_dir / f"fp_{lang}_{corpus}_{rel_key}.json"
 
 
+def _rewrite_sidecar_path(partial: Path) -> Path:
+    """Sidecar path for rewrite capture, derived from the scored partial path.
+
+    Convention: ``fp_<lang>_<corpus>_<rel_key>__rewrites.json`` sits next to
+    the scored partial (``fp_<lang>_<corpus>_<rel_key>.json``) in the same dir.
+    """
+    return partial.with_name(partial.stem + "__rewrites.json")
+
+
 def _is_session_limit_error(exc: SkillRunError) -> bool:
     """Return True when the error message indicates a Pro-plan session limit."""
     return "session limit" in str(exc).lower()
@@ -192,6 +222,7 @@ def run(
     force: bool = False,
     aggregate_only: bool = False,
     runs: int = 5,
+    save_rewrites: bool = False,
     *,
     _corpus_dir_override: Path | None = None,
     _partial_dir_override: Path | None = None,
@@ -263,6 +294,22 @@ def run(
         # run() is the authority for the configured --threshold.
         # Guard against None median (all-failed inconclusive file): None > threshold raises TypeError.
         score["above_threshold"] = (score["edit_ratio"] is not None and score["edit_ratio"] > threshold)
+
+        # Extract and discard the private rewrite-capture key BEFORE writing the
+        # scored partial so the schema stays byte-identical to pre-feature runs.
+        per_run_rewrites = score.pop("_rewrites", [])
+
+        # Opt-in sidecar: write original text + per-run (index, ratio, rewrite).
+        if save_rewrites:
+            sidecar_path = _rewrite_sidecar_path(partial)
+            sidecar = {
+                "original": body,
+                "file": path.name,
+                "lang": lang,
+                "runs": per_run_rewrites,
+            }
+            sidecar_path.write_text(json.dumps(sidecar, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
         partial.write_text(json.dumps(score, indent=2, ensure_ascii=False) + "\n")
         per_file.append(score)
 
@@ -330,6 +377,15 @@ def main() -> None:
         "--runs", type=int, default=5,
         help="Skill invocations per file; verdict = median edit_ratio over runs.",
     )
+    parser.add_argument(
+        "--save-rewrites", action="store_true", default=False,
+        help=(
+            "Write a per-file sidecar JSON next to each scored partial capturing "
+            "the original text and the humanizer's rewrite for every run. "
+            "Useful for diagnosing high edit_ratio on clean human samples. "
+            "Default off; scored partials and aggregate schema are unchanged."
+        ),
+    )
     args = parser.parse_args()
 
     report = run(
@@ -340,6 +396,7 @@ def main() -> None:
         force=args.force,
         aggregate_only=args.aggregate_only,
         runs=args.runs,
+        save_rewrites=args.save_rewrites,
     )
     name = f"false_positive_{args.lang}_{args.corpus}"
     json_path, md_path = write_report(name, report)
