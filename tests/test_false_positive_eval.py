@@ -777,3 +777,119 @@ def test_fp_save_rewrites_false_no_sidecar_and_partial_unchanged(monkeypatch, tm
         f"  Expected: {sorted(EXPECTED_SCORED_PARTIAL_KEYS)}\n"
         f"  Got:      {sorted(scored.keys())}"
     )
+
+
+# ---------------------------------------------------------------------------
+# Verbatim-plus-commentary guard in _score_human_text_once
+# ---------------------------------------------------------------------------
+
+
+def test_fp_score_once_verbatim_plus_commentary_guard_fires(monkeypatch):
+    """POSITIVE: skill returns <input verbatim> + trailing 'no changes' note.
+
+    Guard must:
+    - set edit_ratio 0.0  (body unedited, distance measured as 0)
+    - set verbatim_plus_commentary True
+    - keep the FULL rewrite (incl. note) in the 'rewrite' key (for sidecars)
+    """
+    import evals.scripts.run_false_positive_eval as fp
+
+    input_text = "This is a clean human paragraph that requires no editing at all."
+    note = "\n\nText unverändert — kein Eingriff nötig."
+    skill_output = input_text + note
+
+    monkeypatch.setattr(fp, "run_skill", lambda *a, **k: {"final": skill_output})
+
+    result = fp._score_human_text_once(
+        input_text, lang="de", model="sonnet", domain="casual"
+    )
+
+    assert result is not None
+    assert result["edit_ratio"] == 0.0, (
+        f"Guard should set edit_ratio to 0.0 when body is verbatim, got {result['edit_ratio']}"
+    )
+    assert result["verbatim_plus_commentary"] is True, (
+        "Guard must set verbatim_plus_commentary=True when it fires"
+    )
+    # Full rewrite (incl. note) must be preserved for sidecar
+    assert note.strip() in result["rewrite"], (
+        f"'rewrite' key must retain the note text; got: {result['rewrite']!r}"
+    )
+    assert result["rewrite"] == skill_output, (
+        f"'rewrite' must be the full skill output, not the stripped body"
+    )
+
+
+def test_fp_score_once_genuine_edit_guard_does_not_fire(monkeypatch):
+    """NEGATIVE: skill changes a word in the body AND appends a note.
+
+    The body is NOT a startswith-match of the input → guard must NOT fire →
+    real edit_distance/edit_ratio are preserved.
+    """
+    import evals.scripts.run_false_positive_eval as fp
+
+    input_text = "This is a clean human paragraph that requires no editing at all."
+    # Body differs from input (word changed): startswith will be False
+    changed_body = "This is a clean human paragraph that requires some editing now."
+    note = "\n\nNote: minor adjustment applied."
+    skill_output = changed_body + note
+
+    monkeypatch.setattr(fp, "run_skill", lambda *a, **k: {"final": skill_output})
+
+    result = fp._score_human_text_once(
+        input_text, lang="en", model="sonnet", domain="casual"
+    )
+
+    assert result is not None
+    assert result["edit_ratio"] > 0.0, (
+        f"Real edit must not be masked; expected edit_ratio > 0, got {result['edit_ratio']}"
+    )
+    assert result["verbatim_plus_commentary"] is False, (
+        "Guard must NOT fire when body differs from input"
+    )
+
+
+def test_fp_score_once_clean_preserve_no_note(monkeypatch):
+    """NEGATIVE (edge): skill returns input exactly (no appended note).
+
+    edit_ratio must be 0.0 regardless of guard (rewrite == input, no trailing block).
+    verbatim_plus_commentary may be False (len not strictly greater).
+    No crash.
+    """
+    import evals.scripts.run_false_positive_eval as fp
+
+    input_text = "A perfectly preserved paragraph."
+
+    monkeypatch.setattr(fp, "run_skill", lambda *a, **k: {"final": input_text})
+
+    result = fp._score_human_text_once(
+        input_text, lang="en", model="sonnet", domain="casual"
+    )
+
+    assert result is not None
+    assert result["edit_ratio"] == 0.0, (
+        f"Clean preserve must yield 0.0 edit_ratio; got {result['edit_ratio']}"
+    )
+    # Guard should NOT fire when len(rewrite.strip()) == len(input.strip())
+    assert result["verbatim_plus_commentary"] is False
+
+
+def test_fp_score_once_refusal_path_unaffected_by_guard(monkeypatch):
+    """NEGATIVE: refusal response → _score_human_text_once returns None (unchanged).
+
+    The verbatim-commentary guard must not interfere with the refusal path.
+    """
+    import evals.scripts.run_false_positive_eval as fp
+
+    input_text = "Clean human text."
+    refusal_text = "No text provided. Paste the text to humanize."
+
+    monkeypatch.setattr(fp, "run_skill", lambda *a, **k: {"final": refusal_text})
+
+    result = fp._score_human_text_once(
+        input_text, lang="en", model="sonnet", domain="casual"
+    )
+
+    assert result is None, (
+        f"Refusal must still return None; got {result!r}"
+    )

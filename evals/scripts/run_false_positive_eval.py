@@ -42,7 +42,23 @@ def _score_human_text_once(
     rewritten = result.get("final") or result.get("draft") or ""
     if is_refusal(rewritten):
         return None
-    edit_distance = Levenshtein.distance(text, rewritten)
+
+    # Verbatim-plus-commentary guard: when the skill returns the input body
+    # unchanged and appends a free-form "no changes" note, the note inflates
+    # edit_ratio.  Guard: if rewritten starts with the input (after strip) and
+    # is strictly longer, the body was not edited — measure body distance only
+    # (→ 0).  The real rewritten text (incl. note) is kept in 'rewrite' for
+    # sidecar capture.  The guard fires ONLY on a byte-identical body prefix;
+    # any real edit in the body makes startswith False → real distance measured.
+    text_stripped = text.strip()
+    rewritten_stripped = rewritten.strip()
+    guard_fired = (
+        rewritten_stripped.startswith(text_stripped)
+        and len(rewritten_stripped) > len(text_stripped)
+    )
+    scored_text = text if guard_fired else rewritten
+
+    edit_distance = Levenshtein.distance(text, scored_text)
     edit_ratio = edit_distance / max(1, len(text))
     preflight = (result.get("preflight") or "").lower()
     quick_drop = "quick" in preflight and ("0 tier-1" in preflight or "0/100" in preflight or "human-authored" in preflight)
@@ -56,6 +72,10 @@ def _score_human_text_once(
         # Never written to the scored partial — only consumed by score_human_text
         # when the caller requests rewrite collection.
         "rewrite": rewritten,
+        # Diagnostic flag: True when the trailing-commentary guard fired, meaning
+        # the skill returned the input verbatim plus an appended note and the
+        # edit_ratio was scored as 0 (body only, not the note).
+        "verbatim_plus_commentary": guard_fired,
     }
 
 
