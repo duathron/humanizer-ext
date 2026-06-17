@@ -42,6 +42,22 @@ SELF-TEST (--selftest)
 ----------------------
 Zero-quota: exercises only detection helpers and the Wilson CI fallback.
 No ``run_skill`` call, no ``claude`` subprocess. Exit 0 + print SELFTEST OK.
+
+KNOWN MEASUREMENT LIMITATION — OFF-condition commentary undercount
+------------------------------------------------------------------
+``has_commentary`` detects trailing text AFTER the rewrite body (using
+``_trailing_region``). When the directive is OFF the model may emit an
+UNFENCED free-form note that ``parse_skill_output`` does NOT strip, so the
+note merges verbatim into ``final``. In that case ``_trailing_region`` returns
+"" (the note is already inside ``final``), and ``has_commentary`` returns
+False — the run is NOT counted as commentary-bearing.
+
+Consequence: the OFF-condition ``has_commentary`` rate (and therefore the
+denominator used for ``fence_emission_rate``) is a LOWER BOUND.  Real
+unfenced-leak ≥ measured.  The ON-condition is accurate: the sentinel fence IS
+stripped from ``final`` by the parser, so the fenced note appears in the
+trailing region and is correctly counted.  Gate decisions (Task 5) must treat
+the OFF commentary-rate as a floor, not an exact value.
 """
 from __future__ import annotations
 
@@ -53,11 +69,19 @@ from pathlib import Path
 from typing import Any
 
 # ---------------------------------------------------------------------------
+# Repo root on sys.path — required for bare invocation without PYTHONPATH.
+# mirrors the pattern used in evals/scripts/sp1_changelog_probe.py.
+# parents[0]=evals/scripts, parents[1]=evals, parents[2]=repo root.
+# ---------------------------------------------------------------------------
+REPO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO))
+
+# ---------------------------------------------------------------------------
 # Shared utilities (parse_skill_output, run_skill, _AUDIT_SENTINEL)
 # ---------------------------------------------------------------------------
 # We must be able to import _shared without any claude call at import time.
 # _shared has no I/O at import time (as documented in its module docstring).
-from evals.scripts._shared import (
+from evals.scripts._shared import (  # noqa: E402
     _AUDIT_SENTINEL,
     parse_skill_output,
     run_skill,
@@ -152,13 +176,45 @@ def is_fenced(raw: str) -> bool:
     return _AUDIT_SENTINEL in raw
 
 
-def has_commentary(raw: str, parsed_final: str) -> bool:
-    """True when the raw response has content beyond the extracted final rewrite.
+def _trailing_region(raw: str, final: str) -> str:
+    """Text in raw AFTER the rewrite body ends.
 
-    Proxy: raw (stripped) is more than one character longer than parsed_final
-    (stripped). The +1 tolerance avoids false positives from trailing newlines.
+    Banners/headers (``**Final rewrite:**``, ``Pre-flight:``, ``> `` blockquote
+    markers, etc.) precede the body, so they are not counted as trailing
+    commentary.  Locates the body by its last occurrence in raw; if the model
+    reflowed the body (not found verbatim), returns "" — conservative: we can't
+    locate trailing commentary so we don't fabricate it.
+
+    NOTE — OFF-condition undercount: when the directive is OFF the model may
+    emit an unfenced free-form note that parse_skill_output does NOT strip, so
+    the note merges into ``final``.  _trailing_region then returns "" and
+    has_commentary returns False.  The OFF commentary-rate is therefore a
+    LOWER BOUND (see module docstring).
     """
-    return len(raw.strip()) > len(parsed_final.strip()) + 1
+    body = final.strip()
+    if not body:
+        return raw.strip()            # empty/refusal parse -> whole raw is non-rewrite
+    i = raw.rfind(body)
+    if i == -1:
+        # try the body's tail (model may have tweaked the head/whitespace)
+        tail = body[-60:]
+        i = raw.rfind(tail)
+        if i == -1:
+            return ""                 # can't locate -> conservative no-trailing
+        i += len(tail) - len(body)    # align to body start est.
+    return raw[i + len(body):]
+
+
+def has_commentary(raw: str, final: str) -> bool:
+    """True when raw contains content AFTER the rewrite body ends.
+
+    Uses _trailing_region to detect only trailing text (banners/headers that
+    precede the body are correctly excluded).  The +1 tolerance avoids false
+    positives from a lone trailing newline.
+
+    See module docstring for the OFF-condition lower-bound caveat.
+    """
+    return len(_trailing_region(raw, final).strip()) > 1
 
 
 # ---------------------------------------------------------------------------
@@ -253,6 +309,15 @@ def _print_summary(cond: str, log_path: Path) -> None:
         print(f"  fence_emission_rate  : {rate:.3f}  ({k}/{n})")
         print(f"  Wilson 95% CI        : [{lo:.3f}, {hi:.3f}]")
 
+    if cond == "off":
+        print(
+            "\n  NOTE (OFF condition): has_commentary is a LOWER BOUND here.\n"
+            "  When the directive is off the model may emit unfenced free-form notes\n"
+            "  that parse_skill_output does NOT strip; those notes merge into final\n"
+            "  and are NOT counted as trailing commentary. Real unfenced-leak rate\n"
+            "  >= measured. Treat the commentary-bearing count above as a floor."
+        )
+
 
 # ---------------------------------------------------------------------------
 # Self-test (zero quota)
@@ -270,10 +335,28 @@ def _selftest() -> None:  # noqa: C901
     if is_fenced(raw_plain):
         errors.append("is_fenced: expected False for plain raw")
 
-    # --- has_commentary ---
-    if not has_commentary(raw="body\n\n<!--HUMANIZER-AUDIT-->\nnote", parsed_final="body"):
-        errors.append("has_commentary: expected True when raw > final")
-    if has_commentary("body", "body"):
+    # --- has_commentary (trailing-region detector) ---
+    # Case 1: fenced note AFTER body -> trailing region is non-empty -> True
+    if not has_commentary(
+        raw="REWRITE BODY HERE.\n\n<!--HUMANIZER-AUDIT-->\nnote",
+        final="REWRITE BODY HERE.",
+    ):
+        errors.append(
+            "has_commentary: expected True when fenced note trails the rewrite body"
+        )
+    # Case 2: banner BEFORE body only -> no trailing text -> False.
+    # This is the case the old raw-vs-final-length check got wrong:
+    # parse_skill_output strips the banner from final, making raw > final
+    # even though there is zero trailing commentary.
+    if has_commentary(
+        raw="**Final rewrite:**\nREWRITE BODY HERE.",
+        final="REWRITE BODY HERE.",
+    ):
+        errors.append(
+            "has_commentary: expected False for pre-rewrite banner (no trailing commentary)"
+        )
+    # Case 3: raw == final -> False
+    if has_commentary("REWRITE BODY HERE.", "REWRITE BODY HERE."):
         errors.append("has_commentary: expected False when raw == final")
 
     # --- Wilson fallback ---
