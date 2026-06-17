@@ -783,3 +783,38 @@ def test_parse_quick_direct_trailing_fence_cut():
 def test_parse_no_fence_unchanged():
     resp = "**Final rewrite:**\nA rewrite with no fence and no commentary."
     assert parse_skill_output(resp)["final"] == "A rewrite with no fence and no commentary."
+
+
+# ---------------------------------------------------------------------------
+# Phase 2 Task 4 Step 1 — run_skill(return_raw=True) exposes raw stdout
+# ---------------------------------------------------------------------------
+
+@patch("subprocess.run")
+def test_run_skill_return_raw_gives_stdout_and_parsed(mock_run):
+    """return_raw=True returns (raw_stdout, parsed_dict) tuple."""
+    from evals.scripts._shared import run_skill
+
+    raw_stdout = "Rewrite body.\n\n<!--HUMANIZER-AUDIT-->\nText unverändert."
+    mock_run.return_value = MagicMock(
+        stdout=raw_stdout,
+        stderr="",
+        returncode=0,
+    )
+    raw, parsed = run_skill("x", return_raw=True)
+    assert raw == raw_stdout
+    assert parsed["final"] == "Rewrite body."  # Phase-1 sentinel cut applied
+
+
+@patch("subprocess.run")
+def test_run_skill_default_return_unchanged(mock_run):
+    """Default (no return_raw) returns a bare parsed dict, not a tuple."""
+    from evals.scripts._shared import run_skill
+
+    mock_run.return_value = MagicMock(
+        stdout="Just a rewrite.",
+        stderr="",
+        returncode=0,
+    )
+    out = run_skill("x")  # no flag -> bare parsed dict, not a tuple
+    assert isinstance(out, dict)
+    assert out["final"] == "Just a rewrite."

@@ -236,7 +236,8 @@ def run_skill(
     timeout: int = 180,
     max_attempts: int = 3,
     force_full: bool = False,
-) -> dict[str, str]:
+    return_raw: bool = False,
+) -> dict[str, str] | tuple[str, dict[str, str]]:
     """Invoke the humanizer skill via `claude -p` and return the parsed output.
 
     Loads whatever humanizer skill is installed in the environment. The caller
@@ -251,6 +252,11 @@ def run_skill(
     pre-flight. Use this in detection evals to ensure the skill's full pattern
     detection is exercised, not the routing logic. Callers that legitimately want
     the real pre-flight (FP eval, true-negative cases) keep the default False.
+
+    When ``return_raw=True``, returns ``(raw_stdout, parsed_dict)`` so callers
+    can inspect the raw response (e.g. to detect the ``<!--HUMANIZER-AUDIT-->``
+    sentinel). Default ``False`` preserves the original bare-dict return for
+    full back-compat.
     """
     prompt = _build_humanizer_prompt(
         text, lang=lang, mode=mode, domain=domain, samples_dir=samples_dir,
@@ -264,7 +270,7 @@ def run_skill(
     import os as _os
     cli_env = {k: v for k, v in _os.environ.items() if k != "ANTHROPIC_API_KEY"}
 
-    def _one_attempt() -> dict[str, str]:
+    def _one_attempt() -> dict[str, str] | tuple[str, dict[str, str]]:
         completed = subprocess.run(
             cmd, capture_output=True, text=True, timeout=timeout, env=cli_env
         )
@@ -274,7 +280,8 @@ def run_skill(
                 f"  stderr: {completed.stderr.strip()[:500] or '(empty)'}\n"
                 f"  stdout: {completed.stdout.strip()[:500] or '(empty)'}"
             )
-        return parse_skill_output(completed.stdout)
+        parsed = parse_skill_output(completed.stdout)
+        return (completed.stdout, parsed) if return_raw else parsed
 
     return retry_with_backoff(_one_attempt, max_attempts=max_attempts, base_delay=2.0)
 
