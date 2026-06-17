@@ -213,6 +213,7 @@ Pre-flight: 0 Tier-1 tells per 100 words → human-authored. Switching to Quick-
 
 Use the `**Final rewrite:**` header even when the rewrite is byte-equivalent to the input (because nothing needed to change). This consistent envelope is what lets the eval harness compute a meaningful edit distance.
 
+**Commentary fence (all modes).** Any notes, audit summary, or commentary you place AFTER the final rewrite text MUST begin with the exact line `<!--HUMANIZER-AUDIT-->` on its own line; everything from that marker to the end of your response is non-rewrite commentary. Do NOT use this marker for the Full-mode pre-rewrite "Final AI audit findings" block — that stays where it is, before the `**Final rewrite:**` block. Quick mode still emits only the rewrite (no commentary); but if any commentary slips in, it MUST be fenced with this marker.
 
 ## Reference
 
