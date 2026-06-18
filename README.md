@@ -1,12 +1,14 @@
 # Humanizer (extended)
 
+![Version](https://img.shields.io/badge/version-3.5.2-blue) ![License](https://img.shields.io/badge/license-MIT-blue) ![Compatibility](https://img.shields.io/badge/claude--code-opencode-green)
+
 A skill for Claude Code and OpenCode that removes signs of AI-generated writing from text, making it sound more natural and human.
 
 **Extended fork of [blader/humanizer](https://github.com/blader/humanizer), actively maintained.** Adds English + German (auto-detected) language packs, domain-aware overrides, 12 new patterns (41 total), a Quick/Full/Voice mode selector, a Tier-1 AI-iness density pre-flight, a Detection Guidance section (false positives + signs of human writing + LLM idiolects), a length audit, and an extended final AI audit checklist.
 
 ## What's different from upstream
 
-| Area | Upstream (v2.5.1) | This fork (v3.5.0) |
+| Area | Upstream (v2.5.1) | This fork (v3.5.2) |
 |------|-------------------|--------------------|
 | Language support | English only | **English + German**, auto-detected — German pack (`patterns/de.md`) adds DE-only tells (Nominalstil, Konjunktiv-II stacking, Denglisch, academic Rahmen-Floskeln) + a DACH career register for Anschreiben / Lebenslauf; per-language domain overrides (`domains/de_overrides.md`) |
 | Total patterns | 29 | **41** — adds sentence-starter intensifiers, rhetorical questions, stacked adjectives, quantity vagueness, trailing fragments, debunking-pose headings, conditional frame stacking, miscalibrated epistemic confidence, reference-markup artifacts, placeholder text, markdown contamination, diff-anchored writing |
@@ -24,6 +26,7 @@ A skill for Claude Code and OpenCode that removes signs of AI-generated writing 
 | Pattern #21 (cutoff disclaimers) | base | extended to speculative gap-filling ("maintains a low profile" template) |
 | Pattern #25 (generic conclusions) | base | extended to structural `## Conclusion` sections (delete the whole section) |
 | Pattern #26 (hyphenation) | strip all common pairs | use judgment; preserve technical compounds |
+| Output commentary | inline | **fenced with `<!--HUMANIZER-AUDIT-->`** — any post-rewrite notes start at this sentinel; tooling strips below it cleanly (since v3.5.2) |
 
 See the [version history](#version-history) for the full changelog.
 
@@ -36,7 +39,7 @@ See the [version history](#version-history) for the full changelog.
 /plugin install humanizer-ext@duathron-skills
 ```
 
-The `duathron-skills` marketplace is hosted in this repo and will accumulate additional forks of community skills over time. After installing, the skill becomes available as `/humanizer` in Claude Code.
+The first command registers this repo's `duathron-skills` marketplace; the second installs the skill from it. The `duathron-skills` marketplace is hosted in this repo and will accumulate additional forks of community skills over time. After installing, the skill becomes available as `/humanizer` in Claude Code.
 
 ### Claude Code (manual clone)
 
@@ -70,7 +73,8 @@ mkdir -p ~/.config/opencode/skills/humanizer
 cp SKILL.md ~/.config/opencode/skills/humanizer/
 ```
 
-> **Note:** OpenCode also scans `~/.claude/skills/` for compatibility, so a single clone into `~/.claude/skills/humanizer/` works for both tools.
+> [!NOTE]
+> OpenCode also scans `~/.claude/skills/` for compatibility, so a single clone into `~/.claude/skills/humanizer/` works for both tools.
 
 ## Usage
 
@@ -173,96 +177,118 @@ The German pack adds **DE-only tells** on top of the translated universal patter
 
 …and a **DACH career register** for Anschreiben / Lebenslauf: where US/UK cover letters reward assertive self-promotion, German Bewerbung culture rewards formal-modest understatement — so the career overrides strip the puffery (`ausgeprägte Teamfähigkeit`, `ich sehe mich als idealen Kandidaten`) while preserving the substantive facts, achievements, and motivation.
 
-A language with no pack falls back to English with an inline warning. Adding a new language (FR, ES, …) follows the recipe in [`evals/README.md`](evals/README.md); language-only patterns get IDs starting at #100 (DE), #200 (FR), #300 (ES), and so on.
+A language with no pack falls back to English with an inline warning.
+
+### Output format
+
+**Full mode** produces four things in order: a domain announcement (skipped if you named the domain yourself), a draft rewrite, a final AI audit, and the final rewrite.
+
+**Quick mode** (`/humanizer quick`) returns only the rewritten text — no headers, no commentary, nothing else. The first character of the response is the first character of the rewrite.
+
+**Commentary fence (all modes, since v3.5.2).** Any notes, audit summary, or commentary placed after the final rewrite must begin with the exact line `<!--HUMANIZER-AUDIT-->` on its own line. Everything from that marker to the end of the response is non-rewrite commentary. This lets tooling extract the rewrite cleanly by stripping at the sentinel.
+
+```
+**Final rewrite:**
+> The rewritten text goes here.
+
+<!--HUMANIZER-AUDIT-->
+- Removed 3 AI-vocabulary instances (#7)
+- Dropped the "## Conclusion" section (#25)
+```
+
+> [!NOTE]
+> The `<!--HUMANIZER-AUDIT-->` sentinel is a formatting contract for tooling, not a user-visible feature. It has no effect in normal interactive use.
 
 ## Overview
 
-Based on [Wikipedia's "Signs of AI writing"](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) guide, maintained by WikiProject AI Cleanup. This comprehensive guide comes from observations of thousands of instances of AI-generated text.
+Based on [Wikipedia's "Signs of AI writing"](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) guide, maintained by WikiProject AI Cleanup. The patterns documented there come from observations of thousands of instances of AI-generated text on Wikipedia.
 
 The skill runs a length audit to cut 20–30% of padding, then a specific final AI audit checklist to catch lingering AI-isms before presenting the final version.
 
-### Key Insight from Wikipedia
+### Key insight from Wikipedia
 
 > "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."
 
 ## 41 Patterns Detected (with Before/After Examples)
 
+The 41 patterns are drawn from 13 **universal** patterns (apply in any language; defined in `patterns/_universal.md`) and 28 **English-specific** patterns (defined in `patterns/en.md`). The German pack translates all 37 shared patterns into German and adds 5 DE-only extension patterns (`#100`–`#104`).
+
 ### Content Patterns
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 1 | **Significance inflation** | “marking a pivotal moment in the evolution of...” | “was established in 1989 to collect regional statistics” |
-| 2 | **Notability name-dropping** | “cited in NYT, BBC, FT, and The Hindu” | “In a 2024 NYT interview, she argued...” |
-| 3 | **Superficial -ing analyses** | “symbolizing... reflecting... resonating with...” | Remove or expand with actual sources |
-| 4 | **Promotional language** | “nestled within the breathtaking region” | “is a town in the Gonder region” |
-| 5 | **Vague attributions** | “Experts believe it plays a crucial role” | “according to a 2019 survey by...” |
-| 6 | **Formulaic challenges** | “Despite challenges... continues to thrive” | Specific facts about actual challenges |
+| 1 | **Significance inflation** | "marking a pivotal moment in the evolution of..." | "was established in 1989 to collect regional statistics" |
+| 2 | **Notability name-dropping** | "cited in NYT, BBC, FT, and The Hindu" | "In a 2024 NYT interview, she argued..." |
+| 3 | **Superficial -ing analyses** | "symbolizing... reflecting... resonating with..." | Remove or expand with actual sources |
+| 4 | **Promotional language** | "nestled within the breathtaking region" | "is a town in the Gonder region" |
+| 5 | **Vague attributions** | "Experts believe it plays a crucial role" | "according to a 2019 survey by..." |
+| 6 | **Formulaic challenges** | "Despite challenges... continues to thrive" | Specific facts about actual challenges |
 
 ### Language Patterns
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 7 | **AI vocabulary** (with era clusters) | “robust... meticulous... bolstered... seamless... testament”; GPT-4 / GPT-4o / GPT-5 era lists | plain synonyms or cut (flag figurative use, not literal) |
-| 8 | **Copula avoidance** | “serves as... features... maintains... offers” | “is... has” |
-| 9 | **Negative parallelisms / tailing negations / “rather than” dismissals** | “It's not just X, it's Y”, “..., no guessing”, “X rather than Y (where Y is unstated)” | State the point directly; cut dismissed alternatives nobody claimed |
-| 10 | **Rule of three** | “innovation, inspiration, and insights” | Use natural number of items |
-| 11 | **Synonym cycling** | “protagonist... main character... central figure... hero” | “protagonist” (repeat when clearest) |
-| 12 | **False ranges** | “from the Big Bang to dark matter” | List topics directly |
-| 13 | **Passive voice / subjectless fragments** | “No configuration file needed” | Name the actor when it helps clarity |
+| 7 | **AI vocabulary** (with era clusters) | "robust... meticulous... bolstered... seamless... testament"; GPT-4 / GPT-4o / GPT-5 era lists | plain synonyms or cut (flag figurative use, not literal) |
+| 8 | **Copula avoidance** | "serves as... features... maintains... offers" | "is... has" |
+| 9 | **Negative parallelisms / tailing negations / "rather than" dismissals** | "It's not just X, it's Y", "..., no guessing", "X rather than Y (where Y is unstated)" | State the point directly; cut dismissed alternatives nobody claimed |
+| 10 | **Rule of three** | "innovation, inspiration, and insights" | Use natural number of items |
+| 11 | **Synonym cycling** | "protagonist... main character... central figure... hero" | "protagonist" (repeat when clearest) |
+| 12 | **False ranges** | "from the Big Bang to dark matter" | List topics directly |
+| 13 | **Passive voice / subjectless fragments** | "No configuration file needed" | Name the actor when it helps clarity |
 
 ### Style Patterns
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 14 | **Em dash overuse / paired bracketing** | “institutions—not the people—yet this continues—”, “report—covering three continents—concluded” | Prefer commas or periods; break paired brackets into appositives or separate sentences |
-| 15 | **Boldface overuse** | “**OKRs**, **KPIs**, **BMC**” | “OKRs, KPIs, BMC” |
-| 16 | **Inline-header lists** | “**Performance:** Performance improved” | Convert to prose (preserve genuine lists) |
-| 17 | **Title Case Headings** | “Strategic Negotiations And Partnerships” | “Strategic negotiations and partnerships” |
-| 18 | **Emojis** | “🚀 Launch Phase: 💡 Key Insight:” | Remove emojis |
+| 14 | **Em dash overuse / paired bracketing** | "institutions—not the people—yet this continues—", "report—covering three continents—concluded" | Prefer commas or periods; break paired brackets into appositives or separate sentences |
+| 15 | **Boldface overuse** | "**OKRs**, **KPIs**, **BMC**" | "OKRs, KPIs, BMC" |
+| 16 | **Inline-header lists** | "**Performance:** Performance improved" | Convert to prose (preserve genuine lists) |
+| 17 | **Title Case Headings** | "Strategic Negotiations And Partnerships" | "Strategic negotiations and partnerships" |
+| 18 | **Emojis** | "🚀 Launch Phase: 💡 Key Insight:" | Remove emojis |
 | 19 | **Curly quotes** | U+201C/U+201D typographic quotes | Straight ASCII quotes |
-| 26 | **Hyphenated word pairs** | “cross-functional, data-driven, client-facing” | Drop hyphens on common pairs (use judgment) |
-| 27 | **Persuasive authority tropes** | “At its core, what matters is...”, “In essence...” | State the point directly |
-| 28 | **Signposting announcements** | “Let's dive in”, “Here's what you need to know” | Start with the content |
-| 29 | **Fragmented headers** | “## Performance” + “Speed matters.” | Let the heading do the work |
+| 26 | **Hyphenated word pairs** | "cross-functional, data-driven, client-facing" | Drop hyphens on common pairs (use judgment) |
+| 27 | **Persuasive authority tropes** | "At its core, what matters is...", "In essence..." | State the point directly |
+| 28 | **Signposting announcements** | "Let's dive in", "Here's what you need to know" | Start with the content |
+| 29 | **Fragmented headers** | "## Performance" + "Speed matters." | Let the heading do the work |
 
 ### Communication Patterns
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 20 | **Chatbot artifacts** | “I hope this helps! Let me know if...” | Remove entirely |
-| 21 | **Cutoff disclaimers / speculative gap-filling** | “While details are limited...”; “she maintains a low profile” | Find sources or remove |
-| 22 | **Sycophantic tone** | “Great question! You're absolutely right!” | Respond directly |
+| 20 | **Chatbot artifacts** | "I hope this helps! Let me know if..." | Remove entirely |
+| 21 | **Cutoff disclaimers / speculative gap-filling** | "While details are limited..."; "she maintains a low profile" | Find sources or remove |
+| 22 | **Sycophantic tone** | "Great question! You're absolutely right!" | Respond directly |
 
 ### Filler and Hedging
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 23 | **Filler phrases / didactic disclaimers** | “In order to”, “It is worth noting that”, “Going forward”, “It is important to note”, “Keep in mind”, “consult a professional” | Cut or rewrite directly |
-| 24 | **Excessive hedging** | “could potentially possibly” | “may” |
-| 25 | **Generic conclusions / structural `## Conclusion` sections** | “The future looks bright”; a whole `## Conclusion` that restates the body | Specific plans or facts; delete the whole section |
+| 23 | **Filler phrases / didactic disclaimers** | "In order to", "It is worth noting that", "Going forward", "It is important to note", "Keep in mind", "consult a professional" | Cut or rewrite directly |
+| 24 | **Excessive hedging** | "could potentially possibly" | "may" |
+| 25 | **Generic conclusions / structural `## Conclusion` sections** | "The future looks bright"; a whole `## Conclusion` that restates the body | Specific plans or facts; delete the whole section |
 
 ### New in v3.0
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 30 | **Sentence-starter intensifiers** | “Ultimately... Indeed... Clearly... Essentially...” | Cut; state the claim directly |
-| 31 | **Rhetorical / self-answering questions** | “What makes this effective? The way it reduces...” | “It works because it reduces...” |
-| 32 | **Stacked intensifier adjectives** | “innovative, comprehensive, and forward-thinking” | One specific adjective or none |
-| 33 | **Quantity vagueness** | “a wide range of factors... numerous studies” | Specific count or named examples |
-| 34 | **Trailing emphasis fragments** | “That's the key. And that matters.” | Delete; the previous sentence said it |
+| 30 | **Sentence-starter intensifiers** | "Ultimately... Indeed... Clearly... Essentially..." | Cut; state the claim directly |
+| 31 | **Rhetorical / self-answering questions** | "What makes this effective? The way it reduces..." | "It works because it reduces..." |
+| 32 | **Stacked intensifier adjectives** | "innovative, comprehensive, and forward-thinking" | One specific adjective or none |
+| 33 | **Quantity vagueness** | "a wide range of factors... numerous studies" | Specific count or named examples |
+| 34 | **Trailing emphasis fragments** | "That's the key. And that matters." | Delete; the previous sentence said it |
 
 ### Heading Patterns (new in v3.2)
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 35 | **Debunking-pose headings** | “What the research actually says”, “X: the long game”, “demystified” | Cut “actually / the real / that lands”; audit headings as a separate pass |
+| 35 | **Debunking-pose headings** | "What the research actually says", "X: the long game", "demystified" | Cut "actually / the real / that lands"; audit headings as a separate pass |
 
 ### Epistemic Patterns (new in v3.2)
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 36 | **Conditional frame stacking** | “If the argument holds, and if the reading is right, then perhaps...” | State the conclusion; reserve “if” for real analytical branches |
-| 37 | **Miscalibrated epistemic confidence** | Over: “decisively demonstrates fundamentally”; Over-hedge: “appears to have arguably may have somewhat” | Narrow the claim to what the evidence supports; don't swap one extreme for the other |
+| 36 | **Conditional frame stacking** | "If the argument holds, and if the reading is right, then perhaps..." | State the conclusion; reserve "if" for real analytical branches |
+| 37 | **Miscalibrated epistemic confidence** | Over: "decisively demonstrates fundamentally"; Over-hedge: "appears to have arguably may have somewhat" | Narrow the claim to what the evidence supports; don't swap one extreme for the other |
 
 ### Artifacts and Contamination (new in v3.2)
 
@@ -270,9 +296,27 @@ These do not occur in genuinely human-written text — when present, AI involvem
 
 | # | Pattern | Before | After |
 |---|---------|--------|-------|
-| 38 | **Reference-markup artifacts** | “...modern history `turn0search0`”, `?utm_source=chatgpt.com`, `<grok_card>`, `:contentReference[oaicite:0]` | Strip the markup; add a real citation if needed |
-| 39 | **Phrasal templates / placeholder text** | “Founded in [YEAR], [COMPANY] is...”, `2025-xx-xx`, `XXXX`, `___` | Fill in or delete the sentence |
-| 40 | **Markdown / wikitext contamination** | ```` ```markdown ```` fences left in prose, “Would you like me to convert...” meta-prompts | Remove the fence and meta-prompt |
+| 38 | **Reference-markup artifacts** | "...modern history `turn0search0`", `?utm_source=chatgpt.com`, `<grok_card>`, `:contentReference[oaicite:0]` | Strip the markup; add a real citation if needed |
+| 39 | **Phrasal templates / placeholder text** | "Founded in [YEAR], [COMPANY] is...", `2025-xx-xx`, `XXXX`, `___` | Fill in or delete the sentence |
+| 40 | **Markdown / wikitext contamination** | ```` ```markdown ```` fences left in prose, "Would you like me to convert..." meta-prompts | Remove the fence and meta-prompt |
+
+### New in v3.4.2
+
+| # | Pattern | Before | After |
+|---|---------|--------|-------|
+| 41 | **Diff-anchored writing** | "This function was added to replace the previous approach", "The CLI now uses YAML (previously it used...)" | Describe the current state; drop the diff-frame narrative (except in changelogs / release notes / migration guides) |
+
+### German-only extension patterns (#100–#104)
+
+These apply only when the input language is German. Defined in `patterns/de.md`.
+
+| # | Pattern | Example |
+|---|---------|---------|
+| 100 | **Akademische Rahmen-Floskel** | "Im Rahmen der vorliegenden Arbeit wird..." |
+| 101 | **Impersonales Reflexiv** | "Es lässt sich festhalten, dass..." |
+| 102 | **Konjunktiv-II-Stacking** | "Das würde bedeuten, dass es wäre, als ob..." |
+| 103 | **Denglisch / Anglizismen-Leakage** | "leveragen", "scalen", "Pain Points", "Stakeholder-Buy-in" |
+| 104 | **Nominalstil-Inflation** | "Die Durchführung einer Analyse erfolgte" instead of "Wir analysierten" |
 
 ## Full Example
 
@@ -291,7 +335,7 @@ These do not occur in genuinely human-written text — when present, AI involvem
 >
 > While specific details are limited based on available information, it could potentially be argued that these tools might have some positive effect. Despite challenges typical of emerging technologies—including hallucinations, bias, and accountability—the ecosystem continues to thrive. In order to fully realize this potential, teams must align with best practices.
 >
-> In conclusion, the future looks bright. Exciting times lie ahead as we continue this journey toward excellence. Let me know if you’d like me to expand on any section!
+> In conclusion, the future looks bright. Exciting times lie ahead as we continue this journey toward excellence. Let me know if you'd like me to expand on any section!
 
 **After (Humanized):**
 > AI coding assistants can speed up the boring parts of the job. They're great at boilerplate: config files and the little glue code you don't want to write. They can also help you sketch a test, but you still have to read it.
