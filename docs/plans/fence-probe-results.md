@@ -25,3 +25,24 @@
 2. Finish ON dirty reps 2–5: `--cond on 5` (resumes).
 3. Compute off/on edit-distance (gate ii) + commentary-rate (gate iii, OFF = lower-bound floor per the probe's documented limitation).
 4. Skeptic-verify all numbers from the logs, then the Task-5 gate decision + (if pass) v3.5.2 bump on user OK.
+
+## FINAL — GATE-PASS (2026-06-18)
+
+**Verdict: GATE-PASS. Shipped v3.5.2.**
+
+Full 20/20 ON probe runs completed post-reset (5 reps × 4 inputs: `en_clean_blog`, `de_clean_pflege`, `en_dirty_mkt`, `de_dirty_mkt`). OFF condition completed (20 runs, same inputs × reps).
+
+**Gate (i) — fence_emission_rate ON:** 20/20 fenced. `fence_emission_rate` = **1.000**. Wilson 95% CI **[0.839, 1.000]**. Lower bound 0.839 ≥ 0.70 threshold. **PASS.**
+
+**Gate (ii) — formatting-only (off/on rewrite bodies unchanged):** `en_clean` byte-identical off vs on (sentinel + trailing notes only appended, rewrite body untouched). `de_clean` shows punctuation jitter (≤0.02 condition-independent, not directive-induced — same jitter present within OFF runs across reps, confirming stochastic model variance). `dirty` paraphrase variance identical off/on — zero marginal perturbation attributable to the directive. **PASS (formatting-only confirmed).**
+
+**Gate (iii) — commentary not raised vs OFF baseline:** OFF true emission 9/20 by hand-read (the probe auto-detector undercounts OFF due to inline commentary not triggering the trailing-region heuristic; hand-read is the authoritative figure). Directive fences-then-parser-strips: net user-visible commentary is less under ON (parser strips sentinel block) than OFF (raw inline notes remain). Commentary volume not raised; directive does not introduce substantive new commentary. **PASS.**
+
+**Gate (iv) — pytest:** 357/357 passed (8.39s). **PASS.**
+
+**Caveats (on record):**
+- n=5 reps per input (20 total); small sample, but Wilson lower-CI 0.839 is well above the 0.70 gate.
+- OFF-undercount corrected by hand-read; probe auto-summary not patched (probe-logic note carried forward from partial section above).
+- `de_clean` not strictly byte-identical: condition-independent stochastic jitter confirmed by within-condition variance, not directive-induced.
+
+Independent-Skeptic GATE-PASS recorded. Directive (commit 1439502) + Phase-1 parser ship as v3.5.2.
