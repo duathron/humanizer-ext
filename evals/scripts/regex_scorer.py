@@ -115,6 +115,21 @@ PATTERNS_EN = {
         ),
         "sycophantic opener",
     ),
+    "chatbot_closer": (
+        re.compile(
+            r"(want me to\b[^.?!]*\?|should i continue\?)",
+            re.I,
+        ),
+        "offer-to-continue closer",
+    ),
+    "fake_candid_opener": (
+        re.compile(
+            r"(?m)^[ \t>*\-]*"
+            r"(Look|Here's the thing|The thing is|Let's be honest|Real talk|Honestly)\b[,?]",
+            re.I,
+        ),
+        "fake-candid discourse opener",
+    ),
     # --- Authenticity -------------------------------------------------------
     "puffery": (
         re.compile(
@@ -414,6 +429,21 @@ PATTERNS_DE = {
             re.I,
         ),
         "DE Denglisch / anglicism leakage",
+    ),
+    "de_chatbot_closer": (
+        re.compile(
+            r"(soll ich fortfahren\?|möchten sie,? dass ich\b[^.?!]*\?|soll ich beispiele geben\?)",
+            re.I,
+        ),
+        "Angebot zur Fortsetzung (Chatbot-Schluss)",
+    ),
+    "de_fake_candid_opener": (
+        re.compile(
+            r"(?m)^[ \t>*\-]*"
+            r"(Mal ehrlich[,?]|Ganz ehrlich\?|Die Sache ist die,)",
+            re.I,
+        ),
+        "vorgetäuschte Offenheit (Eröffnungs-Floskel)",
     ),
     # --- Universal mechanics (reuse EN compiled objects by reference) --------
     "em_dash_overuse": PATTERNS_EN["em_dash_overuse"],

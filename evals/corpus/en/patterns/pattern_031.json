@@ -14,6 +14,14 @@
       "domain": "casual",
       "source": "manual_refinement_meetup_consensus",
       "notes": "Meetup 2026-05-26 (2/4/2). Narrow to FRAGMENT-ANSWERS only — Qs themselves are legitimate rhetoric (S/T/M); the immediate-fragment-answer is what makes it AI self-answering."
+    },
+    {
+      "id": "pattern_031_en_002",
+      "input": "Honestly? The approach works because it reduces cognitive load. Look, that's the whole point.",
+      "expected_changes": ["Honestly?", "Look,"],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "upstream_v2.8.0_port"
     }
   ]
 }

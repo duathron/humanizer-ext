@@ -35,6 +35,14 @@
       "expected_unchanged": [],
       "domain": "casual",
       "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_031_de_004",
+      "input": "Mal ehrlich, der Ansatz funktioniert, weil er die kognitive Last reduziert. Die Sache ist die, dass das den Unterschied macht.",
+      "expected_changes": ["Mal ehrlich,", "Die Sache ist die,"],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "upstream_v2.8.0_port"
     }
   ]
 }

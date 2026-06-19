@@ -230,7 +230,7 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ### 20. Collaborative Communication Artifacts
 
-**Words to watch:** I hope this helps, Of course!, Certainly!, You're absolutely right!, Would you like..., let me know, here is a...
+**Words to watch:** I hope this helps, Of course!, Certainly!, You're absolutely right!, Would you like..., Want me to...?, Should I continue?, Want me to give examples?, let me know, here is a...
 
 **Problem:** Text meant as chatbot correspondence gets pasted as content.
 
@@ -355,6 +355,8 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 ### 31. Rhetorical and Self-Answering Questions
 
 **Problem:** LLMs set up questions and then immediately answer them, creating a fake sense of depth or drama. The question adds ceremony without adding content. Also watch for questions that exist only to introduce a section — the question disappears when you just start with the answer.
+
+**Openers to watch:** Look, / Here's the thing / The thing is / Let's be honest / Real talk / Honestly? — used as standalone theatrical hooks before an ordinary point. The words mid-sentence are fine; the tell is the standalone pause-and-reveal opener, which usually disappears when you just state the point.
 
 **Before:**
 > What makes this approach effective? The way it reduces cognitive load. Why does that matter? Because users abandon tools that are hard to use.

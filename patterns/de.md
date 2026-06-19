@@ -488,7 +488,7 @@ Selbstverständlich!, Gerne!, gibt es noch etwas, lassen Sie mich wissen,
 Lass mich wissen, ob ..., detailliertere Aufschlüsselung, hier ist ein,
 Vielen Dank für Ihre Frage!, Mit freundlichen Grüßen, Betreff:, Liebe
 Wikipedia-Editoren, Ich hoffe, diese Nachricht erreicht Sie wohlauf,
-Vielen Dank für Ihre Zeit
+Vielen Dank für Ihre Zeit, Soll ich fortfahren?, Möchten Sie, dass ich …?, Soll ich Beispiele geben?
 
 **Problem:** Als Chatbot-Korrespondenz gedachter Text wird als Inhalt
 eingefügt. Die deutschen Formen ahmen oft formelle Briefkonventionen
@@ -697,6 +697,8 @@ künstlichen Sinn für Tiefe und Dialog erzeugt. Selbstgestellte
 rhetorische Fragen, auf die der Text die Antwort sofort liefert,
 immer in direkte Aussagen umwandeln: Frage streichen, Antwort als
 assertiven Satz formulieren.
+
+**Eröffnungs-Floskeln (vorgetäuschte Offenheit):** "Mal ehrlich", "Ganz ehrlich?", "Die Sache ist die," — als alleinstehende Eröffnungs-Haken vor einer gewöhnlichen Aussage. Die Wörter mitten im Satz sind unbedenklich; das Tell ist der alleinstehende Haken. (Nicht aufnehmen: "Sagen wir es so" — echte Hecke/Reformulierung im Deutschen, kein KI-Tell.)
 
 **Vorher:**
 > Was macht diesen Ansatz effektiv? Die Art, wie er die kognitive Last

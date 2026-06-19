@@ -438,3 +438,46 @@ def test_de_clean_prose_no_lang_specific_hits():
     lang_specific_keys = [k for k in PATTERNS_DE if k not in UNIVERSAL_MECHANICS_KEYS]
     total_lang_specific = sum(hits.get(k, 0) for k in lang_specific_keys)
     assert total_lang_specific == 0, f"False positives on clean German: {hits}"
+
+
+def test_chatbot_closer_fires_en():
+    assert scan("That's the overview. Want me to continue?", lang="en")["chatbot_closer"] >= 1
+    assert scan("Should I continue?", lang="en")["chatbot_closer"] >= 1
+    assert scan("Want me to give examples?", lang="en")["chatbot_closer"] >= 1
+
+
+def test_chatbot_closer_silent_on_ordinary_continue_en():
+    assert scan("Prices continue to climb each year.", lang="en")["chatbot_closer"] == 0
+
+
+def test_fake_candid_opener_fires_en():
+    assert scan("Honestly? It depends on how often you use it.", lang="en")["fake_candid_opener"] >= 1
+    assert scan("Look, the data is clear.", lang="en")["fake_candid_opener"] >= 1
+    assert scan("Here's the thing, nobody actually checked.", lang="en")["fake_candid_opener"] >= 1
+
+
+def test_fake_candid_opener_silent_mid_sentence_en():
+    assert scan("I honestly think it works.", lang="en")["fake_candid_opener"] == 0
+    assert scan("Take a look at the chart.", lang="en")["fake_candid_opener"] == 0
+
+
+def test_de_chatbot_closer_fires():
+    assert scan("Hier ist die Übersicht. Soll ich fortfahren?", lang="de")["de_chatbot_closer"] >= 1
+    assert scan("Möchten Sie, dass ich das ausführe?", lang="de")["de_chatbot_closer"] >= 1
+    assert scan("Soll ich Beispiele geben?", lang="de")["de_chatbot_closer"] >= 1
+
+def test_de_fake_candid_opener_fires():
+    assert scan("Mal ehrlich, das funktioniert selten.", lang="de")["de_fake_candid_opener"] >= 1
+    assert scan("Ganz ehrlich? Es kommt darauf an.", lang="de")["de_fake_candid_opener"] >= 1
+    assert scan("Die Sache ist die, dass niemand es geprüft hat.", lang="de")["de_fake_candid_opener"] >= 1
+
+def test_de_fake_candid_opener_silent_on_legit_use():
+    assert scan("Die Sache ist die Lösung des Problems.", lang="de")["de_fake_candid_opener"] == 0
+    assert scan("In der Sache ist die Lage komplex.", lang="de")["de_fake_candid_opener"] == 0
+
+def test_de_extension_keys_dont_break_clean_prose():
+    text = ("Ich verbrachte den Morgen damit, mein Fahrrad zu reparieren. "
+            "Die Kette war gerissen, was mich eine Stunde kostete.")
+    hits = scan(text, lang="de")
+    assert hits["de_chatbot_closer"] == 0
+    assert hits["de_fake_candid_opener"] == 0

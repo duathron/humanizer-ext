@@ -18,6 +18,14 @@
       "expected_unchanged": [],
       "domain": "casual",
       "source": "seeded_from_pattern_pack"
+    },
+    {
+      "id": "pattern_020_en_002",
+      "input": "The French Revolution began in 1789 amid financial crisis and food shortages. Want me to continue? Should I continue?",
+      "expected_changes": ["Want me to continue?", "Should I continue?"],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "upstream_v2.8.0_port"
     }
   ]
 }

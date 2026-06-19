@@ -37,6 +37,14 @@
       "expected_unchanged": [],
       "domain": "casual",
       "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_020_de_004",
+      "input": "Die Französische Revolution begann 1789. Soll ich fortfahren? Soll ich Beispiele geben?",
+      "expected_changes": ["Soll ich fortfahren?", "Soll ich Beispiele geben?"],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "upstream_v2.8.0_port"
     }
   ]
 }
