@@ -1,0 +1,41 @@
+{
+  "pattern_id": 42,
+  "pattern_name": "Aphorismus-Formeln",
+  "lang": "de",
+  "cases": [
+    {
+      "id": "pattern_042_de_001",
+      "input": "Führung ist kein Werkzeug, sondern ein Spiegel des Teams. Effizienz wird zur Falle, wenn man das vergisst.",
+      "expected_changes": ["ist kein Werkzeug, sondern ein Spiegel", "wird zur Falle"],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "anchor_tp"
+    },
+    {
+      "id": "pattern_042_de_002",
+      "input": "Vertrauen ist die Währung jeder guten Zusammenarbeit.",
+      "expected_changes": ["ist die Währung"],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "held_out_recall_removal_checkable"
+    },
+    {
+      "id": "pattern_042_de_003",
+      "input": "Die Sprache der Diplomatie ist subtil und oft missverstanden.",
+      "expected_changes": [],
+      "expected_unchanged": ["Die Sprache der Diplomatie"],
+      "domain": "casual",
+      "source": "adversarial_fachsprache_tn",
+      "true_negative": true
+    },
+    {
+      "id": "pattern_042_de_004",
+      "input": "Aufmerksamkeit ist die Währung der sozialen Medien.",
+      "expected_changes": [],
+      "expected_unchanged": ["die Währung der sozialen Medien"],
+      "domain": "casual",
+      "source": "adversarial_fachsprache_tn",
+      "true_negative": true
+    }
+  ]
+}

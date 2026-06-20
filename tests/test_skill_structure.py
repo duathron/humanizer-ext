@@ -56,7 +56,7 @@ def test_universal_pack_contains_expected_patterns():
 
 EN_PATTERN_IDS = {
     1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 16, 20, 21, 22, 23, 24,
-    27, 28, 30, 31, 32, 33, 34, 35, 36, 37,
+    27, 28, 30, 31, 32, 33, 34, 35, 36, 37, 42,
 }
 
 
@@ -142,7 +142,7 @@ def test_skill_md_no_longer_contains_pattern_definitions():
 
 DE_PATTERN_IDS = {
     1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 16, 20, 21, 22, 23, 24,
-    27, 28, 30, 31, 32, 33, 34, 35, 36, 37,    # EN-PARALLEL
+    27, 28, 30, 31, 32, 33, 34, 35, 36, 37, 42,    # EN-PARALLEL
     100, 101, 102, 103, 104,                    # DE-only
 }
 

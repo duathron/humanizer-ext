@@ -35,6 +35,23 @@
       "expected_unchanged": [],
       "domain": "casual",
       "source": "manual_de_denoise"
+    },
+    {
+      "id": "pattern_034_de_004",
+      "input": "Das Modell kam am Dienstag. Es veränderte alles. Das ganze Feld verschob sich. Das Team wusste es. Innerhalb eines Monats hatten drei Wettbewerber ihre Abläufe darauf umgestellt.",
+      "expected_changes": ["Es veränderte alles.", "Das ganze Feld verschob sich.", "Das Team wusste es."],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "upstream_v2.8.0_port_staccato_positive"
+    },
+    {
+      "id": "pattern_034_de_005",
+      "input": "Der Build schlug fehl. Ich prüfte die Logs. Ein Test lief in einen Timeout. Ich behob es und pushte.",
+      "expected_changes": [],
+      "expected_unchanged": ["Der Build schlug fehl.", "Ich prüfte die Logs.", "Ein Test lief in einen Timeout."],
+      "domain": "casual",
+      "source": "staccato_negative_survive_case",
+      "true_negative": true
     }
   ]
 }

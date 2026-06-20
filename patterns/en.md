@@ -406,6 +406,16 @@ If an adjective genuinely applies, use one: "This modular solution..."
 **After:**
 > The system processes requests in under 50ms.
 
+**Extension — mid-text dramatic staccato runs:** beyond the single trailing restate above, a *run of ≥3 short declarative sentences mid-paragraph* that manufacture drama is the same tell at higher volume. Fix: restructure the run into flowing prose (merge), don't merely clip.
+
+**Before (mid-text run; continuing prose follows):**
+> The model shipped on Tuesday. It changed everything. The whole field shifted. The team knew it. Within a month three competitors had rebuilt their pipelines around the same idea.
+
+**After:**
+> The model shipped on Tuesday and reshaped the field; within a month three competitors had rebuilt their pipelines around the same idea.
+
+**One-passage-one-pattern rule:** a *single* trailing restate at a paragraph end → #34 (above). A run of *negation* fragments ("No map. No guide. No second chance.") → **#9** (it owns tailing negations) — not here. A run of *≥3 affirmative* short declaratives building drama → this extension.
+
 
 ## HEADING PATTERNS
 
@@ -471,3 +481,17 @@ Both are tells. The fix is not to replace one extreme with the other — it is t
 > The policy was associated with a modest improvement in outcomes in two of the three cases studied.
 
 **Critical rule:** Do not fix over-assertion by adding hedges. Fix it by narrowing the claim.
+
+### 42. Aphorism Formulas
+
+**Problem:** An ordinary claim is recast as a reusable-sounding maxim — gravitas, not precision. Replace the formula with the concrete claim it gestures at.
+
+**Hard tells (distinctive):** "X is not a tool but a mirror", "X becomes a trap".
+**Soft tells (flag in prose, but they are NOT mechanical triggers — they over-fire on legitimate idiom):** "the language of <abstract>", "the currency of <abstract>", and bare "X is the Y of Z". English uses these non-figuratively ("the language of diplomacy", "the currency of nineteen countries"), so judge by whether the phrase *manufactures a maxim* in place of a concrete claim. Also: "the architecture of" stays #35 (heading debunking-pose), not here.
+
+**Before:**
+> Trust is the currency of every healthy team.
+**After:**
+> Teams work better when members can rely on each other.
+
+**Routing vs #9:** the hard anchor "X is not a tool but a mirror" is a "not X but Y" frame, which #9 also owns — but with a different fix. If the negation frame manufactures a profundity maxim (mirror / trap image) → #42 (replace with the concrete claim). If it is a bare "not only…but" dismissal of an unclaimed alternative → #9 (delete the frame).

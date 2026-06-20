@@ -1,0 +1,58 @@
+{
+  "pattern_id": 42,
+  "pattern_name": "Aphorism Formulas",
+  "lang": "en",
+  "cases": [
+    {
+      "id": "pattern_042_en_001",
+      "input": "Leadership is not a tool but a mirror of the team. Efficiency becomes a trap when leaders forget that.",
+      "expected_changes": ["is not a tool but a mirror", "becomes a trap"],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "anchor_tp"
+    },
+    {
+      "id": "pattern_042_en_002",
+      "input": "Symmetry is the language of trust, and consistency is the currency of good design.",
+      "expected_changes": ["is the language of", "is the currency of"],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "held_out_recall_removal_checkable"
+    },
+    {
+      "id": "pattern_042_en_003",
+      "input": "Every dashboard is a story waiting to be told about the data behind it.",
+      "expected_changes": ["is a story waiting to be told"],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "held_out_recall_removal_checkable"
+    },
+    {
+      "id": "pattern_042_en_004",
+      "input": "Tuesday is the busiest day of the week.",
+      "expected_changes": [],
+      "expected_unchanged": ["Tuesday is the busiest day of the week."],
+      "domain": "casual",
+      "source": "adversarial_copula_tn",
+      "true_negative": true
+    },
+    {
+      "id": "pattern_042_en_005",
+      "input": "The CEO is the head of the company.",
+      "expected_changes": [],
+      "expected_unchanged": ["The CEO is the head of the company."],
+      "domain": "casual",
+      "source": "adversarial_copula_tn",
+      "true_negative": true
+    },
+    {
+      "id": "pattern_042_en_006",
+      "input": "The euro is the currency of nineteen countries.",
+      "expected_changes": [],
+      "expected_unchanged": ["The euro is the currency of nineteen countries."],
+      "domain": "casual",
+      "source": "adversarial_genitive_idiom_tn",
+      "true_negative": true
+    }
+  ]
+}

@@ -784,6 +784,16 @@ einarbeiten (merge). Kein Ersetzen durch eine andere Emphase-Formel.
 **Regel:** Trailing-Emphasis-Fragment immer streichen oder in den
 vorangehenden Satz integrieren — nie durch eine ähnliche Emphase ersetzen.
 
+**Erweiterung — dramatisierende Kurzsatz-Ketten mitten im Text:** über den einzelnen angehängten Betonungssatz hinaus ist eine *Kette von ≥3 kurzen Aussagesätzen mitten im Absatz*, die Dramatik erzeugt, dasselbe Tell in stärkerer Form. Fix: die Kette in fließende Prosa umbauen (zusammenführen), nicht nur kürzen.
+
+**Vorher (Kette mitten im Absatz, danach folgt weiterer Text):**
+> Das Modell kam am Dienstag. Es veränderte alles. Das ganze Feld verschob sich. Das Team wusste es. Innerhalb eines Monats hatten drei Wettbewerber ihre Abläufe darauf umgestellt.
+
+**Nachher:**
+> Das Modell kam am Dienstag und veränderte das Feld; innerhalb eines Monats stellten drei Wettbewerber ihre Abläufe darauf um.
+
+**Eine-Passage-ein-Muster-Regel:** ein *einzelner* angehängter Betonungssatz am Absatzende → #34 (oben). Eine Kette aus *Verneinungs*-Fragmenten ("Kein X. Kein Y. Keine Z.") → **#9** (angehängte Verneinungen) — nicht hier. Eine Kette aus *≥3 affirmativen* kurzen Aussagesätzen → diese Erweiterung. (Die bestehende Notiz "weniger verbreitet im Deutschen … nur bei besonders auffälligen Fällen flaggen" gilt fort: die ≥3-Kette IST genau so ein auffälliger Fall.)
+
 **Domain note:** Weniger verbreitet im Deutschen als im Englischen; nur
 bei besonders auffälligen Fällen flaggen. DE-Prosa schließt Abschnitte
 seltener mit solchen Staccato-Fragmenten ab — wenn sie auftreten, ist
@@ -893,6 +903,20 @@ und Überabsicherung, manchmal im selben Abschnitt.
 
 **Kritische Regel:** Überbehauptung nicht durch Hinzufügen von Absicherungen
 beheben. Beheben durch Einengen der Behauptung.
+
+### 42. Aphorismus-Formeln
+
+**Problem:** Eine gewöhnliche Aussage wird als wiederverwendbare Maxime verkleidet — Bedeutungsschwere statt Präzision. Durch die konkrete gemeinte Aussage ersetzen.
+
+**Harte Tells (distinktiv):** "X ist kein Werkzeug, sondern ein Spiegel", "X wird zur Falle".
+**Weiche Tells (in der Prosa benennen, aber KEINE mechanischen Trigger — sie überfeuern auf legitimem Fachsprache-Idiom):** die bare `die Sprache <Genitiv>` / `die Währung <Genitiv>` ("die Sprache der Diplomatie", "die Währung der Aufmerksamkeit") sind etablierte Fachsprache, kein Tell.
+
+**Vorher:**
+> Vertrauen ist die Währung jeder guten Zusammenarbeit.
+**Nachher:**
+> Zusammenarbeit funktioniert, wenn die Beteiligten einander vertrauen.
+
+**Abgrenzung zu #9:** "X ist kein Werkzeug, sondern ein Spiegel" ist ein "kein A, sondern B"-Rahmen, den #9 ebenfalls besitzt — aber mit anderer Behebung. Erzeugt der Verneinungsrahmen eine Bedeutungsschwere-Maxime (Spiegel/Falle-Bild) → #42 (durch die konkrete Aussage ersetzen). Ist es eine bloße "nicht nur … sondern auch"-Abweisung → #9 (Rahmen streichen).
 
 
 ## DE-ONLY PATTERNS

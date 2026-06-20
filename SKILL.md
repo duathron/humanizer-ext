@@ -1,13 +1,13 @@
 ---
 name: humanizer
-version: 3.5.3
+version: 3.6.0
 description: |
   Use when editing or reviewing text to remove signs of AI-generated writing
   and make it sound more natural and human. Works in English and German
   (auto-detected) — the German pack adds DE-only tells (Nominalstil,
   Konjunktiv-II stacking, Denglisch, academic Rahmen-Floskeln) and a DACH
   career register for Anschreiben / Lebenslauf (formal-modest, understated).
-  Detects 41 patterns from Wikipedia's "Signs of AI writing" guide with
+  Detects 42 patterns from Wikipedia's "Signs of AI writing" guide with
   domain-aware overrides for casual, academic, legal, technical, marketing, and
   career (cover letter / CV / LinkedIn) — so passive voice in a legal brief is
   preserved while it's flagged in a blog post and cover-letter metrics are kept
@@ -35,7 +35,7 @@ Choose a mode based on the task. If the user doesn't specify, default to **Full*
 | Mode | What it does | When to use |
 |------|-------------|-------------|
 | **Quick** | Strip AI vocabulary, chatbot artifacts, sycophancy, filler, plus the unconditional mechanical tells (em-dash, Title Case, emojis, curly quotes) and copy-paste artifacts (patterns 7, 14, 17, 18, 19, 20, 22, 23, 38, 39, 40) | Short texts, minor cleanup |
-| **Full** | All 41 patterns + Tier-1 density pre-flight + length audit + final AI audit | Default — thorough rewrites |
+| **Full** | All 42 patterns + Tier-1 density pre-flight + length audit + final AI audit | Default — thorough rewrites |
 | **Voice** | Full pass + mandatory voice matching from a writing sample | When user provides their own writing as reference |
 
 ## Domain
@@ -151,7 +151,7 @@ If the user provides a writing sample (their own previous writing), **analyze it
     - **1–2 tells / 100 words:** Mixed input. Proceed with the Full pass but preserve voice quirks aggressively (apply the Detection Guidance "Signs of human writing" list).
     - **3+ tells / 100 words:** AI-heavy input. Proceed with the full Full pass.
     - Announce the result before the draft, e.g.: *"Pre-flight: 4 Tier-1 tells per 100 words → AI-heavy. Full pass."*
-6. Identify all instances of the 41 patterns above, **respecting domain overrides** (SKIP/light per the Domain table)
+6. Identify all instances of the 42 patterns above, **respecting domain overrides** (SKIP/light per the Domain table)
 7. Rewrite each problematic section
 8. **Length audit:** Could this be 20–30% shorter without losing meaning? Cut padding, redundant sentences, and restatements. (Lighter for academic and technical — precision may legitimately require length.)
 9. Ensure the revised text fits the appropriate register for the domain, varies sentence structure where appropriate, uses specific details, and maintains the right tone

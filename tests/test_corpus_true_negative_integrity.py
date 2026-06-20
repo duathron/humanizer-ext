@@ -41,4 +41,8 @@ def test_only_pattern_019_is_true_negative():
     """After SP3b, pattern_019 is the lone genuine true-neg; the 8 skill-own-example
     rows are converted to detection or deleted — none remain true_negative."""
     tn = {c.id for c in load_pattern_corpus(EN_PATTERNS) if c.true_negative}
-    assert tn == {"pattern_019_en_001"}, f"unexpected true_negative set: {tn}"
+    assert tn == {
+        "pattern_019_en_001",
+        "pattern_042_en_004", "pattern_042_en_005", "pattern_042_en_006",
+        "pattern_034_en_003",
+    }, f"unexpected true_negative set: {tn}"

@@ -481,3 +481,28 @@ def test_de_extension_keys_dont_break_clean_prose():
     hits = scan(text, lang="de")
     assert hits["de_chatbot_closer"] == 0
     assert hits["de_fake_candid_opener"] == 0
+
+
+def test_aphorism_formula_fires_en():
+    assert scan("Leadership is not a tool but a mirror of the team.", lang="en")["aphorism_formula"] >= 1
+    assert scan("Efficiency becomes a trap when teams forget the human layer.", lang="en")["aphorism_formula"] >= 1
+
+def test_aphorism_formula_silent_on_copula_and_soft_tells_en():
+    assert scan("Tuesday is the busiest day of the week.", lang="en")["aphorism_formula"] == 0
+    assert scan("The CEO is the head of the company.", lang="en")["aphorism_formula"] == 0
+    assert scan("Water is the main component of the body.", lang="en")["aphorism_formula"] == 0
+    assert scan("Diplomacy has a language of its own.", lang="en")["aphorism_formula"] == 0
+    assert scan("The euro is the currency of nineteen countries.", lang="en")["aphorism_formula"] == 0
+
+def test_de_aphorism_formula_fires():
+    assert scan("Führung ist kein Werkzeug, sondern ein Spiegel des Teams.", lang="de")["de_aphorism_formula"] >= 1
+    assert scan("Effizienz wird zur Falle, wenn Teams den Menschen vergessen.", lang="de")["de_aphorism_formula"] >= 1
+
+def test_de_aphorism_formula_silent_on_fachsprache():
+    assert scan("Die Sprache der Diplomatie ist subtil.", lang="de")["de_aphorism_formula"] == 0
+    assert scan("Aufmerksamkeit ist die Währung der sozialen Medien.", lang="de")["de_aphorism_formula"] == 0
+
+def test_de_aphorism_dont_break_clean_prose():
+    text = ("Ich verbrachte den Morgen damit, mein Fahrrad zu reparieren. "
+            "Die Kette war gerissen, was mich eine Stunde kostete.")
+    assert scan(text, lang="de")["de_aphorism_formula"] == 0

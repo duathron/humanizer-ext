@@ -14,6 +14,23 @@
       "domain": "casual",
       "source": "manual_refinement_meetup_consensus",
       "notes": "Meetup 2026-05-26 (5/3/1). Casual-domain; B/S/G defend short fragments as voice — keep but note domain."
+    },
+    {
+      "id": "pattern_034_en_002",
+      "input": "The model shipped on Tuesday. It changed everything. The whole field shifted. The team knew it. Within a month three competitors had rebuilt their pipelines around the same idea.",
+      "expected_changes": ["It changed everything.", "The whole field shifted.", "The team knew it."],
+      "expected_unchanged": [],
+      "domain": "casual",
+      "source": "upstream_v2.8.0_port_staccato_positive"
+    },
+    {
+      "id": "pattern_034_en_003",
+      "input": "The build failed. I checked the logs. A test timed out. I fixed it and pushed.",
+      "expected_changes": [],
+      "expected_unchanged": ["The build failed.", "I checked the logs.", "A test timed out."],
+      "domain": "casual",
+      "source": "staccato_negative_survive_case",
+      "true_negative": true
     }
   ]
 }

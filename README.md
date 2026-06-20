@@ -1,17 +1,17 @@
 # Humanizer (extended)
 
-![Version](https://img.shields.io/badge/version-3.5.3-blue) ![License](https://img.shields.io/badge/license-MIT-blue) ![Compatibility](https://img.shields.io/badge/claude--code-opencode-green)
+![Version](https://img.shields.io/badge/version-3.6.0-blue) ![License](https://img.shields.io/badge/license-MIT-blue) ![Compatibility](https://img.shields.io/badge/claude--code-opencode-green)
 
 A skill for Claude Code and OpenCode that removes signs of AI-generated writing from text, making it sound more natural and human.
 
-**Extended fork of [blader/humanizer](https://github.com/blader/humanizer), actively maintained.** Adds English + German (auto-detected) language packs, domain-aware overrides, 12 new patterns (41 total), a Quick/Full/Voice mode selector, a Tier-1 AI-iness density pre-flight, a Detection Guidance section (false positives + signs of human writing + LLM idiolects), a length audit, and an extended final AI audit checklist.
+**Extended fork of [blader/humanizer](https://github.com/blader/humanizer), actively maintained.** Adds English + German (auto-detected) language packs, domain-aware overrides, 12 new patterns (42 total), a Quick/Full/Voice mode selector, a Tier-1 AI-iness density pre-flight, a Detection Guidance section (false positives + signs of human writing + LLM idiolects), a length audit, and an extended final AI audit checklist.
 
 ## What's different from upstream
 
-| Area | Upstream (v2.5.1) | This fork (v3.5.3) |
+| Area | Upstream (v2.5.1) | This fork (v3.6.0) |
 |------|-------------------|--------------------|
 | Language support | English only | **English + German**, auto-detected — German pack (`patterns/de.md`) adds DE-only tells (Nominalstil, Konjunktiv-II stacking, Denglisch, academic Rahmen-Floskeln) + a DACH career register for Anschreiben / Lebenslauf; per-language domain overrides (`domains/de_overrides.md`) |
-| Total patterns | 29 | **41** — adds sentence-starter intensifiers, rhetorical questions, stacked adjectives, quantity vagueness, trailing fragments, debunking-pose headings, conditional frame stacking, miscalibrated epistemic confidence, reference-markup artifacts, placeholder text, markdown contamination, diff-anchored writing |
+| Total patterns | 29 | **42** — adds sentence-starter intensifiers, rhetorical questions, stacked adjectives, quantity vagueness, trailing fragments, debunking-pose headings, conditional frame stacking, miscalibrated epistemic confidence, reference-markup artifacts, placeholder text, markdown contamination, diff-anchored writing |
 | AI vocabulary list | base set | **expanded** with bolstered, meticulous, robust, seamless, intuitive, comprehensive, plus **era-specific clusters** (GPT-4 / GPT-4o / GPT-5 eras) for dating suspect text |
 | Modes | single behavior | **Quick / Full / Voice** selector |
 | Domain awareness | none — same rules everywhere | **6 domains** (casual, academic, legal, technical, marketing, career) with per-pattern override matrix — passive voice preserved in legal briefs, lists preserved in technical docs, promotional language preserved in marketing, metrics/proper-nouns preserved in cover letters |
@@ -107,7 +107,7 @@ The skill runs in one of three modes. If you don't specify, it defaults to **Ful
 | Mode | What it does |
 |------|-------------|
 | **Quick** | Strips AI vocabulary, chatbot artifacts, sycophancy, and filler only. Fast cleanup for short texts. |
-| **Full** | All 41 patterns, a Tier-1 AI-iness density pre-flight, a length audit (cut 20–30% padding), and an extended final AI audit checklist. Default. |
+| **Full** | All 42 patterns, a Tier-1 AI-iness density pre-flight, a length audit (cut 20–30% padding), and an extended final AI audit checklist. Default. |
 | **Voice** | Full pass plus mandatory voice matching from a writing sample you provide. |
 
 Specify a mode by including it in your prompt:
@@ -136,7 +136,7 @@ The skill detects (or accepts) a domain and adjusts which patterns are enforced.
 
 | Domain | What changes |
 |--------|-------------|
-| **casual** (default) | All 41 patterns strict; personal voice encouraged |
+| **casual** (default) | All 42 patterns strict; personal voice encouraged |
 | **academic** | Passive voice and hedging preserved; first-person discouraged; "soul" section disabled |
 | **legal** | Passive voice, hedging, and formal connectors preserved; precise impersonal register |
 | **technical** | Lists, bold, and inline-header lists preserved for scannability; direct active voice |
@@ -209,9 +209,9 @@ The skill runs a length audit to cut 20–30% of padding, then a specific final 
 
 > "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."
 
-## 41 Patterns Detected (with Before/After Examples)
+## 42 Patterns Detected (with Before/After Examples)
 
-The 41 patterns are drawn from 13 **universal** patterns (apply in any language; defined in `patterns/_universal.md`) and 28 **English-specific** patterns (defined in `patterns/en.md`). The German pack translates all 37 shared patterns into German and adds 5 DE-only extension patterns (`#100`–`#104`).
+The 42 patterns are drawn from 13 **universal** patterns (apply in any language; defined in `patterns/_universal.md`) and 29 **English-specific** patterns (defined in `patterns/en.md`). The German pack (`patterns/de.md`) re-expresses the 29 language-specific patterns in German and adds 5 DE-only extension patterns (`#100`–`#104`).
 
 ### Content Patterns
 
@@ -353,6 +353,7 @@ These apply only when the input language is German. Defined in `patterns/de.md`.
 
 ## Version History
 
+- **3.6.0** — Adds **#42 Aphorism Formulas** (manufactured-maxim tell: "X is not a tool but a mirror", "X becomes a trap"; "the language/currency of" kept as soft tells, not mechanical triggers, to avoid over-firing on legit idiom) and extends **#34** with a mid-text dramatic staccato-run sub-tell (≥3 short affirmative declaratives → merge into flowing prose). EN + DE. New deterministic `aphorism_formula`/`de_aphorism_formula` regex anchors (high-precision subset; recall via the Gate-2 full-pass removal check). #42↔#9 routing rule disambiguates the "not X but Y" frame. Count 41→42.
 - **3.5.3** — Patch: ports two upstream `blader/humanizer` v2.8.0 tells as extensions to existing patterns (no new pattern, count stays 41). **#20 Collaborative Communication Artifacts** gains offer-to-continue closers ("Want me to…?", "Should I continue?"); **#31 Rhetorical and Self-Answering Questions** gains fake-candid discourse openers ("Look,", "Here's the thing", "Honestly?"). Both in EN + DE; the German calque "Sagen wir es so" was deliberately excluded (it is a real German hedge). New deterministic `regex_scorer` keys (`chatbot_closer`/`fake_candid_opener` + DE) with FP guards proven by scorer-silence assertions; TP corpus cases added. No frozen-ID/count/true-negative-lock change.
 - **3.5.2** — Patch: commentary fence. The skill now prefixes any post-rewrite commentary/audit/notes with a `<!--HUMANIZER-AUDIT-->` sentinel so tooling cleanly separates the rewrite from commentary; the eval parser strips at the sentinel. Eval-validity hardening (free-form self-notes were inflating edit-distance, surfaced in SP3c). Gate: fence emitted on 20/20 probe runs (Wilson 95% CI [0.839, 1.0]); formatting-only — rewrite bodies unchanged directive-off vs -on. No pattern/detection/domain changes; parser-side `<!--HUMANIZER-AUDIT-->` support shipped Phase 1 (eval-only).
 - **3.5.1** - Patch: wires German into interactive auto-detect. v3.5.0 shipped the DE pack + eval but SKILL.md step 2 still declared "Supported languages … currently `en`", so interactive German input fell back to English with a warning (the eval only reached the pack via an explicit `--lang de`); step 2 now declares `en` and `de` (auto-detected, no flag). README docs pass: a "Languages" section (DE usage, DE-only tells #100–104, DACH Anschreiben register, fallback + new-language pointer), the `career` domain added to the domains table, and corrected counts (41 patterns; non-numeric audit-checklist wording). No pattern/eval changes; 302 pytest pass.

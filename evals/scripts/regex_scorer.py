@@ -115,6 +115,13 @@ PATTERNS_EN = {
         ),
         "sycophantic opener",
     ),
+    "aphorism_formula": (
+        re.compile(
+            r"\b(is not a tool but a mirror|becomes a trap)\b",
+            re.I,
+        ),
+        "manufactured-maxim aphorism (distinctive anchor)",
+    ),
     "chatbot_closer": (
         re.compile(
             r"(want me to\b[^.?!]*\?|should i continue\?)",
@@ -287,6 +294,13 @@ PATTERNS_EN = {
 
 PATTERNS_DE = {
     # --- Directness ---------------------------------------------------------
+    "de_aphorism_formula": (
+        re.compile(
+            r"(ist kein Werkzeug,? sondern ein Spiegel|wird zur Falle)",
+            re.I,
+        ),
+        "manufactured-maxim aphorism (DE distinctive anchor)",
+    ),
     "de_significance_inflation": (
         re.compile(
             r"\b(steht für|dient als|ist ein Zeugnis|ist eine Erinnerung|"
