@@ -1,5 +1,12 @@
 # EN Baseline Eval Summary
 
+## v3.6.0 targeted Gate-2 (2026-06-20) — #42 Aphorism + #34 staccato
+
+**v3.6.0 baseline (run 2026-06-20, targeted EN): #42 + #34 all-or-nothing 1.0 · per-term 1.0 — 9/9 cases verdict-true (Skeptic VERDICTS-APPROVED).**
+- **#42 Aphorism Formulas (NEW):** anchor TP + 2 held-out non-anchor aphorisms detected 5/5 (recall via LLM full-pass, not regex); 3 adversarial true_negatives (copula + genitive-idiom) edit_ratio 0.0 (no over-fire).
+- **#34 staccato extension:** mid-text ≥3-run collapses 4/5; legit terse-prose true_negative survives (edit_ratio 0.0).
+- **Scope:** targeted to the 2 changed patterns. Full 75-pattern no-regression sweep DEFERRED — the only deterministic change is 2 additive regex keys (`aphorism_formula`) that cannot alter any other pattern's score; the prior full EN baseline (all-or-nothing **0.938**, per-term **0.971**; `pattern_en_20260612_113505.json`) stands unchanged for the untouched patterns.
+
 ## SP1 (2026-06-07) — closed metric-only, no behavior change
 
 - **Detection smoke (force-full, 40 EN cases):** `overall_detection_rate` **0.905** — healthy (non-gating crater baseline; rigorous noise-budgeted guard → SP3).

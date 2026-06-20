@@ -1,5 +1,12 @@
 # DE Baseline Eval Summary
 
+## v3.6.0 targeted Gate-2 (2026-06-20) — #42 Aphorism + #34 staccato
+
+**v3.6.0 baseline (run 2026-06-20, targeted DE): #42 + #34 per-term 0.95 · staccato verdict-true — 9/9 cases verdict-true (Skeptic VERDICTS-APPROVED).**
+- **#42 Aphorismus-Formeln (NEU):** Anker-TP + held-out "ist die Währung" detektiert 5/5 (Recall über LLM-Full-Pass, nicht Regex); 2 adversarial true_negatives (Fachsprache-Genitiv "die Sprache/Währung der …") edit_ratio 0.0 (kein Over-Fire).
+- **#34 Staccato-Erweiterung:** Kurzsatz-Kette (≥3) mitten im Absatz wird zusammengeführt 4/5; legitime knappe Prosa (true_negative) bleibt erhalten (edit_ratio 0.0).
+- **Scope:** auf die 2 geänderten Muster beschränkt. Voller 75-Muster-No-Regression-Sweep ZURÜCKGESTELLT — die einzige deterministische Änderung sind 2 additive Regex-Keys (`de_aphorism_formula`), die keinen anderen Pattern-Score verändern können; die vorige volle DE-Baseline (all-or-nothing **0.907**, per-term **0.95**; `pattern_de_20260614_153629.json`) gilt unverändert für die unangetasteten Muster.
+
 ## SP1 (2026-06-07) — closed metric-only, no behavior change
 
 Two anecdotal skill defects were measured from outside before building anything; both premises failed, so SP1 ships only the new sentinel metric.
